@@ -1,0 +1,4 @@
+Rodney Rehm for his great CFPropertyList Class
+	https://github.com/rodneyrehm/CFPropertyList
+David Ferguson for his Alfred2 Workflows PHP Class
+	http://dferg.us/workflows-class/

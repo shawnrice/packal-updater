@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd">
+<dictionary title="Scripting Notifications Dictionary">
+    <suite name="Standard Suite" code="????" description="Common classes and commands for most applications.">
+		<cocoa name="NSCoreSuite"/>
+		<class name="application" code="capp" description="The application&apos;s top-level scripting object.">
+			<cocoa class="NSApplication"/>
+			<property name="name" code="pnam" description="The name of the application." type="text" access="r"/>
+            <property name="version" code="vers" description="The version number of the application." type="text" access="r"/>
+			<property name="event handlers script path" code="NUsp" description="The path to the event handlers script. This is required for calling the user notification event handlers." type="file">
+            </property>
+		</class>
+	</suite>
+    <suite name="Notifications Scripting Suite" code="NUui" description="Commands and classes controlling the Notifications Scripting application.">
+        <command name="display notification" code="NUdisnot" description="Display a notification.">
+            <direct-parameter type="text" description="the title of the notification"/>
+            <parameter name="subtitle" code="NUst" type="text" optional="yes" description="The subtitle of the notification." >
+            </parameter>
+            <parameter name="message" code="NUit" type="text" optional="yes" description="The body text of the notification." >
+            </parameter>
+            <parameter name="has action button" code="NUha" type="boolean" optional="yes" description="The notification displays an action button. Set to true by default." >
+            </parameter>
+            <parameter name="action button" code="NUab" type="text" optional="yes" description="The title of the action button displayed in the notification." >
+            </parameter>
+            <parameter name="other button" code="NUob" type="text" optional="yes" description="A custom title for the close button in an alert-style notification." >
+            </parameter>
+            <parameter name="sound name" code="NUsd" type="text" optional="yes" description="The sound to play when the notification is delivered. Use &quot;Default&quot; for the default sound played by the user notification center. The sound name is case sensitive. You can use sound files located in /System/Library/Sounds, /Library/Sounds and ~/Library/Sounds." >
+            </parameter>
+            <parameter name="delivery date" code="NUdt" type="date" optional="yes" description="The date when the notification should be delivered." >
+            </parameter>
+            <parameter name="delivery time zone" code="NUtz" type="text" optional="yes" description="The time zone to interpret the delivery date." >
+                <cocoa key="timeZone"/>
+            </parameter>
+            <parameter name="user info" code="NUus"  type="record" optional="yes" description="Specific user info that can be attached to the notification. The user info content must be of reasonable serialized size (less than 1k). The supported types are text, integer, real, boolean, date, alias, file and POSIX file." >
+            </parameter>
+        </command>
+       </suite>
+    <suite name="Notifications Scripting Event Handler Suite" code="sgnn" description="Commands that are executed as Notifications Scripting event handlers.">
+        <event name="notification activated" code="NUdiactv" description="This handler is called when a notification was activated.">
+            <parameter name="title" code="NUtt" type="text" optional="yes" description="The title of the notification." >
+            </parameter>
+            <parameter name="subtitle" code="NUst" type="text" optional="yes" description="The subtitle of the notification." >
+                <cocoa key="subtitle"/>
+            </parameter>
+            <parameter name="message" code="NUit" type="text" optional="yes" description="The body text of the notification." >
+                <cocoa key="informativeText"/>
+            </parameter>
+            <parameter name="delivered date" code="NUdd" type="date" optional="yes" description="The date when the notification was delivered." >
+                <cocoa key="date"/>
+            </parameter>
+            <parameter name="activation type" code="NUat" type="integer" optional="yes" description="A constant that describe how the user notification was activated." >
+            </parameter>
+            <documentation>
+                <html>
+                    <![CDATA[
+                        <p>These constants describe how the user notification was activated :</br>
+                        1 : the user clicked on the contents of the notification alert</br>
+                        2 : the user clicked on the action button of the notification alert
+                        </p>
+                    ]]>
+                </html>
+            </documentation>
+            <parameter name="user info" code="NUus" type="record" optional="yes" description="Specific user info that can be attached to the notification." >
+            </parameter>
+         </event>
+        <event name="notification delivered" code="NUdidlvd" description="This handler is called when a notification was delivered.">
+            <parameter name="title" code="NUtt" type="text" optional="yes" description="The title of the notification." >
+            </parameter>
+            <parameter name="subtitle" code="NUst" type="text" optional="yes" description="The subtitle of the notification." >
+                <cocoa key="subtitle"/>
+            </parameter>
+            <parameter name="message" code="NUit" type="text" optional="yes" description="The body text of the notification." >
+                <cocoa key="informativeText"/>
+            </parameter>
+            <parameter name="actual delivery date" code="NUdd" type="date" optional="yes" description="The date this notification was actually delivered." >
+            </parameter>
+            <parameter name="user info" code="NUus" type="record" optional="yes" description="Specific user info that can be attached to the notification." >
+            </parameter>
+        </event>
+    </suite> 
+</dictionary>

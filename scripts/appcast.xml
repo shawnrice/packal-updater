@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<workflow>
+  <name>Caffeinate Control</name>
+  <uuid>203e161c-2cb5-42d0-b874-cce88ffe48b3</uuid>
+  <version>2</version>
+  <bundle>com.shawn.patrick.rice.caffeinate.control</bundle>
+  <updated>1383433979</updated>
+  <file>caffeinate_control.alfredworkflow</file>
+  <signature>oqlsCxvwuBgV0DijSc8JTNtU7KQH+SHDEsE9Z3J9cjO2naJjVNExsNN4Pr3itynYlrGKycesJcwokOcN4/ulQIaroxQB1evdQ2352PCCIQiF5MGT+DRP6nlk0h8PRdggIdtfM84l/WStNmGDRallinj1OsaLS1U5i0yylL3dTDc=</signature>
+</workflow>

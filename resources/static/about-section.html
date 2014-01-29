@@ -1,0 +1,40 @@
+<div id="">
+	<h3>About Packal</h3>
+</div>
+<div id="about"  class='body-text'>
+<p id="demo"></p>
+
+
+	<p>The Packal Workflow is a companion to the website <a href="http://packal.org">Packal.org</a>, which is a repository for Alfred2 Workflows and Themes. It also has a bit of developer documentation for creating Workflows.</p>
+	<p>This Workflow interfaces with the website in order to provide seamless updates for your Workflows.</p>
+	<h4>How it Works</h4>
+	<h5>Migration Security</h5>
+	<p>Packal uses a method of updating Workflows that I worked out with Andrew (the author of Alfred2). Workflows need some specific alterations to the plist files when they are updated, and Alfred2 runs these natively when you import the Workflow. Understandably, Alfred2 gives you prompts whenever you update a Workflow manually, which becomes a bit inelegant when you want to update multiple Workflows at once. Packal runs a script that migrates the settings from a previously installed Workflow to the new version, ensuring the same security.</p>
+	<h5>Code Signing</h5>
+	<p>Packal interfaces <em>only</em> with the Packal website and will not pull Workflow updates from any other source. This behavior not only simplifies the update logic in the Workflow, but it also allows us to sign the packages to ensure that they originate from the Packal website and haven't been altered. The signing ensures that the Workflow update hasn't been compromised</p>
+	<h5>Virus Scanning</h5>
+	<p>Each Workflow is subjected to a virus scan when uploaded to the Packal website. This scan is run on the initial Workflow, and it is also run on every subsequent update before any update is available to the public to download either through the site or via this Workflow. Hence, we do all that we can in order to make sure that you aren't receiving any sort of malware. That being said, however, doesn't guarantee that a Workflow won't do bad things to your computer; after all, Workflows, by their very nature, are simply scripts that can manipulate files and run background processes. Logistically, we can't check the code for each Workflow when it is updated, so malware is possible, but it is unlikely. The website has a mechanism to report a poorly behaving Workflow, which then can be removed from the repository.</p>
+	<h4>Why Not Other Updating Methods?</h4>
+	<p>The only functioning framework for updating Workflows, at the time of writing this, is Alleyoop, written by Daniel Shannon, and it is a great resource, but he always meant for it to be a stopgap measure until something like Packal was created. Originally, Alleyoop included Workflow updating that was similar to Packal, but Andrew expressed concerns about update security, and so Daniel changed the framework so that it would only download Workflows rather than update them. In addition, it requires developers to implement Alleyoop. Daniel made the implementation simple, but it added one more step. With Packal, all the developer has to do is upload the new file, and everything is good. Alleyoop is great, but Packal has made it obsolete.</p>
+	<p>Packal has the additional benefit of being a centralized location to find Workflows rather than having to comb through the Alfred forums to find them. So that's rad.</p>
+
+	<h4>What's Included in the Packal Workflow?</h4>
+	<p>The Packal Workflow is a bit heavier than most Workflows because it is bundled with a few applications.</p>
+	<ul>
+		<li>A PHP-CLI 5.4 binaray;</li>
+		<li>An Automator application that allows viewing webpages in a dismissable pop-up (you're reading this in it);</li>
+		<li>An Automator application that interacts with the native notification center, which acts as a fallback when Growl isn't available.</li>
+	</ul>
+	<p>These items were necessary because of how Packal works with your Workflows. The configurations are potentially numerous enough that I needed an easier interface than Alfred could provide or regular Applescript dialogs. I didn't want to make it so that someone needed to alter a configuation file with a text editor, especially since some of the options require a precise syntax, which would be easy to mess up.</p>
+	<h4>Why Can't I Update All of my Workflows with Packal?</h4>
+	<p>The answer is simple: Packal interfaces only with the Packal.org website. If developers choose not to upload their Workflows onto Packal, then we will respect that and not hijack their work. Also, Packal prevents, as far as it is possible, for other people to upload Workflows that they didn't write. Only the person who submitted the Workflow to Packal initially can update it on the site. This helps ensure code integrity.</p>
+	<h4>So, there is a Workflow on Packal that I Have, but the Packal Workflow Doesn't Recognize It</h4>
+	<p>The Packal Workflow checks to see if a downloaded Workflow originally came from Packal. If it didn't, then we won't touch it. However, there are two ways to register a Workflow with Packal:
+		<ol>
+			<li>Download a new copy of it from the Packal website; or</li>
+			<li>Run the "packal configure" command and have Packal do it for you</li>
+		</ol>
+	Option #2 isn't guaranteed to work, unfortunately. We rely on matching the <em>bundle id</em> set in the Workflow for updating purposes. If the installed version of your Workflow doesn't have a bundle id set, then Packal ignores it entirely. If you set the bundle id manually to the one that appears on the Packal website, then you can register it with Packal via method #2, although, at that point, doing #1 seems faster.</p>
+	<h4>Packal Commands</h4>
+	<p>To be written</p>
+</div>

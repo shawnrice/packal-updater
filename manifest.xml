@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<manifest>
+  <workflow>
+    <name>Workflow Help Workflows</name>
+    <uuid>650a22ca-7445-4e2b-9cea-e1f6b89d1592</uuid>
+    <version>1.05</version>
+    <bundle>com.help.shawn.rice</bundle>
+    <updated>1383633514</updated>
+    <file>workflow_help_workflows.alfredworkflow</file>
+    <icon>helpwfkl.png</icon>
+  </workflow>
+  <workflow>
+    <name>Wolfram|Alpha</name>
+    <uuid>6257dd4f-3a7c-4283-a1d3-92bb67f69ce3</uuid>
+    <version>1.0</version>
+    <bundle>tylereich.wolframalpha</bundle>
+    <updated>1383623105</updated>
+    <file>wolframalpha.alfredworkflow</file>
+    <icon>icon.png</icon>
+  </workflow>
+  <workflow>
+    <name>VideoTime</name>
+    <uuid>46c9819d-16d1-4e52-9da6-5c7855613c56</uuid>
+    <version>1.0</version>
+    <bundle>com.cusotmct.VideoTIme</bundle>
+    <updated>1383813795</updated>
+    <file>videotime.alfredworkflow</file>
+    <icon>videotime.png</icon>
+  </workflow>
+  <workflow>
+    <name>TextSoap Cleaners</name>
+    <uuid>3998c72f-0b94-49c7-b3de-0ce4e2091529</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.TextSoapCleaners</bundle>
+    <updated>1383813891</updated>
+    <file>textsoapcleaners.alfredworkflow</file>
+    <icon>textsoapcleaners.png</icon>
+  </workflow>
+  <workflow>
+    <name>Text Massagers</name>
+    <uuid>ddd9870e-7746-403c-9601-37d1f6d1fe92</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.TextMassagers</bundle>
+    <updated>1383813850</updated>
+    <file>textmassagers.alfredworkflow</file>
+    <icon>textmassagers.png</icon>
+  </workflow>
+  <workflow>
+    <name>Text Manipulator</name>
+    <uuid>5c73b684-ef5e-4105-803f-82a1c84c3f17</uuid>
+    <version>1.0</version>
+    <bundle>com.textmanipulator.shawn.patrick.rice</bundle>
+    <updated>1383505559</updated>
+    <file>text_manipulator.alfredworkflow</file>
+    <icon>icon.png</icon>
+  </workflow>
+  <workflow>
+    <name>Sudoers</name>
+    <uuid>7c0abf5b-d05f-43e8-8a27-33cef2215e2c</uuid>
+    <version>1.0</version>
+    <bundle>com.shawn.patrick.rice.sudoers</bundle>
+    <updated>1383624317</updated>
+    <file>sudoers.alfredworkflow</file>
+    <icon>red-lock.png</icon>
+  </workflow>
+  <workflow>
+    <name>Screenshot Settings</name>
+    <uuid>2a8e6d56-60de-4ea6-893f-40a6d8d084a9</uuid>
+    <version>1.0</version>
+    <bundle>com.cmchap.screenshotsettings</bundle>
+    <updated>1383693403</updated>
+    <file>screenshot_settings.alfredworkflow</file>
+    <icon>icon.png</icon>
+  </workflow>
+  <workflow>
+    <name>s3cmd Toolkit</name>
+    <uuid>0b18fcbb-1824-478c-bc4b-1637f74a515b</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.s3cmd</bundle>
+    <updated>1383813953</updated>
+    <file>s3cmdtoolkit.alfredworkflow</file>
+    <icon>s3cmdtookit.png</icon>
+  </workflow>
+  <workflow>
+    <name>Octopow</name>
+    <uuid>c9b56c47-dea0-4041-ba3c-95d5966954a6</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.octopow</bundle>
+    <updated>1383814052</updated>
+    <file>octopow.alfredworkflow</file>
+    <icon>octopow.png</icon>
+  </workflow>
+  <workflow>
+    <name>Next Item</name>
+    <uuid>e6d66ab9-e463-47f3-b90d-351853819fb8</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.NextItem</bundle>
+    <updated>1383814006</updated>
+    <file>nextitem.alfredworkflow</file>
+    <icon>nextitem.png</icon>
+  </workflow>
+  <workflow>
+    <name>File Name Sequencer</name>
+    <uuid>08ec6ba2-2d33-47f0-8e2e-2292fe7a7ad6</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.filenamesequencer</bundle>
+    <updated>1383814105</updated>
+    <file>filenamesequencer.alfredworkflow</file>
+    <icon>filenamesequencer.png</icon>
+  </workflow>
+  <workflow>
+    <name>ExpanDrive Toolkit</name>
+    <uuid>033738b2-2468-40bf-a3cb-11ae83d88eaa</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.ExpanDrive</bundle>
+    <updated>1383814156</updated>
+    <file>expandrivetoolkit.alfredworkflow</file>
+    <icon>expandrivetoolkit.png</icon>
+  </workflow>
+  <workflow>
+    <name>DHCP Toggle</name>
+    <uuid>b1df7f4b-9451-4823-b755-cfb004e3a643</uuid>
+    <version>1.0</version>
+    <bundle>com.shawn.patrick.rice.dhcp.toggle</bundle>
+    <updated>1383516880</updated>
+    <file>dhcp_toggle.alfredworkflow</file>
+    <icon>3d7639f7-afb2-486e-a6e4-5ea424058245.png</icon>
+  </workflow>
+  <workflow>
+    <name>Compress Image</name>
+    <uuid>aeb5a828-5837-4766-836e-8b4de020ee7b</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.CompressImage</bundle>
+    <updated>1383814207</updated>
+    <file>compressimage.alfredworkflow</file>
+    <icon>compressimage.png</icon>
+  </workflow>
+  <workflow>
+    <name>Colors</name>
+    <uuid>1ab19fe9-9ec1-4ad8-8b4d-4b956f51cfc2</uuid>
+    <version>1.4.1</version>
+    <bundle>tylereich.colors</bundle>
+    <updated>1383516635</updated>
+    <file>colors.v1.41.alfredworkflow</file>
+    <icon>icon.png</icon>
+  </workflow>
+  <workflow>
+    <name>Calca Tookit</name>
+    <uuid>f9f5b33d-0dc6-422d-a448-5e3d5d1086aa</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.Calca</bundle>
+    <updated>1383814268</updated>
+    <file>calcatoolkit.alfredworkflow</file>
+    <icon>calcatoolkit.png</icon>
+  </workflow>
+  <workflow>
+    <name>Caffeinate Control</name>
+    <uuid>203e161c-2cb5-42d0-b874-cce88ffe48b3</uuid>
+    <version>2.0</version>
+    <bundle>com.shawn.patrick.rice.caffeinate.control</bundle>
+    <updated>1383644658</updated>
+    <file>caffeinate_control.alfredworkflow</file>
+    <icon>icon.png</icon>
+  </workflow>
+  <workflow>
+    <name>Alfred Time Keeper</name>
+    <uuid>26267d61-5267-47c5-9942-a775fffddc60</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.AlfredTimeKeeper</bundle>
+    <updated>1383814358</updated>
+    <file>alfredtimekeeper.alfredworkflow</file>
+    <icon>alfredtimekeeper.png</icon>
+  </workflow>
+  <workflow>
+    <name>Alfred Bible</name>
+    <uuid>fb0a3a19-cceb-43cc-b159-fc036f31d427</uuid>
+    <version>1.0</version>
+    <bundle>com.customct.AlfredBible</bundle>
+    <updated>1383814314</updated>
+    <file>alfredbible.alfredworkflow</file>
+    <icon>alfredbible.png</icon>
+  </workflow>
+</manifest>

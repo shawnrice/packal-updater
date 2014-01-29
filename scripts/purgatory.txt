@@ -1,0 +1,117 @@
+<?php
+if ( checkServer() ) {
+?>
+	<div class='informational message' onclick="$(this).fadeOut('3000'); $('div.section').delay('100').animate({top: '-=50'},400);">
+	<div class='close-box'>x</div><div>The server is reachable.</div></div>
+<?php
+} else {
+?>
+	<div class='warning message'>The server is not reachable. An Internet connection is needed to update your Workflows, but you can still configure Packal's behavior offline.</div>
+<?php
+}
+?>
+
+
+
+----
+
+
+Configuration for the Workflows
+---
+
+<!-- Here are the individual workflows that Packal controls. -->
+<div id="workflow" class="section">
+	<h4>Workflows with Bundles</h4>
+	<table id="workflow-list">
+<?php
+// Create the form to specify which workflows are available for Packal to control.
+$stripe = true;
+foreach ( $availableWorkflows as $workflow ) {
+	if ( $stripe ) { 
+		$bg = "background-a";
+		$stripe = false;
+	}
+	else {
+		$bg = "background-b";
+		$stripe = true;
+	}
+	echo "
+		<tr class='$bg'>
+		<td class='test'>
+			<table style='width: 100%; text-align: left;'>
+				<tr>
+					<td class='tdd td-input'><div class='switch'><input id='" . $workflow['bundle'] . "' type='checkbox' name='" . $workflow['bundle'] . "'><label></label></div></td>
+
+					<td class='tdd'><label for='" . $workflow['bundle'] . "'>" . $workflow['name'] . "</label></td>
+					<td class='tdd' style='font-size:9px; text-shadow: none; text-align: right;'>(" . $workflow['bundle'] . ")</td>
+				</tr>
+			</table>
+		</td>
+		</tr>
+		<tr class='spacer'><td class='spacer'>&nbsp;</td></tr>";
+}
+?>
+	</table>
+</div>
+
+
+
+
+
+
+
+
+
+/**
+ *
+ *  Below is a legacy function that will be used to expand migration later to preserve
+ *  things like notification settings, etc...
+ *
+ * 	For now, it's unused.
+ * 
+ */
+function returnObject ( $object ) {
+
+  switch ($object['type']) {
+    case 'alfred.workflow.trigger.hotkey':
+      $value = array(
+        'type' => 'hotkey',
+        'uuid' => $object['uid'],
+        'action' => $object['config']['action'],
+        'argument' => $object['config']['argument'],
+        'hotkey' => $object['config']['hotkey'],
+        'hotmod' => $object['config']['hotmod'],
+        'leftcursor' => $object['config']['leftcursor'],
+        'modsmode' => $object['config']['modsmode']
+        );
+      break;
+
+    case 'alfred.workflow.output.notification':
+      $value = array(
+        'type' => 'notification',
+        'uuid' => $object['uid'],
+        'kind' => $object['config']['output']
+        );
+      break;
+
+    case 'alfred.workflow.input.scriptfilter':
+      $value = array(
+        'type' => 'scriptfilter',
+        'uuid' => $object['uid'],
+        'keyword' => $object['config']['keyword']
+        );
+      break;
+
+    case 'alfred.workflow.input.keyword':
+      $value = array(
+        'type' => 'keyword',
+        'uuid' => $object['uid'],
+        'keyword' => $object['config']['keyword']
+        );
+      break;
+    default:
+      return "None";
+      break;
+  }
+  return $value;
+}
