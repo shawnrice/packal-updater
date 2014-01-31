@@ -5,24 +5,27 @@
  * @version 1.0 this version tag is parsed
  */
 
-namespace CFPropertyList;
+// namespace CFPropertyList;
 
 /**
  * Require CFPropertyList
  */
-require_once(__DIR__.'/../libraries/CFPropertyList/classes/CFPropertyList/CFPropertyList.php');
+foreach (glob("CFPropertyList/*.php") as $filename) 
+{ 
+    require_once $filename; 
+}
 // require_once(__DIR__.'/check-server-status.php');
 /**
  * Require David Ferguson's Workflows class
  */
-require_once('../libraries/workflows.php');
+require_once('workflows.php');
 
 /**
  * Write the initial 'keep-alive' zombie file before letting the js maintain it.
  * This call just ensures that the kill-webserver script doesn't kill the webserver
  * too soon. It's probably uncessary, but it's a nice safety net.
  */
-require_once('webserver-keep-alive-update.php');
+// require_once('webserver-keep-alive-update.php');
 
 // Add the plist functions for later use...
 require_once('plist-functions.php');
@@ -49,7 +52,7 @@ if ( shell_exec( $cmd ) ) {
  *
  *
  */
-include('../resources/templates/header.php');
+// include('../resources/templates/header.php');
 // This includes the keep alive function.
 // Within that, we could also have something that checks the external internet connection
 // If it fails, then we disable the update functionality, and if it passes, then we enable it.
@@ -238,7 +241,9 @@ function str_replace( needle , replace , haystack ) {
 // $data/global/manifest.xml
 // We'll get the copy from github
 
-$manifest = simplexml_load_file('../manifest.xml');
+var_dump(file_exists('purgatory.txt'));
+
+$manifest = simplexml_load_file('manifest.xml');
 
 // Set blank variables for use shortly...
 
