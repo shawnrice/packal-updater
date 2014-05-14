@@ -6,7 +6,7 @@
  * 
  */
 
-require_once( 'libraries/workflows.php' );
+require_once( __DIR__.'/../libraries/workflows.php' );
 require_once( 'first-run.php' );
 
 $w = new Workflows;
