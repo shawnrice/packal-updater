@@ -248,6 +248,11 @@ body {
 
 }
 
+.table-info {
+    width: 50%;
+    background-color: #ccc;
+}
+
 .letterpress h1 {
     margin:0;
     padding:0;
