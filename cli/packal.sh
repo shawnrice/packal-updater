@@ -179,7 +179,7 @@ backup() {
 
 }
 
-restoreBack() {
+restoreBackup() {
   # Right now this function is empty.
   a=1
 }

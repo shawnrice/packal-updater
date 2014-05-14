@@ -1,5 +1,7 @@
 <?php
 
+require_once( 'includes/plist-migration.php' );
+
 $bundle   = "com.packal.shawn.patrick.rice";
 $HOME     = exec( 'echo $HOME' );
 $data     = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
@@ -8,6 +10,7 @@ $cache    = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/
 $manifest = "$data/manifest.xml";
 $config   = "$data/config/config.xml";
 
+$repo = "https://github.com/packal/repository/raw/master";
 
 $function = $argv[1];
 unset( $argv[0] );
@@ -129,9 +132,64 @@ function getConfirmation( $yes = FALSE ) {
   return $response;
 }
 
-function doUpdate( $bundle ) {
+function doUpdate( $bundle, $force = FALSE ) {
 
-  
+  global $data, $cache, $manifest, $repo;
+
+  if ( is_array( $bundle ) ) {
+    $bundle = $bundle[0];
+  }
+
+  $dir = trim( `./packal.sh getDir "$bundle" 2> /dev/null` );
+
+
+  if ( ! file_exists( "$dir/packal/package.xml" ) ) {
+    echo "Error: No package information exists.";
+    return FALSE;
+  }
+
+  $xml = simplexml_load_file( "$manifest" );
+
+  foreach ( $xml as $x ) :
+    if ( "$x->bundle" != "$bundle" )
+      continue;
+
+    $xml = $x;
+    break;
+
+  endforeach;
+
+  // Make the temporary directories.
+  if ( ! file_exists( "$cache/update" ) )
+    mkdir( "$cache/update" );
+  if ( ! file_exists( "$cache/update/$bundle" ) )
+    mkdir( "$cache/update/$bundle" );
+  if ( ! file_exists( "$cache/update/$bundle/tmp" ) )
+    mkdir( "$cache/update/$bundle/tmp" );
+
+  `curl -sL "$repo/$bundle/$xml->file" > "$cache/update/$bundle/$xml->file"`;
+  `curl -sL "$repo/$bundle/appcast.xml" > "$cache/update/$bundle/appcast.xml"`;
+  `unzip -qo "$cache/update/$bundle/$xml->file" -d "$cache/update/$bundle/tmp"`;
+
+
+  $valid = verifySignature( "$cache/update/$bundle/appcast.xml",
+                            "$cache/update/$bundle/$xml->file",
+                            "$dir/packal/$bundle.pub"
+          );
+
+  if ( ! $valid ) {
+    echo "Error: Cannot verify signature for $xml->file from $bundle.";
+    return FALSE;
+  }
+
+  // Why can't I just include the function, call it, and be done with it?
+  // It's too late to figure that out.
+  `php includes/plist-migration "$dir/info.plist" "$cache/update/$bundle/tmp/info.plist"`;
+
+
+
+  // Backup the bundle.
+  // `./packal.sh backup "$bundle"`;
 
 }
 
@@ -170,6 +228,38 @@ function setOption( $opt = array(), $value ) {
 }
 
 
+/**
+ * Checks to the signature of a package
+ * @param  string 	$appcast 	an xml file containing the signature (path)
+ * @param  string 	$package 	a file that has been signed (path)
+ * @param  string 	$key     	the public key to use for checking (path)
+ * @return [type]          [description]
+ */
+function verifySignature( $appcast , $package , $key ) {
+
+  $appcast = simplexml_load_file($appcast);
+  $signature = $appcast->signature;
+
+  $data = sha1_file( $package , false );
+
+  // fetch public key from certificate and ready it
+  $fp = fopen( $key , 'r' );
+  $cert = fread( $fp , filesize( $key ) );
+  fclose( $fp );
+
+  // Get the public key
+  $id = openssl_get_publickey( $cert );
+
+  // Get the result of the signature
+  $result = openssl_verify( $data , base64_decode( $signature ) , $id , OPENSSL_ALGO_SHA1 );
+
+  // Free key from memory
+  openssl_free_key( $id );
+
+  // Return the result
+  return $result;
+
+}
 
 function validateAPI( $key ) {
   // To be written.

@@ -5,7 +5,10 @@ namespace CFPropertyList;
 /**
 * Require CFPropertyList
 */
-require_once('../../libraries/CFPropertyList/classes/CFPropertyList/CFPropertyList.php');
+require_once( '../libraries/CFPropertyList/classes/CFPropertyList/CFPropertyList.php' );
+require_once( 'plist-functions.php' );
+
+migratePlist( $argv[1], $argv[2] );
 
 /**
  * Migrates the hotkeys and keywords from the current plist to the new version. It alters the actual files.
@@ -13,7 +16,7 @@ require_once('../../libraries/CFPropertyList/classes/CFPropertyList/CFPropertyLi
  * @param  string $new     The new plist file
  * @return mixed           Either "true" or an error code
  */
-function migratePlist( $current, $new ) {
+function migratePlist($current, $new) {
 	if (! file_exists($current) ) {
 		return 1; // Error Code #1 is original file doesn't exist
 	}
