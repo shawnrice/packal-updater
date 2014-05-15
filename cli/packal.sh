@@ -77,7 +77,6 @@ generateMap() {
   # Creates a map of bundles and directories.
 
   path="$( cd "$(dirname "$0")/.." ; pwd -P )"
-  # data="$HOME/Library/Application Support/Alfred 2/Workflow Data/com.api"
   endpoints="$data/endpoints"
   me=$(basename "$path")
 

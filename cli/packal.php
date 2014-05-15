@@ -50,9 +50,9 @@ function setOption( $opt = array(), $value ) {
                     'username',
                     'api_key' );
 
-  $bool   = array( 'auto_add',
-                   'report',
-                   'notify' );
+  $bool   = array(  'auto_add',
+                    'report',
+                    'notify' );
 
   if ( ! in_array( $opt[0] ) ) {
     echo "Error: invalid option.";
@@ -105,8 +105,29 @@ function checkUpdate( $wf ) {
 /**
  * Checks updates for all workflows (that are on Packal)
  */
-function checkUpdates( $force = FALSE ) {
+function checkUpdates( $opt = array() ) {
   global $manifest, $cache;
+
+  print_r( $opt );
+
+
+  if ( isset( $opt[0] ) ) {
+    if ( $opt[0] == 1 )
+      $yes = TRUE;
+    else
+      $yes = FALSE;
+  } else {
+    $yes = FALSE;
+  }
+  if ( isset( $opt[1] ) ) {
+    if ( $opt[1] == 1 )
+      $force = TRUE;
+    else
+      $force = FALSE;
+  } else {
+    $force = FALSE;
+  }
+
 
   $xml = simplexml_load_file( "$manifest" );
   $me  = getOption( array( 'username', TRUE ) );
@@ -142,6 +163,17 @@ function checkUpdates( $force = FALSE ) {
       }
       echo "\n";
       $i++;
+    } else {
+      if ( $force == FALSE )
+        continue;
+
+      echo "Checking $i... Forcing Update for $w->name ($w->bundle)";
+
+      file_put_contents( "$cache/updates", $w->bundle . "\n", FILE_APPEND );
+      $updatable[] = array( (string) $w->name, "Forced Update", (string) $w->version, (string) $w->bundle );
+      echo "\n";
+      $i++;
+
     }
 
 
@@ -166,7 +198,7 @@ function checkUpdates( $force = FALSE ) {
   echo "\n";
   echo "* Note: Packal tracks updates on timestamps not version numbers, so if these seem off, then the workflow author did not update the version number.\n";
   echo "\n";
-  $conf = getConfirmation( $force );
+  $conf = getConfirmation( $yes );
 
   if ( $conf ) {
     foreach ( $updatable as $u ) :
@@ -225,10 +257,15 @@ function doUpdate( $bundle, $force = FALSE ) {
 
   $dir = trim( `./packal.sh getDir "$bundle" 2> /dev/null` );
 
-
-  if ( ! file_exists( "$dir/packal/package.xml" ) ) {
-    echo "Error: No package information exists.";
-    return FALSE;
+  // The force variable means to download even if the original
+  // is not from Packal. Obviously, since we don't have the
+  // update data, this just means to download the update no
+  // matter what and to get everything.
+  if ( ! $force ) {
+    if ( ! file_exists( "$dir/packal/package.xml" ) ) {
+      echo "Error: No package information exists.";
+      return FALSE;
+    }
   }
 
   $xml = simplexml_load_file( "$manifest" );
