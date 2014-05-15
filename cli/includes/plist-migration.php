@@ -30,7 +30,7 @@ function migratePlist( $current, $new ) {
 
 	// Construct the workflow plist objects
 	$workflow = new CFPropertyList( $current );
-	$import = new CFPropertyList( $new );
+	$import   = new CFPropertyList( $new );
 
 	// Declare an array to store the data about the original plist in.
 	$original = array();

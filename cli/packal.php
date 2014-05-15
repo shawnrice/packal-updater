@@ -122,7 +122,7 @@ function checkUpdates( $force = FALSE ) {
       continue;
 
     if ( "$w->author" == "$me" ) {
-      echo "Skipping $i... $w->name\n";
+      echo "* Skipping $i... $w->name ($w->bundle)\n";
       $i++;
       continue;
     }
@@ -130,7 +130,7 @@ function checkUpdates( $force = FALSE ) {
 
 
     if ( file_exists( "$dir/packal/package.xml" ) ) {
-      echo "Checking $i... $w->name";
+      echo "Checking $i... $w->name ($w->bundle)";
 
       $wf = simplexml_load_file( "$dir/packal/package.xml" );
       $wf->updated += 120; // Compensation for time in the generated packages.
@@ -257,10 +257,11 @@ function doUpdate( $bundle, $force = FALSE ) {
   $cmd = "php includes/plist-migration.php \"$dir/info.plist\" \"$cache/update/$bundle/tmp/info.plist\"";
   exec( "$cmd" );
 
-
-
   // Backup the bundle.
-  // `./packal.sh backup "$bundle"`;
+  `./packal.sh backup "$bundle"`;
+
+  $cmd = "./packal.sh replaceFiles \"$dir\" \"$cache/update/$bundle/tmp/\"";
+  exec( "$cmd" );
 
 }
 

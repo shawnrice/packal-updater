@@ -179,6 +179,15 @@ backup() {
 
 }
 
+replaceFiles() {
+  old="$1"
+  new="$2"
+  cd "$old"
+  rm -fR *
+  mv -f "$new"* .
+  cd -
+}
+
 restoreBackup() {
   # Right now this function is empty.
   a=1
@@ -210,6 +219,9 @@ elif [ "$1" = "checkUpdate" ]; then
 
 elif [ "$1" = "backup" ]; then
   backup "$2"
+
+elif [ "$1" = "replaceFiles" ]; then
+  replaceFiles "$2" "$3"
 
 else
   echo "Error: invalid command ($1)"
