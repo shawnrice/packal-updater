@@ -24,6 +24,8 @@ else
   echo "Undefined method: $function";
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// Option functions
 
 function getOption( $opt = array() ) {
   global $data, $config;
@@ -36,6 +38,47 @@ function getOption( $opt = array() ) {
   echo $config->$opt[0];
 
 }
+
+function setOption( $opt = array(), $value ) {
+
+  global $config;
+
+  $options = array( 'backup',
+                    'auto_add',
+                    'report',
+                    'notify',
+                    'username',
+                    'api_key' );
+
+  $bool   = array( 'auto_add',
+                   'report',
+                   'notify' );
+
+  if ( ! in_array( $opt[0] ) ) {
+    echo "Error: invalid option.";
+    return FALSE;
+  } else if ( in_array( $opt[0], $bool ) && ( ! ( $value == 0 || $value == 1 ) ) ) {
+    echo "Error: $opt[0] value must be 0 or 1.";
+    return FALSE;
+  } else if ( ( $opt[0] == "backup" ) && ( ! is_numeric( $value ) ) ) {
+    echo "Error: $opt[0] value must be numeric.";
+  }
+
+  // Load the config
+  $xml = simplexml_load_file( $config );
+
+  $xml->$opt[0] = $value;
+
+  // Save the config again.
+  $xml->asXml( $config );
+}
+
+function validateAPI( $key ) {
+  // To be written.
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Check single update
 
 function checkUpdate( $wf ) {
   global $manifest;
@@ -56,7 +99,13 @@ function checkUpdate( $wf ) {
   endforeach;
 }
 
-function checkUpdates() {
+////////////////////////////////////////////////////////////////////////////////
+/// Check and do all updates
+
+/**
+ * Checks updates for all workflows (that are on Packal)
+ */
+function checkUpdates( $force = FALSE ) {
   global $manifest, $cache;
 
   $xml = simplexml_load_file( "$manifest" );
@@ -72,23 +121,31 @@ function checkUpdates() {
     if ( $dir == "FALSE" )
       continue;
 
-    if ( "$w->author" == "$me" )
+    if ( "$w->author" == "$me" ) {
+      echo "Skipping $i... $w->name\n";
+      $i++;
       continue;
+    }
 
-    echo "Checking $i... $w->name";
+
 
     if ( file_exists( "$dir/packal/package.xml" ) ) {
+      echo "Checking $i... $w->name";
 
       $wf = simplexml_load_file( "$dir/packal/package.xml" );
       $wf->updated += 120; // Compensation for time in the generated packages.
-      echo " — Update Available";
-      if ( "$w->updated" > "$wf->updated" )
-        file_put_contents( "$cache/updates", $w->bundle . "\n", FILE_APPEND );
-        $updatable[] = array( (string) $w->name, (string) $w->version );
-    }
-    echo "\n";
 
-    $i++;
+      if ( "$w->updated" > "$wf->updated" ) {
+        echo " — Update Available";
+        file_put_contents( "$cache/updates", $w->bundle . "\n", FILE_APPEND );
+        $updatable[] = array( (string) $w->name, (string) $wf->version, (string) $w->version );
+      }
+      echo "\n";
+      $i++;
+    }
+
+
+
   endforeach;
 
   if ( ! count( $updatable > 0 ) )
@@ -97,7 +154,7 @@ function checkUpdates() {
   echo "Updates available for: ";
   $count = count( $updatable ) - 1;
   foreach ( $updatable as $u ) {
-    echo "$u[0] ($u[1])";
+    echo "$u[0] ($u[1] -> $u[2])";
     if ( $count > 0 )
       echo ", ";
     else
@@ -105,12 +162,17 @@ function checkUpdates() {
     $count--;
   }
   echo "\n";
-
-  $conf = getConfirmation( TRUE );
+  echo "* Note: Packal tracks updates on timestamps not version numbers, so if these seem off, then the workflow author did not update the version number.\n";
+  echo "\n";
+  $conf = getConfirmation( $force );
   print_r($conf);
 
 }
 
+/**
+ * Get update confirmation from the user via command line
+ * @param bool $yes = FALSE Automatically confirm.
+ */
 function getConfirmation( $yes = FALSE ) {
 
   if ( $yes ) {
@@ -132,6 +194,11 @@ function getConfirmation( $yes = FALSE ) {
   return $response;
 }
 
+/**
+ * [doUpdate description]
+ * @param {[type]} $bundle [description]
+ * @param {[type]} $force  =             FALSE [description]
+ */
 function doUpdate( $bundle, $force = FALSE ) {
 
   global $data, $cache, $manifest, $repo;
@@ -183,8 +250,12 @@ function doUpdate( $bundle, $force = FALSE ) {
   }
 
   // Why can't I just include the function, call it, and be done with it?
-  // It's too late to figure that out.
-  `php includes/plist-migration "$dir/info.plist" "$cache/update/$bundle/tmp/info.plist"`;
+  // I think it might be a namespacing issue or something.
+  // migratePlist( "$dir/info.plist", "$cache/update/$bundle/tmp/info.plist" );
+
+  // It's too late to figure that out. Maybe tomorrow.
+  $cmd = "php includes/plist-migration.php \"$dir/info.plist\" \"$cache/update/$bundle/tmp/info.plist\"";
+  exec( "$cmd" );
 
 
 
@@ -192,41 +263,6 @@ function doUpdate( $bundle, $force = FALSE ) {
   // `./packal.sh backup "$bundle"`;
 
 }
-
-function setOption( $opt = array(), $value ) {
-
-  global $config;
-
-  $options = array( 'backup',
-                    'auto_add',
-                    'report',
-                    'notify',
-                    'username',
-                    'api_key' );
-
-  $bool   = array( 'auto_add',
-                   'report',
-                   'notify' );
-
-  if ( ! in_array( $opt[0] ) ) {
-    echo "Error: invalid option.";
-    return FALSE;
-  } else if ( in_array( $opt[0], $bool ) && ( ! ( $value == 0 || $value == 1 ) ) ) {
-    echo "Error: $opt[0] value must be 0 or 1.";
-    return FALSE;
-  } else if ( ( $opt[0] == "backup" ) && ( ! is_numeric( $value ) ) ) {
-    echo "Error: $opt[0] value must be numeric.";
-  }
-
-  // Load the config
-  $xml = simplexml_load_file( $config );
-
-  $xml->$opt[0] = $value;
-
-  // Save the config again.
-  $xml->asXml( $config );
-}
-
 
 /**
  * Checks to the signature of a package
@@ -261,6 +297,13 @@ function verifySignature( $appcast , $package , $key ) {
 
 }
 
-function validateAPI( $key ) {
-  // To be written.
+////////////////////////////////////////////////////////////////////////////////
+/// Strongarm functions
+
+function forcePackal() {
+global $manifest, $cache;
+
+  $xml = simplexml_load_file( "$manifest" );
+  $me  = getOption( array( 'username', TRUE ) );
+
 }

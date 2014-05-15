@@ -14,15 +14,15 @@ function stripHotkey( $location, $plist ) {
 	$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
 
 	// Reset the Hotstring (key)
-	$cmd = $PlistBuddy . "\"set $location:hotstring \" $plist";
+	$cmd = $PlistBuddy . "\"set $location:hotstring \" '$plist'";
 	exec( $cmd );
 
 	// Reset the hotkey
-	$cmd = $PlistBuddy . "\"set $location:hotkey 0\" $plist";
+	$cmd = $PlistBuddy . "\"set $location:hotkey 0\" '$plist'";
 	exec( $cmd );
 
 	// Reset the modifier keys
-	$cmd = $PlistBuddy . "\"set $location:hotmod 0\" $plist";
+	$cmd = $PlistBuddy . "\"set $location:hotmod 0\" '$plist'";
 	exec( $cmd );
 
 }
@@ -41,9 +41,8 @@ function setPlistValue( $location, $value, $plist ) {
 	$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
 
 	// Set the value
-	$cmd = $PlistBuddy . "\"set $location $value\" $plist";
-	echo $cmd;
-	echo "<br>";
+	$cmd = $PlistBuddy . "\"set $location $value\" '$plist'";
+	// echo $cmd;
 	exec( $cmd );
 
 }
