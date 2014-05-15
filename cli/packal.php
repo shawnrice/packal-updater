@@ -138,7 +138,7 @@ function checkUpdates( $force = FALSE ) {
       if ( "$w->updated" > "$wf->updated" ) {
         echo " — Update Available";
         file_put_contents( "$cache/updates", $w->bundle . "\n", FILE_APPEND );
-        $updatable[] = array( (string) $w->name, (string) $wf->version, (string) $w->version );
+        $updatable[] = array( (string) $w->name, (string) $wf->version, (string) $w->version, (string) $w->bundle );
       }
       echo "\n";
       $i++;
@@ -148,24 +148,40 @@ function checkUpdates( $force = FALSE ) {
 
   endforeach;
 
-  if ( ! count( $updatable > 0 ) )
+  if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) ) {
+    echo "Everything is up to date.\n";
     return FALSE;
+  }
 
   echo "Updates available for: ";
   $count = count( $updatable ) - 1;
-  foreach ( $updatable as $u ) {
+  foreach ( $updatable as $u ) :
     echo "$u[0] ($u[1] -> $u[2])";
     if ( $count > 0 )
       echo ", ";
     else
       echo ".\n";
     $count--;
-  }
+  endforeach;
   echo "\n";
   echo "* Note: Packal tracks updates on timestamps not version numbers, so if these seem off, then the workflow author did not update the version number.\n";
   echo "\n";
   $conf = getConfirmation( $force );
-  print_r($conf);
+
+  if ( $conf ) {
+    foreach ( $updatable as $u ) :
+      echo "Trying to update $u[0] ($u[3])...";
+      if ( doUpdate( $u[3] ) ) {
+        echo " Success.\n";
+      } else {
+        echo " ERROR.";
+      }
+    endforeach;
+  } else {
+    echo "Aborting.\n";
+  }
+
+
 
 }
 
@@ -262,6 +278,10 @@ function doUpdate( $bundle, $force = FALSE ) {
 
   $cmd = "./packal.sh replaceFiles \"$dir\" \"$cache/update/$bundle/tmp/\"";
   exec( "$cmd" );
+
+  `rm -fR "$cache/update/$bundle/tmp"`;
+
+  return TRUE;
 
 }
 

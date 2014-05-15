@@ -48,21 +48,24 @@ function migratePlist( $current, $new ) {
 
 			switch ( $o[ 'type' ]) :
 				case 'alfred.workflow.trigger.hotkey' :
-					$value = array(
-						'hotkey' => $o[ 'config' ][ 'hotkey' ],
-						'hotmod' => $o[ 'config' ][ 'hotmod' ],
-						'hotstring' => $o[ 'config' ][ 'hotstring' ]
-					);
+					$value = array();
+          if ( isset( $o[ 'config' ][ 'hotkey' ] ) )
+						$value[ 'hotkey' ] = $o[ 'config' ][ 'hotkey' ];
+          if ( isset( $o[ 'config' ][ 'hotmod' ] ) )
+						$value[ 'hotmod' ] = $o[ 'config' ][ 'hotmod' ];
+          if ( isset( $o[ 'config' ][ 'hotstring' ] ) )
+						$value[ 'hotstring' ] = $o[ 'config' ][ 'hotstring' ];
+
 					$original[ $o[ 'uid' ] ][ 'config' ] = $value;
 					break;
-			    case 'alfred.workflow.input.filefilter' :
-			    case 'alfred.workflow.input.scriptfilter' :
-			    case 'alfred.workflow.input.keyword' :
-			    	$value = array(
-			        	'keyword' => $o[ 'config' ][ 'keyword' ]
-			    	);
-	    			$original[ $o[ 'uid' ] ][ 'config' ] = $value;
-			    break;
+		    case 'alfred.workflow.input.filefilter' :
+		    case 'alfred.workflow.input.scriptfilter' :
+		    case 'alfred.workflow.input.keyword' :
+		    	$value = array(
+		        	'keyword' => $o[ 'config' ][ 'keyword' ]
+		    	);
+    			$original[ $o[ 'uid' ] ][ 'config' ] = $value;
+		    break;
 			endswitch;
 
 		}
