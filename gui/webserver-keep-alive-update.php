@@ -5,8 +5,12 @@
  * that contains the time.
  */
 
-require_once('../resources/includes/date-and-time.php');
-
+// Set date/time to avoid warnings/errors.
+if ( ! ini_get('date.timezone') ) {
+$tz = exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' );
+ini_set( 'date.timezone', $tz );
+}
+  
 // Make the time
 $time = time();
 

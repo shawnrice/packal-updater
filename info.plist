@@ -36,6 +36,17 @@
 				<string></string>
 			</dict>
 		</array>
+		<key>C1FFB920-0CA6-4611-ACCE-9D08E0295195</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
 		<key>E7387A23-9D8C-4328-BA35-1297450274F7</key>
 		<array>
 			<dict>
@@ -61,31 +72,29 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>argumenttype</key>
-				<integer>1</integer>
-				<key>escaping</key>
-				<integer>127</integer>
-				<key>keyword</key>
-				<string>packal</string>
-				<key>runningsubtext</key>
-				<string>Gathering information about workflows.</string>
-				<key>script</key>
-				<string>include('scripts/packal-controller-filter.php');</string>
-				<key>subtext</key>
-				<string>Manage your package.</string>
-				<key>title</key>
-				<string>Packal</string>
-				<key>type</key>
-				<integer>1</integer>
-				<key>withspace</key>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>hotkey</key>
+				<integer>0</integer>
+				<key>hotmod</key>
+				<integer>0</integer>
+				<key>hotstring</key>
+				<string></string>
+				<key>leftcursor</key>
 				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.input.scriptfilter</string>
+			<string>alfred.workflow.trigger.hotkey</string>
 			<key>uid</key>
-			<string>5D87F5EF-371D-4C05-A410-30A647BD83EA</string>
+			<string>7E1A4F4B-A5EB-4D2A-807B-2C3AA5341204</string>
 			<key>version</key>
-			<integer>0</integer>
+			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -132,25 +141,29 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>action</key>
+				<key>argumenttype</key>
 				<integer>0</integer>
-				<key>argument</key>
-				<integer>0</integer>
-				<key>hotkey</key>
-				<integer>0</integer>
-				<key>hotmod</key>
-				<integer>0</integer>
-				<key>hotstring</key>
-				<string></string>
-				<key>leftcursor</key>
+				<key>escaping</key>
+				<integer>127</integer>
+				<key>keyword</key>
+				<string>&amp;*&amp;%$packal</string>
+				<key>runningsubtext</key>
+				<string>Gathering information about workflows.</string>
+				<key>script</key>
+				<string>//include('scripts/packal-controller-filter.php');</string>
+				<key>subtext</key>
+				<string>Manage your package.</string>
+				<key>title</key>
+				<string>Packal</string>
+				<key>type</key>
+				<integer>1</integer>
+				<key>withspace</key>
 				<false/>
-				<key>modsmode</key>
-				<integer>0</integer>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.trigger.hotkey</string>
+			<string>alfred.workflow.input.scriptfilter</string>
 			<key>uid</key>
-			<string>7E1A4F4B-A5EB-4D2A-807B-2C3AA5341204</string>
+			<string>5D87F5EF-371D-4C05-A410-30A647BD83EA</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -159,6 +172,33 @@
 			<string>alfred.workflow.output.largetype</string>
 			<key>uid</key>
 			<string>AE61FC74-BE9B-40CB-A73B-EFEB7C10A19C</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>127</integer>
+				<key>keyword</key>
+				<string>.</string>
+				<key>runningsubtext</key>
+				<string>Looking for new packages</string>
+				<key>script</key>
+				<string>php script.php "{query}"</string>
+				<key>title</key>
+				<string>Update your packages</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>C1FFB920-0CA6-4611-ACCE-9D08E0295195</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -176,6 +216,23 @@
 			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
 			<string>E7387A23-9D8C-4328-BA35-1297450274F7</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>127</integer>
+				<key>script</key>
+				<string>php scripts/packal-controller-script.php</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -200,6 +257,16 @@
 			<real>10</real>
 		</dict>
 		<key>AE61FC74-BE9B-40CB-A73B-EFEB7C10A19C</key>
+		<dict>
+			<key>ypos</key>
+			<real>130</real>
+		</dict>
+		<key>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</key>
+		<dict>
+			<key>ypos</key>
+			<real>370</real>
+		</dict>
+		<key>C1FFB920-0CA6-4611-ACCE-9D08E0295195</key>
 		<dict>
 			<key>ypos</key>
 			<real>130</real>

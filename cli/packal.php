@@ -1,6 +1,6 @@
 <?php
 
-require_once( 'includes/plist-migration.php' );
+require_once( __DIR__ . '/includes/plist-migration.php' );
 
 $bundle   = "com.packal.shawn.patrick.rice";
 $HOME     = exec( 'echo $HOME' );
@@ -175,9 +175,7 @@ function checkUpdates( $opt = array() ) {
       $i++;
 
     }
-
-
-
+    
   endforeach;
 
   if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) ) {
@@ -316,8 +314,9 @@ function doUpdate( $bundle, $force = FALSE ) {
   $cmd = "./packal.sh replaceFiles \"$dir\" \"$cache/update/$bundle/tmp/\"";
   exec( "$cmd" );
 
-  `rm -fR "$cache/update/$bundle/tmp"`;
+  `rm -fR "$cache/update/$bundle"`;
 
+  echo "TRUE";
   return TRUE;
 
 }

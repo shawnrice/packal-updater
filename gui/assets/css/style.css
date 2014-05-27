@@ -1,0 +1,701 @@
+html {
+  font-size: 12px;
+  line-height: 16px;
+  font-family: 'Source Sans Pro', Georgia;
+}
+
+body {
+  user-select: none;
+    -webkit-user-select: none;
+}
+
+#updating-overlay {
+  display: none;
+  height: 300px;
+  width: 500px;
+  border: 5px solid black;
+  z-index: 200;
+  position: absolute;
+  top: 150px;
+  left: 300px;
+  opacity: .8;
+  background-color: #efefef;
+  text-align: center;
+}
+
+#updating-overlay h2 {
+  margin-top: 100px;
+}
+
+
+/************ MENU **************/
+
+.bt-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  border-width: 0px;
+  border-style: solid;
+  border-color: #333;
+  background-color: rgba(0,0,0,0);
+  -webkit-backface-visibility: hidden;
+  -webkit-transition: border-width 0.3s, background-color 0.3s, height 0s 0.3s;
+  transition: border-width 0.3s, background-color 0.3s, height 0s 0.3s;
+}
+
+.bt-menu.bt-menu-open {
+  height: 100%;
+  border-width: 90px 30px 30px 30px;
+  background-color: rgba(0,0,0,0.3);
+  -webkit-transition: border-width 0.3s, background-color 0.3s;
+  transition: border-width 0.3s, background-color 0.3s;
+}
+
+.bt-menu-open {
+  z-index: 1000;
+}
+
+.bt-overlay {
+  position: absolute;
+  width: 100%;
+}
+
+.bt-menu-open .bt-overlay {
+  height: 100%;
+}
+
+.bt-menu-trigger {
+  position: fixed;
+  top: 22px;
+  left: 50%;
+  z-index: 100;
+  display: block;
+  margin-left: -25px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+
+.bt-menu-trigger span {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 8%;
+  background-color: #000;
+  font-size: 0px;
+  -webkit-transition: background-color 0.3s;
+  transition: background-color 0.3s;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.bt-menu-open .bt-menu-trigger span {
+  background-color: #fff;
+}
+
+.bt-menu-trigger span:before,
+.bt-menu-trigger span:after {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  content: '';
+  -webkit-transition: -webkit-transform 0.3s, background-color 0.3s;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.bt-menu-trigger span:before {
+  -webkit-transform: translateY(-250%);
+  transform: translateY(-250%);
+}
+
+.bt-menu-trigger span:after {
+  -webkit-transform: translateY(250%);
+  transform: translateY(250%);
+}
+
+.bt-menu-open .bt-menu-trigger span:before,
+.bt-menu-open .bt-menu-trigger span:after {
+  background-color: #fff;
+}
+
+.bt-menu-open .bt-menu-trigger span:before {
+  -webkit-transform: translateY(-350%);
+  transform: translateY(-350%);
+}
+
+.bt-menu-open .bt-menu-trigger span:after {
+  -webkit-transform: translateY(350%);
+  transform: translateY(350%);
+}
+
+.bt-menu ul {
+  position: fixed;
+  top: 0px;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  list-style: none;
+  text-align: center;
+  white-space: nowrap;
+  height: 0;
+  -webkit-transition: height 0s 0.3s;
+  transition: height 0s 0.3s;
+}
+
+.bt-menu.bt-menu-open ul {
+  height: 90px;
+  -webkit-transition: none;
+  transition: none;
+}
+
+.bt-menu ul li,
+.bt-menu ul li a {
+  text-align: center;
+}
+
+.bt-menu ul li {
+  display: inline-block;
+  margin: 0 2%;
+  width: 5%;
+  height: 90px;
+  line-height: 90px;
+  opacity: 0;
+  -webkit-transition: -webkit-transform 0.3s, opacity 0.3s;
+  transition: transform 0.3s, opacity 0.3s;
+  -webkit-transform: translate3d(0,-100%,0);
+  transform: translate3d(0,-100%,0);
+}
+
+.bt-menu ul li:nth-child(3) {
+  margin-right: 70px;
+}
+
+.bt-menu ul li:nth-child(4) {
+  margin-left: 70px;
+}
+
+.bt-menu.bt-menu-open ul li {
+  opacity: 1;
+  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+}
+
+.bt-menu.bt-menu-open ul li:first-child,
+.bt-menu.bt-menu-open ul li:last-child {
+  -webkit-transition-delay: 0.15s;
+  transition-delay: 0.15s;
+}
+
+.bt-menu.bt-menu-open ul li:nth-child(2),
+.bt-menu.bt-menu-open ul li:nth-last-child(2) {
+  -webkit-transition-delay: 0.1s;
+  transition-delay: 0.1s;
+}
+
+.bt-menu.bt-menu-open ul li:nth-child(3),
+.bt-menu.bt-menu-open ul li:nth-last-child(3) {
+  -webkit-transition-delay: 0.05s;
+  transition-delay: 0.05s;
+}
+
+.bt-menu ul li a {
+  display: block;
+  outline: none;
+  color: #fff;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 1.15em;
+  -webkit-transition: color 0.2s;
+  transition: color 0.2s;
+}
+
+.bt-menu ul li a:before {
+  display: none;
+  font-size: 32px;
+}
+
+.bt-menu ul li a:hover,
+.bt-menu ul li a:focus {
+  color: #2980b9;
+}
+
+/************ /MENU *************/
+
+
+.box {
+  width: 30%;
+  position: relative;
+  float: left;
+  height: 200px;
+  border: 1px black solid;
+  margin: 1em;
+  padding: 1em;
+  z-index: 0;
+
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.header {
+  position: relative;
+  height: 10%;
+  margin: 0 0 25px 0;
+  /*padding-left: 3em;*/
+  background: #fff;
+  padding-bottom: 20px;
+
+}
+
+.header h1 {
+  margin: 10px 0 0 0;
+  font-size: 3em;
+}
+
+.clear {
+ clear:both;
+}
+
+.title {
+  height: 100%;
+  padding: 2em 0 0 0em;
+}
+
+.author {
+  content: 'Me.';
+}
+
+.wficon {
+  height: 72px;
+  width: 72px;
+  z-index: 0;
+}
+
+.wficon-container {
+  width: 100%;
+  text-align: right;
+  bottom: 17px;
+  position: absolute;
+  padding-right: 25px;
+}
+
+.separator {
+  border: 0px;
+  height: 1px;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  background: black;
+}
+
+.blacklisted {
+  opacity: .3;
+  background: #ccc;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  margin: -1em 0 0 -1em;
+  z-index: 1000;
+
+}
+
+.hide {
+  display: none;
+}
+
+.blist, .open-directory, #open-backup-dir {
+  cursor: pointer;
+}
+
+
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat';
+}
+
+.icon {
+  width: 24px;
+  margin-right: 1em;
+  margin-bottom: 1em;
+}
+
+.nav > ul > li > div > div {
+  float: left;
+  position: relative;
+
+}
+
+.nav > ul > li > div {
+  border-top: 1px black solid;
+  min-height: 20px;
+  padding: .25em;
+}
+
+.nav ul li {
+  clear: both;
+  list-style: none;
+  margin: 1em 1em;
+  line-height: 24px;
+
+}
+
+table tr:nth-child(even) {
+  background: rgba(0,0,0,0.1);
+}
+
+a {
+  text-decoration: none;
+  color: #08C;
+  transition: all 0.3s ease-out;
+  position: relative;
+  padding: .5em;
+  margin: -.5em;
+}
+a:hover { color: #0AF; }
+
+*, *:before, *:after {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.clearfix:before,
+.clearfix:after {
+  content: " ";
+  display: table;
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+
+
+.short {
+  float: left;
+  white-space: nowrap;
+  max-width: 100%;
+  height: 3em;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  padding: 0;
+}
+.short p {
+  margin: 0;
+  height: 3em;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.backups li {
+  list-style: none;
+  font-size: 1.2em;
+  margin: 1em;
+
+}
+
+.delete-backup {
+  cursor: pointer;
+}
+
+.fa {
+  opacity: .8;
+}
+
+.delete-backup:hover {
+  color: #A60000;
+  -webkit-transition:color .25s ease-in;
+   transition:color .25s ease-in;
+}
+
+/***
+Status
+***/
+
+.detail-accordion > h3 {
+  cursor: pointer;
+  font-weight: normal;
+  font-size: 1em !important;
+  letter-spacing: 1px;
+  line-height: 1.2em;
+  color: gray;
+  margin-bottom: 1em;
+  border-bottom: 1px dashed black;
+  border-top: 1px dashed black;
+  text-align: center;
+  max-width: 75px;
+  padding: 2px 0;
+  font-family: 'Montserrat', Georgia !important;
+  margin-left: 2em;
+}
+.detail-accordion > div > div, .detail-accordion > p {
+  padding: .75em 1em;
+  border: 1px solid black;
+  margin: .25em 0 1em 2.5em;
+  line-height: 1.5em;
+  width: 600px;
+  position: relative;
+  float: left;
+  clear: both;
+  font-size: .75em;
+}
+.detail-accordion2 {
+  margin-top: -1em !important;
+}
+.ui-accordion .ui-accordion-content{
+  overflow:auto;
+}
+
+.url-open, .update-manifest {
+  clear: none !important;
+  position: relative !important;
+  float: right !important;
+  margin: -2.5em .5em 0 0 !important;
+  border: none !important;
+  width: 100px !important;
+  cursor: pointer;
+  color: gray;
+  border-bottom: 1px gray dashed !important;
+  padding: 0 !important;
+}
+
+.update-manifest {
+ clear: none !important;
+  position: relative !important;
+  float: right !important;
+  margin: -1.9em 13em 0 0 !important;
+  border: none !important;
+  width: 133px !important;
+  cursor: pointer;
+  color: gray;
+  border-bottom: 1px gray dashed !important;
+  padding: 0 !important; 
+}
+
+.status-body {
+  font-size: 1.5em;
+  margin: 3em 0 0 2%;
+  width: 95%;
+}
+
+.status-body > div {
+  margin-bottom: 2em;
+}
+
+/*******
+  FONTS
+ *******/
+
+/* Webfont: Lato-Regular *//*@font-face {
+    font-family: 'Lato';
+    src: url('assets/Lato/Lato-Regular.woff') format('woff'), /* Modern Browsers */
+/*         url('assets/Lato/Lato-Regular.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}*/
+
+/*******************************************************************************
+General Layout
+*******************************************************************************/
+.viewport {
+  position: fixed;
+  height: 600px;
+  width: 1110px;
+  padding: 0 10px 0 35px;
+  border: 1px black solid;
+  background: #fff;
+}
+
+.pane {
+  height: 86%;
+  overflow: scroll;
+  padding: 0 0em 0 0em;
+}
+
+.preloader {
+  width: 100%;
+  height: 100%;
+  padding: 114px 0 0 500px;
+}
+
+.preloader h2 {
+  margin-left: -32px;
+  margin-bottom: 28px;
+}
+
+/*******************************************************************************
+Updates
+*******************************************************************************/
+.updates-complete-backdrop {
+  background: url( 'assets/images/packal-man.jpg' ) no-repeat center;
+  
+  position: absolute;
+  height: 77%;
+  width: 93%;
+  opacity: .25;
+  clear: none;
+}
+
+.center-me-please {
+  clear: none;
+  position: absolute;
+  float: left;
+  font-size: 1.5em;
+  margin-top: 20%;
+  margin-left: 25%;
+  
+}
+
+.update-box {
+  border: 1px solid black;
+  width: 90%;
+  padding: .1em;
+  height: 110px;
+  margin: 25px 0 0 2%;
+}
+
+.update-icon {
+  width: 125px;
+  height: 110px;
+  display: inline-block;
+  float: left;
+  position: relative;
+  text-align: center;
+  padding: 25px 0;
+  opacity: .9;
+  
+}
+
+.update-icon img {
+  max-width: 48px;
+}
+
+
+.update-content {
+  float: left;
+  position: relative; 
+}
+
+.update-button {
+  /*border: 2px black solid;*/
+  /*font-size: 1.5em;*/
+  float: right;
+  margin: 1em 1em 0 0;
+  /*width: 100px;*/
+  height: 110px;
+  padding: 15px 50px 0 0;
+  text-align: center;
+}
+
+.update-box button:focus {
+  outline: none;
+}
+
+button.css3button {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  color: #e6e6e6;
+  padding: 10px 20px;
+  background: -moz-linear-gradient(
+    top,
+    #8426ff 0%,
+    #8426ff);
+  background: -webkit-gradient(
+    linear, left top, left bottom,
+    from(#8426ff),
+    to(#8426ff));
+  -moz-border-radius: 30px;
+  -webkit-border-radius: 30px;
+  border-radius: 30px;
+  border: 5px solid #000000;
+  -moz-box-shadow:
+    0px 1px 3px rgba(000,000,000,0.5),
+    inset 0px 0px 1px rgba(255,255,255,0.7);
+  -webkit-box-shadow:
+    0px 1px 3px rgba(000,000,000,0.5),
+    inset 0px 0px 1px rgba(255,255,255,0.7);
+  box-shadow:
+    0px 1px 3px rgba(000,000,000,0.5),
+    inset 0px 0px 1px rgba(255,255,255,0.7);
+  text-shadow:
+    0px -1px 0px rgba(20,1,31,0.2),
+    0px 1px 0px rgba(214,169,214,0.3);
+}
+
+/**
+ * Backups
+ */
+
+.backup-box {
+  border: 1px solid black;
+  width: 90%;
+  padding: 1em;
+  margin: 25px 0 0 2%;
+}
+
+/*******************************************************************************
+Settings
+*******************************************************************************/
+/* general style for the form */
+.settings-form {
+  width: 95%;
+  margin: 0.3em auto 0 auto;
+  font-size: 1.5em;
+  line-height: 2em;
+}
+
+/* normalize the input elements, make them look like everything else */
+.settings-form input,
+.settings-form select,
+.settings-form button {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.settings-form input:focus {
+  outline: none;
+}
+
+.settings-form input,
+.settings-form select  {
+  line-height: inherit;
+  display: inline-block;
+  color: #b14943;
+  cursor: pointer;
+  border-bottom: 1px dashed #b14943;
+  line-height: 1.2em;
+  padding: 0;
+  margin: 0 .25em;
+}
+
+#packal-username,
+#number-of-backups,
+#workflow-reporting,
+#force-packal,
+#notification-options {
+  display: none;
+}

@@ -5,8 +5,8 @@ namespace CFPropertyList;
 /**
 * Require CFPropertyList
 */
-require_once( '../libraries/CFPropertyList/classes/CFPropertyList/CFPropertyList.php' );
-require_once( 'plist-functions.php' );
+require_once( __DIR__ . '/../../libraries/CFPropertyList/classes/CFPropertyList/CFPropertyList.php' );
+require_once( __DIR__ . '/plist-functions.php' );
 
 if ( isset( $argv ) && ( ! empty( $argv[2] ) ) )
   migratePlist( $argv[1], $argv[2] );
