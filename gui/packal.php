@@ -15,7 +15,7 @@
   else if ( isset( $_POST[ 'page' ] ) )
     $page   = $_POST[ 'page' ];
   else
-    $page   = 'status';
+    $page   = 'updates';
 
   if ( ! file_exists( "$data/config/config.xml" ) ) {
     $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
@@ -95,6 +95,9 @@
       break;
     case 'updateManifest' :
       updateManifest();
+      break;
+    case 'updateWorkflow' :
+      updateWorkflow();
       break;
     default:
       echo "Action";
@@ -448,28 +451,7 @@ function settings() {
 }
 
 function status() {
-// echo 
   global $wf, $config, $workflows, $blacklist, $manifestBundles, $me, $data, $workflowsDir;
-
-
-
-// $endpoints is a local map.
-// $wf 
-
-// Variables needed:
-// LOCAL:
-// # of workflows installed
-// # of workflows that I've written
-// 
-// PACKAL:
-// # of workflows in manifest
-// 
-// HYBRID:
-// 
-// # of workflows I've written on Packal
-// # of workflows 
-
-// Check for authorName and username against these packages.
 
   $meta = array();
 
@@ -486,7 +468,7 @@ function status() {
     $workflows[ $bundle ] = $dir; // Installed workflows
     $meta[ 'installedWorkflows' ][] = $bundle;
     if ( isset( $config->authorName ) && ( $config->authorName ) ) {
-      // Look here only if the user has set authorname value.
+      // Look here only if the user has set authorName value.
         if ( exec( "/usr/libexec/PlistBuddy -c \"Print :createdby\" '$workflowsDir$dir/info.plist' &2> /dev/null" ) == $config->authorName )
           $meta[ 'myWorkflows' ][] = $bundle;
     }
@@ -500,17 +482,45 @@ function status() {
       } else {
         $meta[ 'availableOnPackal' ][] = $bundle;  
       }
-      
     }
 
   endforeach;
 
 
   // Set date/time things here.
-  $m = date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) );
-  $hours = floor($m / 3600);
-  $mins = floor(($m - ($hours*3600)) / 60);
-  $secs = floor($m % 60);
+  $m     = date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) );
+  $days  = floor( $m / 86400 );
+  $hours = floor( ( $m - ( $days * 86400 ) ) / 3600 );
+  $mins  = floor( ( $m - ( $hours * 3600 ) ) / 60 );
+  $secs  = floor( $m % 60 );
+
+  if ( $m > ( 60 * 60 * 24 ) ) {
+    if ( $m > ( 60 * 60 * 24 * 7) ) {
+      if ( $m > ( 60 * 60 * 24 * 7 * 30) ) {
+        if ( $m > ( 60 * 60 * 24 * 7 * 120) ) {
+          $time = "a really long time ago.";
+        }
+        $time = "over a month ago.";
+      }
+      $time = "over a week ago.";
+    } else {
+      $time = "over a day ago.";
+    }
+  } else {
+    $time = '';
+    if ( $hours > 0 )
+      $time .= $hours . ' hours, ';
+    if ( $mins > 0 )
+      $time .=  $mins . ' minutes';
+    if ( $hours > 0 && $mins > 0 )
+      $time .= ', and ';
+    else
+      $time .= ' and ';
+    if ( $secs > 0 )
+      $time .= $secs . ' seconds';
+    $time .= ' ago.';
+  }
+
 
   foreach ( $workflows as $k => $v ) :
     if ( file_exists( "$workflowsDir/$v/packal/package.xml" ) && in_array( $k, $manifestBundles ) ) {
@@ -525,7 +535,7 @@ function status() {
 
 <div class='status-body'>
 <div>
-  <p id='manifest-status'>The manifest was last updated <strong><?php echo $hours . ' hours, ' . $mins . ' minutes, and ' . $secs . ' seconds ago.'; ?></strong></p>
+  <p id='manifest-status'>The manifest was last updated <strong><?php echo "$time" ; ?></strong></p>
 <div class='update-manifest'>Update Manifest</div>
 </div>
 
@@ -695,7 +705,7 @@ function updates() {
           <p><h3>Current: <span style='font-size: 1.25em'><?php echo $w->version; ?></span> <i class="fa fa-long-arrow-right fa-lg"></i> Proposed: <span style='font-size: 1.25em'><?php echo $wf[ "$k" ][ 'version' ]; ?></span></h3></p>
           </div>
           <div class='update-button'>
-            <button type="button" name="" value="" class="css3button">Update</button>
+            <button type="button" name="" value=<?php echo "'$k'"; ?> class="css3button">Update</button>
           </div>
           </div>
 
@@ -712,17 +722,19 @@ function updates() {
   }
   ?>
   <script>
-    $( '.update-manifest' ).click( function() {
+    $( '.css3button' ).click( function() {
       // dir = $( this ).attr( 'id' ); , data: { action: 'updateManifest' }
+      bundle = $( this ).val();
       $.ajax({
         url: 'packal.php',
         beforeSend: function( xhr ) {
           $( '#updating-overlay' ).show();
         },
-        data: { action: 'updateManifest' },
+        data: { action: 'updateWorkflow', workflow: bundle },
       }).done(function( data ) {
+        $( '.pane' ).load( 'packal.php', { page: 'updates' } ).hide().fadeIn('fast').delay(50);
         $( '#updating-overlay' ).hide();
-        $( '#manifest-status' ).html( data );
+        // $( '#manifest-status' ).html( data );
       });
     });
   </script>
@@ -826,15 +838,47 @@ function updateManifest() {
   $call = exec( "../cli/packal.sh update TRUE TRUE");
   
   // Set date/time things here.
-  $m = date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) );
-  $hours = floor($m / 3600);
-  $mins = floor(($m - ($hours*3600)) / 60);
-  $secs = floor($m % 60);
-  echo "The manifest was last updated <strong> $hours hours $mins minutes, and $secs seconds ago.</strong>";
+  $m     = date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) );
+  $days  = floor( $m / 86400 );
+  $hours = floor( ( $m - ( $days * 86400 ) ) / 3600 );
+  $mins  = floor( ( $m - ( $hours * 3600 ) ) / 60 );
+  $secs  = floor( $m % 60 );
+
+  if ( $m > ( 60 * 60 * 24 ) ) {
+    if ( $m > ( 60 * 60 * 24 * 7) ) {
+      if ( $m > ( 60 * 60 * 24 * 7 * 30) ) {
+        if ( $m > ( 60 * 60 * 24 * 7 * 120) ) {
+          $time = "a really long time ago.";
+        }
+        $time = "over a month ago.";
+      }
+      $time = "over a week ago.";
+    } else {
+      $time = "over a day ago.";
+    }
+  } else {
+    $time = '';
+    if ( $hours > 0 )
+      $time .= $hours . ' hours, ';
+    if ( $mins > 0 )
+      $time .=  $mins . ' minutes';
+    if ( $hours > 0 && $mins > 0 )
+      $time .= ', and ';
+    else if ( $hours > 0 || $mins > 0 )
+      $time .= ' and ';
+    if ( $secs > 0 )
+      $time .= $secs . ' seconds';
+    $time .= ' ago.';
+  }
+
+  echo "The manifest was last updated <strong>$time</strong>";
 }
 
-function updateWorkflow( $bundle ) {
-  
+function updateWorkflow() {
+  $bundle = $_GET[ 'workflow' ];
+  $call = exec( "php ../cli/packal.php doUpdate '$bundle'");
+  die();
+
 }
 
 /*******************************************************************************

@@ -152,13 +152,14 @@ backup() {
   date=`date +"%Y-%m-%d-%H.%M.%S"`
 
   file=`echo $date-$name.alfredworkflow | tr '&' '_' | tr ' ' '_'`
-  zip -q -r "$cache/$file" "$dir"
-
+  cd "$dir"
+  zip -q -r "$cache/$file" *
+  cd -
   dir "$data/backups/$name"
 
   backups=`ls "$data/backups/$name" | grep alfredworkflow | wc -l`
 
-  keep=`php packal.php getOption backup`
+  keep=`php ../cli/packal.php getOption backups`
 
   if [[ $backups -ge $keep ]]; then
     count=$backups

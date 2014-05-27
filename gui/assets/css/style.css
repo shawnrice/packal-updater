@@ -477,7 +477,7 @@ Status
  clear: none !important;
   position: relative !important;
   float: right !important;
-  margin: -1.9em 13em 0 0 !important;
+  margin: -1.9em 9em 0 0 !important;
   border: none !important;
   width: 133px !important;
   cursor: pointer;
@@ -542,7 +542,7 @@ General Layout
 Updates
 *******************************************************************************/
 .updates-complete-backdrop {
-  background: url( 'assets/images/packal-man.jpg' ) no-repeat center;
+  background: url( '../../assets/images/packal-man.jpg' ) no-repeat center;
   
   position: absolute;
   height: 77%;

@@ -12,6 +12,11 @@ $config   = "$data/config/config.xml";
 
 $repo = "https://github.com/packal/repository/raw/master";
 
+if ( ! isset( $argv[1] ) ) {
+  echo "ERROR: You need to specify an action.
+";
+  die();
+}
 $function = $argv[1];
 unset( $argv[0] );
 unset( $argv[1] );
@@ -84,7 +89,7 @@ function checkUpdate( $wf ) {
   global $manifest;
 
   $wf = $wf[0];
-  $dir = trim( `./packal.sh getDir "$wf" 2> /dev/null` );
+  $dir = trim( `../cli/packal.sh getDir "$wf" 2> /dev/null` );
   $xml = simplexml_load_file( "$dir/packal/package.xml" );
   $last = $xml->updated;
 
@@ -137,7 +142,7 @@ function checkUpdates( $opt = array() ) {
 
   $i = 1;
   foreach( $xml as $w ) :
-    $dir = trim( `./packal.sh getDir "$w->bundle" 2> /dev/null` );
+    $dir = trim( `../cli/packal.sh getDir "$w->bundle" 2> /dev/null` );
 
     if ( $dir == "FALSE" )
       continue;
@@ -253,7 +258,8 @@ function doUpdate( $bundle, $force = FALSE ) {
     $bundle = $bundle[0];
   }
 
-  $dir = trim( `./packal.sh getDir "$bundle" 2> /dev/null` );
+
+  $dir = trim( `../cli/packal.sh getDir "$bundle"` );
 
   // The force variable means to download even if the original
   // is not from Packal. Obviously, since we don't have the
@@ -305,13 +311,12 @@ function doUpdate( $bundle, $force = FALSE ) {
   // migratePlist( "$dir/info.plist", "$cache/update/$bundle/tmp/info.plist" );
 
   // It's too late to figure that out. Maybe tomorrow.
-  $cmd = "php includes/plist-migration.php \"$dir/info.plist\" \"$cache/update/$bundle/tmp/info.plist\"";
+  $cmd = "php " . __DIR__ . "/includes/plist-migration.php \"$dir/info.plist\" \"$cache/update/$bundle/tmp/info.plist\"";
   exec( "$cmd" );
 
   // Backup the bundle.
-  `./packal.sh backup "$bundle"`;
-
-  $cmd = "./packal.sh replaceFiles \"$dir\" \"$cache/update/$bundle/tmp/\"";
+  echo `../cli/packal.sh backup "$bundle"`;
+  $cmd = "../cli/packal.sh replaceFiles \"$dir\" \"$cache/update/$bundle/tmp/\"";
   exec( "$cmd" );
 
   `rm -fR "$cache/update/$bundle"`;
@@ -330,7 +335,7 @@ function doUpdate( $bundle, $force = FALSE ) {
  */
 function verifySignature( $appcast , $package , $key ) {
 
-  $appcast = simplexml_load_file($appcast);
+  $appcast = simplexml_load_file( $appcast );
   $signature = $appcast->signature;
 
   $data = sha1_file( $package , false );
