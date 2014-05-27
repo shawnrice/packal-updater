@@ -1,7 +1,7 @@
 <?php
 
 require_once( __DIR__ . '/includes/plist-migration.php' );
-
+$cliDir = __DIR__;
 $bundle   = "com.packal.shawn.patrick.rice";
 $HOME     = exec( 'echo $HOME' );
 $data     = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
@@ -86,10 +86,10 @@ function validateAPI( $key ) {
 /// Check single update
 
 function checkUpdate( $wf ) {
-  global $manifest;
+  global $manifest, $cliDir;
 
   $wf = $wf[0];
-  $dir = trim( `../cli/packal.sh getDir "$wf" 2> /dev/null` );
+  $dir = trim( `"$cliDir/packal.sh" getDir "$wf" 2> /dev/null` );
   $xml = simplexml_load_file( "$dir/packal/package.xml" );
   $last = $xml->updated;
 
@@ -111,7 +111,7 @@ function checkUpdate( $wf ) {
  * Checks updates for all workflows (that are on Packal)
  */
 function checkUpdates( $opt = array() ) {
-  global $manifest, $cache;
+  global $manifest, $cache, $cliDir;
 
   print_r( $opt );
 
@@ -142,7 +142,7 @@ function checkUpdates( $opt = array() ) {
 
   $i = 1;
   foreach( $xml as $w ) :
-    $dir = trim( `../cli/packal.sh getDir "$w->bundle" 2> /dev/null` );
+    $dir = trim( `"$cliDir/packal.sh" getDir "$w->bundle" 2> /dev/null` );
 
     if ( $dir == "FALSE" )
       continue;
@@ -252,14 +252,14 @@ function getConfirmation( $yes = FALSE ) {
  */
 function doUpdate( $bundle, $force = FALSE ) {
 
-  global $data, $cache, $manifest, $repo;
+  global $data, $cache, $manifest, $repo, $cliDir;
 
   if ( is_array( $bundle ) ) {
     $bundle = $bundle[0];
   }
 
 
-  $dir = trim( `../cli/packal.sh getDir "$bundle"` );
+  $dir = trim( `"$cliDir/packal.sh" getDir "$bundle"` );
 
   // The force variable means to download even if the original
   // is not from Packal. Obviously, since we don't have the
@@ -315,8 +315,8 @@ function doUpdate( $bundle, $force = FALSE ) {
   exec( "$cmd" );
 
   // Backup the bundle.
-  echo `../cli/packal.sh backup "$bundle"`;
-  $cmd = "../cli/packal.sh replaceFiles \"$dir\" \"$cache/update/$bundle/tmp/\"";
+  echo `"$cliDir/packal.sh" backup "$bundle"`;
+  $cmd = "$cliDir/packal.sh replaceFiles \"$dir\" \"$cache/update/$bundle/tmp/\"";
   exec( "$cmd" );
 
   `rm -fR "$cache/update/$bundle"`;

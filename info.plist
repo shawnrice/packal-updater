@@ -6,30 +6,22 @@
 	<string>com.packal.shawn.patrick.rice</string>
 	<key>connections</key>
 	<dict>
-		<key>25E9E324-545E-41FF-84DB-9BAC959BD6DA</key>
+		<key>1F4D4C11-58BD-413E-9E17-D93F880D403C</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
-				<string>AE61FC74-BE9B-40CB-A73B-EFEB7C10A19C</string>
+				<string>C1FFB920-0CA6-4611-ACCE-9D08E0295195</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
 				<string></string>
 			</dict>
 		</array>
-		<key>5D87F5EF-371D-4C05-A410-30A647BD83EA</key>
+		<key>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>25E9E324-545E-41FF-84DB-9BAC959BD6DA</string>
+				<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -41,17 +33,6 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-			</dict>
-		</array>
-		<key>E7387A23-9D8C-4328-BA35-1297450274F7</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -127,51 +108,14 @@
 				<key>escaping</key>
 				<integer>127</integer>
 				<key>script</key>
-				<string>php scripts/packal-controller-script.php "{query}"</string>
+				<string>php scripts/packal-controller-script.php</string>
 				<key>type</key>
 				<integer>0</integer>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
-			<string>25E9E324-545E-41FF-84DB-9BAC959BD6DA</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>argumenttype</key>
-				<integer>0</integer>
-				<key>escaping</key>
-				<integer>127</integer>
-				<key>keyword</key>
-				<string>&amp;*&amp;%$packal</string>
-				<key>runningsubtext</key>
-				<string>Gathering information about workflows.</string>
-				<key>script</key>
-				<string>//include('scripts/packal-controller-filter.php');</string>
-				<key>subtext</key>
-				<string>Manage your package.</string>
-				<key>title</key>
-				<string>Packal</string>
-				<key>type</key>
-				<integer>1</integer>
-				<key>withspace</key>
-				<false/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.scriptfilter</string>
-			<key>uid</key>
-			<string>5D87F5EF-371D-4C05-A410-30A647BD83EA</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>type</key>
-			<string>alfred.workflow.output.largetype</string>
-			<key>uid</key>
-			<string>AE61FC74-BE9B-40CB-A73B-EFEB7C10A19C</string>
+			<string>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -203,36 +147,23 @@
 			<integer>0</integer>
 		</dict>
 		<dict>
-			<key>config</key>
-			<dict>
-				<key>escaping</key>
-				<integer>127</integer>
-				<key>script</key>
-				<string>php scripts/update.php</string>
-				<key>type</key>
-				<integer>0</integer>
-			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.script</string>
+			<string>alfred.workflow.output.largetype</string>
 			<key>uid</key>
-			<string>E7387A23-9D8C-4328-BA35-1297450274F7</string>
+			<string>AE61FC74-BE9B-40CB-A73B-EFEB7C10A19C</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>escaping</key>
-				<integer>127</integer>
-				<key>script</key>
-				<string>php scripts/packal-controller-script.php</string>
-				<key>type</key>
-				<integer>0</integer>
+				<key>triggerid</key>
+				<string>com.packal.start</string>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.script</string>
+			<string>alfred.workflow.trigger.external</string>
 			<key>uid</key>
-			<string>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</string>
+			<string>1F4D4C11-58BD-413E-9E17-D93F880D403C</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -241,15 +172,10 @@
 	<string></string>
 	<key>uidata</key>
 	<dict>
-		<key>25E9E324-545E-41FF-84DB-9BAC959BD6DA</key>
+		<key>1F4D4C11-58BD-413E-9E17-D93F880D403C</key>
 		<dict>
 			<key>ypos</key>
-			<real>10</real>
-		</dict>
-		<key>5D87F5EF-371D-4C05-A410-30A647BD83EA</key>
-		<dict>
-			<key>ypos</key>
-			<real>10</real>
+			<real>130</real>
 		</dict>
 		<key>7E1A4F4B-A5EB-4D2A-807B-2C3AA5341204</key>
 		<dict>
@@ -264,17 +190,12 @@
 		<key>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</key>
 		<dict>
 			<key>ypos</key>
-			<real>370</real>
+			<real>10</real>
 		</dict>
 		<key>C1FFB920-0CA6-4611-ACCE-9D08E0295195</key>
 		<dict>
 			<key>ypos</key>
-			<real>130</real>
-		</dict>
-		<key>E7387A23-9D8C-4328-BA35-1297450274F7</key>
-		<dict>
-			<key>ypos</key>
-			<real>250</real>
+			<real>10</real>
 		</dict>
 		<key>F3825148-0DEF-4920-8AA9-2675D7B90496</key>
 		<dict>

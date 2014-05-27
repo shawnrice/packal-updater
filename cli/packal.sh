@@ -76,7 +76,10 @@ isCacheValid() {
 generateMap() {
   # Creates a map of bundles and directories.
 
-  path="$( cd "$(dirname "$0")/.." ; pwd -P )"
+  pushd `dirname $0` > /dev/null
+  path=`pwd -P`
+  popd > /dev/null
+
   endpoints="$data/endpoints"
   me=$(basename "$path")
 
@@ -88,7 +91,7 @@ if [ ! "$1" = "TRUE" ]; then
   fi
 
   echo "{" > "$endpoints/endpoints.json"
-  for w in "../../"*
+  for w in "$path/../../"*
   do
     local bundle=`$pb -c "Print :bundleid" "$w/info.plist" 2> /dev/null`
     if [ ! -z "$bundle" ]; then
@@ -100,10 +103,9 @@ if [ ! "$1" = "TRUE" ]; then
   if [ -f "$endpoints/endpoints.list" ]; then
     rm "$endpoints/endpoints.list"
   fi
-  for w in "../../"*
+  for w in "$path/../../"*
   do
-    local bundle=`$pb -c "Print :bundleid" "$w/info.plist"`
-
+    local bundle=`$pb -c "Print :bundleid" "$w/info.plist" 2> /dev/null`
     if [ ! -z "$bundle" ]; then
       echo "\"$bundle\"=\"$path$w\"" | sed 's|'"$me"'\.\./\.\./||g' >> "$endpoints/endpoints.list"
     fi
@@ -159,7 +161,7 @@ backup() {
 
   backups=`ls "$data/backups/$name" | grep alfredworkflow | wc -l`
 
-  keep=`php ../cli/packal.php getOption backups`
+  keep=`php "$path/packal.php" getOption backups`
 
   if [[ $backups -ge $keep ]]; then
     count=$backups
