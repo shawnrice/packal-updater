@@ -260,7 +260,7 @@ function doUpdate( $bundle, $force = FALSE ) {
 
 
   $dir = trim( `"$cliDir/packal.sh" getDir "$bundle"` );
-
+echo $dir;
   // The force variable means to download even if the original
   // is not from Packal. Obviously, since we don't have the
   // update data, this just means to download the update no

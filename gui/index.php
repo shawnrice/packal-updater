@@ -45,8 +45,7 @@
       $( '.nav' ).click( function() {
         $( '.pane' ).html("<div class='preloader'><h2>Loading...</h2><img alt='preloader' src='assets/images/preloader.gif' /></div>");
         $( '.pane' ).load( 'packal.php', { page: $( this ).attr( 'id' ) } ).hide().fadeIn('fast').delay(50);
-      });
-      
+      });      
       </script>
     </body>
   </html>

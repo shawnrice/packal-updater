@@ -81,8 +81,10 @@ generateMap() {
   popd > /dev/null
 
   endpoints="$data/endpoints"
-  me=$(basename "$path")
-
+  dir=$(dirname "$path")
+  me=$(basename "$dir")
+  path=`echo $dir| sed 's|'"$me"'||g'`
+  
 if [ ! "$1" = "TRUE" ]; then
     if [[ ! `checkModified "$endpoints/endpoints.json"` -lt `stat -f "%m" "$path/.."` ]]; then
       # Nothing new has been installed, so there is no reason to update the map
@@ -91,11 +93,11 @@ if [ ! "$1" = "TRUE" ]; then
   fi
 
   echo "{" > "$endpoints/endpoints.json"
-  for w in "$path/../../"*
+  for w in "$path"*
   do
     local bundle=`$pb -c "Print :bundleid" "$w/info.plist" 2> /dev/null`
     if [ ! -z "$bundle" ]; then
-      echo "\"$bundle\": \"$path$w\"," | sed 's|'"$me"'||g' | sed 's|\.\./\.\./||g' >> "$endpoints/endpoints.json"
+      echo "\"$bundle\": \"$w\"," >> "$endpoints/endpoints.json"
     fi
   done
   echo `cat "$endpoints/endpoints.json" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' | sed -e '$s|,$|}|'`  > "$endpoints/endpoints.json"
@@ -103,11 +105,11 @@ if [ ! "$1" = "TRUE" ]; then
   if [ -f "$endpoints/endpoints.list" ]; then
     rm "$endpoints/endpoints.list"
   fi
-  for w in "$path/../../"*
+  for w in "$path"*
   do
     local bundle=`$pb -c "Print :bundleid" "$w/info.plist" 2> /dev/null`
     if [ ! -z "$bundle" ]; then
-      echo "\"$bundle\"=\"$path$w\"" | sed 's|'"$me"'\.\./\.\./||g' >> "$endpoints/endpoints.list"
+      echo "\"$bundle\"=\"$w\"" >> "$endpoints/endpoints.list"
     fi
   done
 

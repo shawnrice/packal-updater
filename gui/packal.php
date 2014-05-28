@@ -15,7 +15,7 @@
   else if ( isset( $_POST[ 'page' ] ) )
     $page   = $_POST[ 'page' ];
   else
-    $page   = 'updates';
+    $page   = 'about';
 
   if ( ! file_exists( "$data/config/config.xml" ) ) {
     $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
@@ -487,39 +487,7 @@ function status() {
   endforeach;
 
 
-  // Set date/time things here.
-  $m     = date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) );
-  $days  = floor( $m / 86400 );
-  $hours = floor( ( $m - ( $days * 86400 ) ) / 3600 );
-  $mins  = floor( ( $m - ( $hours * 3600 ) ) / 60 );
-  $secs  = floor( $m % 60 );
-
-  if ( $m > ( 60 * 60 * 24 ) ) {
-    if ( $m > ( 60 * 60 * 24 * 7) ) {
-      if ( $m > ( 60 * 60 * 24 * 7 * 30) ) {
-        if ( $m > ( 60 * 60 * 24 * 7 * 120) ) {
-          $time = "a really long time ago.";
-        }
-        $time = "over a month ago.";
-      }
-      $time = "over a week ago.";
-    } else {
-      $time = "over a day ago.";
-    }
-  } else {
-    $time = '';
-    if ( $hours > 0 )
-      $time .= $hours . ' hours, ';
-    if ( $mins > 0 )
-      $time .=  $mins . ' minutes';
-    if ( $hours > 0 && $mins > 0 )
-      $time .= ', and ';
-    else
-      $time .= ' and ';
-    if ( $secs > 0 )
-      $time .= $secs . ' seconds';
-    $time .= ' ago.';
-  }
+  $time = getManifestModTime();
 
 
   foreach ( $workflows as $k => $v ) :
@@ -540,7 +508,7 @@ function status() {
 </div>
 
 
-<div><p>You have <?php echo count( $workflows ); ?> workflows installed with Bundle IDs.</p></div>
+<div><p>You have <strong><?php echo count( $workflows ); ?></strong> workflows installed with Bundle IDs.</p></div>
 <div><p>Of those, <strong><?php echo count( $meta[ 'myWorkflows' ] ) ?></strong> are ones that you wrote.</p>
 <div id='myworkflows' class='detail-accordion'>
   <h3>Details</h3>
@@ -571,15 +539,22 @@ function status() {
   </div>
 </div>
 </div>
-<div><p>Of the others, <strong><?php echo count( $meta[ 'availableOnPackal' ] ); ?></strong> can be downloaded and updated from Packal.</p></div>
+<div>
+  <p>
+    Of the others, 
+    <strong><?php echo count( $meta[ 'availableOnPackal' ] ); ?></strong>
+    can be downloaded and updated from Packal.
+  </p>
+</div>
 <div id='availableOnPackal' class='detail-accordion'>
   <h3 class='detail-accordion2'>Details</h3>
-  <div class=''>
+  <div>
       <?php
     foreach ( $meta[ 'availableOnPackal' ] as $m ) :
       if ( ! empty( $m ) ) {
       echo '<div><p><strong>' . $wf[ $m ][ 'name' ] . '</strong>';
-      echo " ($m)" . "</p><div id='" . $wf[ $m ][ 'url' ] . "' class='url-open'>View on Packal</div></div>";
+      echo " ($m)" . "</p><div id='" . $wf[ $m ][ 'url' ] . 
+        "' class='url-open'>View on Packal</div></div>";
       }
 
     endforeach;
@@ -587,9 +562,21 @@ function status() {
   </div>
 </div>
 
-<div><p>There are <strong><?php echo count( $wf ); ?></strong> workflows available on Packal.</p></div>
+  <div>
+    <p>
+      There are 
+      <strong><?php echo count( $wf ); ?></strong>
+      workflows available on Packal.
+    </p>
+  </div>
 
-<div><p>You've written <strong><?php echo count( $meta[ 'mineOnPackal' ] ); ?></strong> of the ones on Packal.</p></div>
+  <div>
+    <p>
+      You've written 
+      <strong><?php echo count( $meta[ 'mineOnPackal' ] ); ?></strong>
+      of the ones on Packal.
+    </p>
+  </div>
 </div>
   <script type='text/javascript'>
   $( "#myworkflows" ).accordion({ active: false, collapsible: true });
@@ -600,7 +587,6 @@ function status() {
     $.get( "packal.php", { action: 'openDirectory', 'directory': dir } );
   });
   $( '.update-manifest' ).click( function() {
-    // dir = $( this ).attr( 'id' ); , data: { action: 'updateManifest' }
     $.ajax({
       url: 'packal.php',
       beforeSend: function( xhr ) {
@@ -625,46 +611,69 @@ function status() {
 function about() {
 ?>
 
-<h2>How Does it Work?</h2>
+<div id='about'>
+  <h2>How Does it Work?</h2>
 
-<h3>Packal.org</h3>
+  <h3>Packal.org</h3>
+  <p>
+    This workflow is a companion to Packal.org. It can update any workflows
+    that you have downloaded from the site. However, it does not work with any
+    other sources.
+  </p>
+
+  <h3>Code Signing</h3>
+  <p>
+
+  </p>
+  <h3>Plist Migration</h3>
+
+  <h2>Support this Project</h2>
+  <p>The Packal Updater Workflow is an extension of 
+    <a href='http://www.packal.org' class='hijack' >Packal.org</a>, which is 
+    developed, maintained, and <em>funded</em> by Shawn Patrick Rice. While 
+    there are ads on the website, they don't cover the server costs. If you'd 
+    like to chip in to help Packal running, then click the little, yellow button
+    below.
+  </p>
+  <p class='clearfix'></p>
+  <div style='text-align: center;'>
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input type="hidden" name="cmd" value="_donations">
+    <input type="hidden" name="business" value="rice@shawnrice.org">
+    <input type="hidden" name="item_name" value="Donation">
+    <input type="hidden" name="currency_code" value="USD">
+    <input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_LG.gif:NonHostedGuest">
+    <input type="image" src="assets/images/paypal.gif" name="submit" alt="PayPal - The safer, easier way to pay online!">
+    <img alt="" border="0" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==">
+  </form>
+</div>
+  <h2>License</h2>
+  Code is provided AS IS.
+
+  GPL v3.
 
 
-<h3>Code Signing</h3>
+  <h2>Credit Where Credit is Due</h2>
+  Fonts
+  Merrasay?
+  Lato?
 
+  <p>For the dynamic layout of this "application" code was used from the overly talented <a href='http://www.linkedin.com/in/manoela' class='hijack'>Manoela "Mary Lou" Ilic</a> from <a href='http://tympanus.net/codrops/' class='hijack'>Codrops</a>.</p>
+  <p>Specifically, the <a href='http://tympanus.net/codrops/2013/09/30/animated-border-menus/' class='hijack'>menus</a> were adapted as was the <a href='http://tympanus.net/codrops/2013/05/21/natural-language-form-with-custom-input-elements/' class='hijack'>settings form</a>.</p>
+  <p>Icons from <a href='http://fortawesome.github.io/Font-Awesome/' class='hijack'>Font Awesome</a>.</p>
 
+  The updated makes use of Terminal Notifier.
 
-<h2>Support this Project</h2>
-<p>The Packal Updater Workflow is an extension of <a href='http://www.packal.org'>Packal.org</a>, which is developed, maintained, and funded by Shawn Patrick Rice.</p>
-<p class='clearfix'></p>
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-  <input type="hidden" name="cmd" value="_donations">
-  <input type="hidden" name="business" value="rice@shawnrice.org">
-  <input type="hidden" name="item_name" value="Donation">
-  <input type="hidden" name="currency_code" value="USD">
-  <input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_LG.gif:NonHostedGuest">
-  <input type="image" src="assets/images/paypal.gif" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==">
-</form>
-<h2>License</h2>
-Code is provided AS IS.
-
-GPL v3.
-
-
-<h2>Credit Where Credit is Due</h2>
-Fonts
-Merrasay?
-Lato?
-
-<p>For the dynamic layout of this "application" code was used from the overly talented <a href='http://www.linkedin.com/in/manoela'>Manoela "Mary Lou" Ilic</a> from <a href='http://tympanus.net/codrops/'>Codrops</a>.</p>
-<p>Specifically, the <a href='http://tympanus.net/codrops/2013/09/30/animated-border-menus/'>menus</a> were adapted as was the <a href='http://tympanus.net/codrops/2013/05/21/natural-language-form-with-custom-input-elements/'>settings form</a>.</p>
-<p>Icons from <a href='http://fortawesome.github.io/Font-Awesome/'>Font Awesome</a>.</p>
-
-The updated makes use of Terminal Notifier.
-
-And, of course, <a href='http://www.alfredapp.com'>Alfred</a> itself without which none of this would be possible — or practical.
-
+  And, of course, <a href='http://www.alfredapp.com' class='hijack'>Alfred</a> itself without which none of this would be possible — or practical.
+</div>
+<script>
+  $( '.hijack' ).click( function() {
+    event.preventDefault();
+    link = $( this ).attr( 'href' );
+    $.get( "packal.php", { action: 'openDirectory', 'directory': link } );
+    alert( link );
+  });
+</script>
 <?php
 }
 
@@ -734,7 +743,6 @@ function updates() {
       }).done(function( data ) {
         $( '.pane' ).load( 'packal.php', { page: 'updates' } ).hide().fadeIn('fast').delay(50);
         $( '#updating-overlay' ).hide();
-        // $( '#manifest-status' ).html( data );
       });
     });
   </script>
@@ -785,13 +793,12 @@ function writeBlacklist() {
 function writeConfig() {
   global $config, $data;
 
-  $backups = array( 
-                    1 => 'one',
+  $backups = array( 1 => 'one',
                     2 => 'two',
                     3 => 'three',
                     4 => 'four',
                     5 => 'five'
-    );
+  );
 
   $key = $_GET[ 'key' ];
   $value = $_GET[ 'value' ];
@@ -836,8 +843,36 @@ function updateManifest() {
   global $data;
 
   $call = exec( "../cli/packal.sh update TRUE TRUE");
-  
-  // Set date/time things here.
+  $time = getManifestModTime();
+  echo "The manifest was last updated <strong>$time</strong>";
+  die();
+}
+
+function updateWorkflow() {
+  $bundle = $_GET[ 'workflow' ];
+  $call = exec( "php " . __DIR__ . "/../cli/packal.php doUpdate '$bundle'");
+  echo $call;
+  die();
+}
+
+function deleteFile() {
+  $file = $_GET[ 'file' ];
+  echo $file;
+}
+
+/*******************************************************************************
+ * Utility Functions
+ ******************************************************************************/
+
+function sortWorkflowByName( $a, $b ) {
+  return $a[ 'name' ] > $b[ 'name' ];
+}
+
+function getManifestModTime() {
+
+  global $data;
+
+    // Set date/time things here.
   $m     = date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) );
   $days  = floor( $m / 86400 );
   $hours = floor( ( $m - ( $days * 86400 ) ) / 3600 );
@@ -858,35 +893,32 @@ function updateManifest() {
     }
   } else {
     $time = '';
-    if ( $hours > 0 )
-      $time .= $hours . ' hours, ';
-    if ( $mins > 0 )
-      $time .=  $mins . ' minutes';
+    if ( $hours > 0 ) {
+      $time .= $hours . ' hour';
+      if ( $hours > 1 )
+        $time .= 's, ';
+      else
+        $time .= ', ';
+    }
+    if ( $mins > 0 ) {
+      $time .=  $mins . ' minute';
+      if ( $mins > 1 )
+        $time .= 's';
+      else
+        $time .= '';
+    }
     if ( $hours > 0 && $mins > 0 )
       $time .= ', and ';
     else if ( $hours > 0 || $mins > 0 )
       $time .= ' and ';
-    if ( $secs > 0 )
-      $time .= $secs . ' seconds';
+    if ( $secs > 0 ) {
+      $time .= $secs . ' second';
+      if ( $time > 1 )
+        $time .= 's';
+    }
     $time .= ' ago.';
   }
-
-  echo "The manifest was last updated <strong>$time</strong>";
-}
-
-function updateWorkflow() {
-  $bundle = $_GET[ 'workflow' ];
-  $call = exec( "php ../cli/packal.php doUpdate '$bundle'");
-  die();
-
-}
-
-/*******************************************************************************
- * Utility Functions
- ******************************************************************************/
-
-function sortWorkflowByName( $a, $b ) {
-  return $a[ 'name' ] > $b[ 'name' ];
+  return $time;
 }
 
 ?>

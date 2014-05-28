@@ -32,6 +32,14 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
+				<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
 				<string>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</string>
 				<key>modifiers</key>
 				<integer>0</integer>
@@ -105,23 +113,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>escaping</key>
-				<integer>127</integer>
-				<key>script</key>
-				<string>php scripts/packal-controller-script.php</string>
-				<key>type</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>argumenttype</key>
 				<integer>1</integer>
 				<key>escaping</key>
@@ -167,6 +158,23 @@
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>127</integer>
+				<key>script</key>
+				<string>php scripts/packal-controller-script.php</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string></string>
@@ -190,7 +198,7 @@
 		<key>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</key>
 		<dict>
 			<key>ypos</key>
-			<real>10</real>
+			<real>210</real>
 		</dict>
 		<key>C1FFB920-0CA6-4611-ACCE-9D08E0295195</key>
 		<dict>

@@ -510,6 +510,16 @@ Status
 }*/
 
 /*******************************************************************************
+ * About
+ ******************************************************************************/
+
+#about {
+  font-size: 1.5em;
+  line-height: 1.5em;
+  width: 95%;
+}
+
+/*******************************************************************************
 General Layout
 *******************************************************************************/
 .viewport {
@@ -545,7 +555,7 @@ Updates
   background: url( '../../assets/images/packal-man.jpg' ) no-repeat center;
   
   position: absolute;
-  height: 77%;
+  height: 60%;
   width: 93%;
   opacity: .25;
   clear: none;
@@ -556,7 +566,7 @@ Updates
   position: absolute;
   float: left;
   font-size: 1.5em;
-  margin-top: 20%;
+  margin-top: 15%;
   margin-left: 25%;
   
 }
