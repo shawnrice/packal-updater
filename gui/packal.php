@@ -611,9 +611,11 @@ function status() {
 function about() {
 ?>
 
-<div id='about'>
+<div id='about-section'>
   <h2>How Does it Work?</h2>
-
+  <p>
+    In a nutshell, it updates the workflows that you've downloaded from Packal.org.
+  </p>
   <h3>Packal.org</h3>
   <p>
     This workflow is a companion to Packal.org. It can update any workflows
@@ -623,10 +625,19 @@ function about() {
 
   <h3>Code Signing</h3>
   <p>
-
+    All packages downloaded from Packal have been signed by the server, and the
+    signature is checked by this workflow before an update is allowed to
+    continue. This check ensures that the package hasn't been tampered with.
   </p>
   <h3>Plist Migration</h3>
-
+  <p>
+    When Alfred updates workflows normally, it strips any hotkeys found in the
+    new <code>info.plist</code> file, and it also migrates any hotkeys / keywords
+    that the user set. The Packal updater does the same thing. However, if you
+    have modified the original workflow, then the updater will overwrite those
+    modifications. If you do not want a workflow to be overwritten, then just
+    mark it off under the blacklist tab.
+  </p>
   <h2>Support this Project</h2>
   <p>The Packal Updater Workflow is an extension of 
     <a href='http://www.packal.org' class='hijack' >Packal.org</a>, which is 
@@ -648,30 +659,65 @@ function about() {
   </form>
 </div>
   <h2>License</h2>
-  Code is provided AS IS.
+  <p>Code is provided AS IS under the GPLv3 license.</p>
 
-  GPL v3.
-
+  <p>Copyright © <?php printCopyrightYear(); ?>  Shawn Patrick Rice</p>
+  <p>
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+  </p>
+  <p>
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+  </p>
+  <p>
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, 
+    <a href='http://www.gnu.org/licenses/' class='hijack'>see the license here</a>.
+  </p>
 
   <h2>Credit Where Credit is Due</h2>
   Fonts
-  Merrasay?
+  Merrasat?
   Lato?
 
-  <p>For the dynamic layout of this "application" code was used from the overly talented <a href='http://www.linkedin.com/in/manoela' class='hijack'>Manoela "Mary Lou" Ilic</a> from <a href='http://tympanus.net/codrops/' class='hijack'>Codrops</a>.</p>
-  <p>Specifically, the <a href='http://tympanus.net/codrops/2013/09/30/animated-border-menus/' class='hijack'>menus</a> were adapted as was the <a href='http://tympanus.net/codrops/2013/05/21/natural-language-form-with-custom-input-elements/' class='hijack'>settings form</a>.</p>
-  <p>Icons from <a href='http://fortawesome.github.io/Font-Awesome/' class='hijack'>Font Awesome</a>.</p>
+  <p>
+    For the dynamic layout of this "application" code was used from the overly
+    talented <a href='http://www.linkedin.com/in/manoela' class='hijack'>Manoela 
+    "Mary Lou" Ilic</a> from 
+    <a href='http://tympanus.net/codrops/' class='hijack'>Codrops</a>.
+  </p>
+  <p>
+    Specifically, the 
+    <a href='http://tympanus.net/codrops/2013/09/30/animated-border-menus/'
+     class='hijack'>menus</a> were adapted as was the 
+    <a href='http://tympanus.net/codrops/2013/05/21/natural-language-form-with-custom-input-elements/' 
+     class='hijack'>settings form</a>.
+  </p>
+  <p>
+    Icons from 
+    <a href='http://fortawesome.github.io/Font-Awesome/' class='hijack'>
+    Font Awesome</a>.
+  </p>
 
-  The updated makes use of Terminal Notifier.
+  <p>
+    The updater makes use of Terminal Notifier.
+  </p>
 
-  And, of course, <a href='http://www.alfredapp.com' class='hijack'>Alfred</a> itself without which none of this would be possible — or practical.
+  <p>
+    And, of course, <a href='http://www.alfredapp.com' class='hijack'>Alfred</a>
+    itself without which none of this would be possible — or practical.
+  </p>
 </div>
 <script>
   $( '.hijack' ).click( function() {
     event.preventDefault();
     link = $( this ).attr( 'href' );
     $.get( "packal.php", { action: 'openDirectory', 'directory': link } );
-    alert( link );
   });
 </script>
 <?php
@@ -919,6 +965,15 @@ function getManifestModTime() {
     $time .= ' ago.';
   }
   return $time;
+}
+
+function printCopyrightYear() {
+  $year = date( 'Y', mktime() );
+  
+  if ( $year != 2014 )
+    echo "2014 – $year";
+  else
+    echo "2014";
 }
 
 ?>
