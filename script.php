@@ -2,11 +2,14 @@
 
 require_once( 'libraries/workflows.php' );
 
-$w     = new Workflows;
-$q     = $argv;
-$data  = $w->data();
-$cache = $w->cache();
+// Get the version of OSX; if we aren't using Mavericks, then we'll need to download the PHP binary.
+$osx = exec( "sw_vers | grep 'ProductVersion:' | grep -o '10\.[0-9]*'" );
 
+$w      = new Workflows;
+$q      = $argv;
+$data   = $w->data();
+$cache  = $w->cache();
+$config = simplexml_load_file( "$data/config/config.xml" );
 if ( ! file_exists( $data ) )
   mkdir( $data );
 if ( ! file_exists( $cache) )
@@ -15,11 +18,16 @@ if ( ! file_exists( $cache) )
 // Update the manifest if past cache.
 exec( __DIR__ . "/cli/packal.sh update" );
 
-$manifest = simplexml_load_file( "$data/manifest.xml" );
-$json = json_decode( file_get_contents( "$data/endpoints/endpoints.json" ), TRUE );
-$mine = array_keys( $json );
-$count = count( $manifest->workflow );
-$me = exec( "php " . __DIR__ . "/cli/packal.php getOption username" );
+// Do the workflow reporting script as long as the config option is set.
+if ( $config->workflowReporting == 1 )
+  exec( "nohup php " . __DIR__ . "/report-usage-data.php  > /dev/null 2>&1 &" );
+
+$blacklist = json_decode( file_get_contents( "$data/config/blacklist.json" ), TRUE );
+$manifest  = simplexml_load_file( "$data/manifest.xml" );
+$json      = json_decode( file_get_contents( "$data/endpoints/endpoints.json" ), TRUE );
+$mine      = array_keys( $json );
+$count     = count( $manifest->workflow );
+$me        = exec( "php " . __DIR__ . "/cli/packal.php getOption username" );
 
 foreach ( $manifest->workflow as $wf ) :
 
@@ -55,7 +63,7 @@ unset( $wf );
     if ( file_exists( "../$v/packal/package.xml" ) ) {
       $p = simplexml_load_file( "../$v/packal/package.xml" );
       if ( in_array( $k, $manifestBundles ) ) {
-        if ( ($wf[ "$k" ][ 'updated' ] ) > $p->updated + 500) {
+        if ( ($wf[ "$k" ][ 'updated' ] ) > $p->updated + 500 && ( ! in_array( $k, $blacklist ) ) ) {
           $updates[ $k ][ 'name' ] = (string) $p->name;
           $updates[ $k ][ 'path' ] = "../$v";
           $updates[ $k ][ 'version' ] = (string) $p->version;
@@ -65,16 +73,33 @@ unset( $wf );
   endforeach;
 
 if ( empty( $q[1] ) ) {
+  if ( ! isset( $updates ) )
+    $w->result( 'updates', 'updates', 'All of your workflows are up to date.', "", '', 'no', 'update');
+  else 
+    $w->result( 'updates', 'updates', 'Updates available', "There are " . count( $updates ) . " available updates.", '', 'no', 'update');
+
+  if ( ( date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) < 86400 ) ) ) {
+    $manifestTime = getManifestModTime();
+    $w->result( '', '', 'The manifest is up to date.', "Last updated $manifestTime", '', 'yes', '');
+  } else {
+    $w->result( '', '', 'The manifest is out of date.', "Last updated $manifestTime", '', 'yes', '');
+  }
+
   $w->result( 'open-gui', 'open-gui', 'Open GUI', 'Open GUI', '', 'yes', '');
-  $w->result( '', '', 'Manifest', "There are $count workflows in the manifest.", '', 'no', '');
+  $w->result( '', '', 'Packal', "There are $count workflows in the manifest.", '', 'no', '');
   $w->result( '', '', 'Packal', "Of which, you have " . count( $packal ) . " installed.", '', 'no', '');
   $w->result( '', '', 'Packal', "And you wrote " . count( $mywf ) . " of those.", '', 'no', '');
-  $w->result( 'updates', 'updates', 'Updates available', "There are " . count( $updates ) . " available updates.", '', 'no', 'update');
+  
   echo $w->toxml();
   die();
 }
 
-if ( $q[1] == 'update' ) {
+// $pattern = "/[uU]{1}[pP]{1}/";
+// print_r( preg_match( $pattern, $q[1] ) );
+// if ( preg_match( $pattern, $q[1] ) ) {
+if ( strpos( $q[1], 'update' ) !== FALSE ) {
+  if ( ! isset( $updates ) )
+    $updates = array();
   if ( count( $updates ) > 0 ) {
     if ( count( $updates ) > 1 ) {
       $w->result( 'update-all', 'update-all', "Update all workflows", '', '', '', '');
@@ -83,7 +108,7 @@ if ( $q[1] == 'update' ) {
       $w->result( "update-$k", "update-$k", "Update " . $v[ 'name' ], "Update from version " . $v[ 'version' ] . " to " . $wf[ $k ][ 'version' ], $v[ 'path' ] . "/icon.png", '', '');
     endforeach;
   } else {
-    $w->result( '', '', "There are no updates", '', '', 'no', '');
+    $w->result( '', '', "All of your workflows are up to date.", '', '', 'no', '');
   }
   echo $w->toxml();
   die();
@@ -117,5 +142,56 @@ function return_backups( $dir, &$w ) {
 
 }
 
+function getManifestModTime() {
 
+  global $data;
+
+    // Set date/time things here.
+  $m     = date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) );
+  $days  = floor( $m / 86400 );
+  $hours = floor( ( $m - ( $days * 86400 ) ) / 3600 );
+  $mins  = floor( ( $m - ( $hours * 3600 ) ) / 60 );
+  $secs  = floor( $m % 60 );
+
+  if ( $m > ( 60 * 60 * 24 ) ) {
+    if ( $m > ( 60 * 60 * 24 * 7) ) {
+      if ( $m > ( 60 * 60 * 24 * 7 * 30) ) {
+        if ( $m > ( 60 * 60 * 24 * 7 * 120) ) {
+          $time = "a really long time ago.";
+        }
+        $time = "over a month ago.";
+      }
+      $time = "over a week ago.";
+    } else {
+      $time = "over a day ago.";
+    }
+  } else {
+    $time = '';
+    if ( $hours > 0 ) {
+      $time .= $hours . ' hour';
+      if ( $hours > 1 )
+        $time .= 's, ';
+      else
+        $time .= ', ';
+    }
+    if ( $mins > 0 ) {
+      $time .=  $mins . ' minute';
+      if ( $mins > 1 )
+        $time .= 's';
+      else
+        $time .= '';
+    }
+    if ( $hours > 0 && $mins > 0 )
+      $time .= ', and ';
+    else if ( $hours > 0 || $mins > 0 )
+      $time .= ' and ';
+    if ( $secs > 0 ) {
+      $time .= $secs . ' second';
+      if ( $time > 1 )
+        $time .= 's';
+    }
+    $time .= ' ago.';
+  }
+  return $time;
+}
 ?>

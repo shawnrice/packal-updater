@@ -15,7 +15,7 @@
   else if ( isset( $_POST[ 'page' ] ) )
     $page   = $_POST[ 'page' ];
   else
-    $page   = 'about';
+    $page   = 'updates';
 
   if ( ! file_exists( "$data/config/config.xml" ) ) {
     $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
@@ -126,6 +126,8 @@
     else
       $file = 'assets/images/package.png';
 
+
+
     ?>
     <div class = <?php echo "'$classes'"; ?> >
       <h3>
@@ -138,6 +140,7 @@
       <p>By <?php echo exec( "/usr/libexec/PlistBuddy -c \"Print :createdby\" '$workflowsDir/$d/info.plist'" ); ?></p>
       <p><?php echo "$b"; ?></p>
       <div class = 'wficon-container'>
+
         <img src=<?php echo "'$file'"; ?> class = 'wficon' />
       </div>
     </div>
@@ -261,7 +264,7 @@ function blacklist() {
       
       <div id=<?php echo "'$bundleFix'"; ?> class = <?php echo "'$classes'"; ?> >
         <div id=<?php echo "'disabled-$bundleFix'"?> class=<?php echo "'blacklisted$disabled $bundle'"?>>
-          <i class=<?php echo "'fa fa-times$disabled'"?> style='line-height: 190px; font-size: 250px; padding-left: 20%;'></i>
+          <i class=<?php echo "'fa fa-times'"?> style='line-height: 190px; font-size: 250px; padding-left: 20%;'></i>
         </div>
         <div><h3><?php echo $w['name']; ?></h3></div>
         <div class='short'><p> <?php echo $wf[ $bundle ][ 'short' ]; ?></p></div>
@@ -300,7 +303,7 @@ These are your workflows that are found on Packal. We won't try to update them.<
       <div><h3><?php echo $name; ?></h3></div>
       <div class='short'><p> <?php echo $wf[ $bundle ][ 'short' ]; ?></p></div>
       <div class = 'wficon-container'>
-        <img alt='workflow icon' src=<?php if ( $file === TRUE ) echo "serve_image.php?file=" . __DIR__ . "/" . $workflowsDir . $workflows[ $bundle ] ."/icon.png"; ?> class = 'wficon' />
+        <img alt='workflow icon' src=<?php if ( $file === TRUE ) echo "serve_image.php?file=" . __DIR__ . "/" . $workflowsDir . $workflows[ $bundle ] ."/icon.png"; else echo $file; ?> class = 'wficon' />
       </div>
     </div>
     <?php
@@ -706,6 +709,8 @@ function about() {
 
   <p>
     The updater makes use of Terminal Notifier.
+    Zebra Tooltips
+    https://github.com/stefangabos/Zebra_Tooltips/
   </p>
 
   <p>
@@ -725,7 +730,7 @@ function about() {
 
 
 function updates() {
-  global $manifestBundles, $wf, $workflowsDir, $data;
+  global $manifestBundles, $wf, $workflowsDir, $data, $blacklist;
   $manifest = simplexml_load_file( "$data/manifest.xml" );
   $endpoints = json_decode( file_get_contents( "$data/endpoints/endpoints.json" ), TRUE );
   foreach ( $endpoints as $k => $v ) :
@@ -742,7 +747,7 @@ function updates() {
     if ( file_exists( "$workflowsDir/$v/packal/package.xml" ) ) {
       $w = simplexml_load_file( "$workflowsDir/$v/packal/package.xml" );
       if ( in_array( $k, $manifestBundles ) ) {
-        if ( ($wf[ "$k" ][ 'updated' ] ) > $w->updated + 500) {
+        if ( ($wf[ "$k" ][ 'updated' ] ) > $w->updated + 500 && ( ! in_array( $k, $blacklist ) ) ) {
           // These are the ones that need updating.
           $updates[] = $wf[ "$k" ][ 'name' ];
           ?>

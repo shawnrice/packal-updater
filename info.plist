@@ -27,6 +27,14 @@
 				<key>modifiersubtext</key>
 				<string></string>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
 		</array>
 		<key>C1FFB920-0CA6-4611-ACCE-9D08E0295195</key>
 		<array>
@@ -164,7 +172,7 @@
 				<key>escaping</key>
 				<integer>127</integer>
 				<key>script</key>
-				<string>php scripts/packal-controller-script.php</string>
+				<string>php scripts/packal-controller-script.php "{query}"</string>
 				<key>type</key>
 				<integer>0</integer>
 			</dict>
@@ -172,6 +180,21 @@
 			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
 			<string>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -209,6 +232,11 @@
 		<dict>
 			<key>ypos</key>
 			<real>10</real>
+		</dict>
+		<key>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</key>
+		<dict>
+			<key>ypos</key>
+			<real>250</real>
 		</dict>
 	</dict>
 	<key>webaddress</key>

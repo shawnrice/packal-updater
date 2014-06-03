@@ -5,6 +5,7 @@ html {
 }
 
 body {
+  background: rgba(253, 253, 253, .5);
   user-select: none;
     -webkit-user-select: none;
 }
@@ -253,7 +254,7 @@ body {
   height: 10%;
   margin: 0 0 25px 0;
   /*padding-left: 3em;*/
-  background: #fff;
+  
   padding-bottom: 20px;
 
 }
@@ -479,7 +480,7 @@ Status
   float: right !important;
   margin: -1.9em 9em 0 0 !important;
   border: none !important;
-  width: 133px !important;
+  width: 126px !important;
   cursor: pointer;
   color: gray;
   border-bottom: 1px gray dashed !important;
@@ -519,6 +520,10 @@ Status
   width: 95%;
 }
 
+#about-section p {
+  margin-left: 2em;
+}
+
 /*******************************************************************************
 General Layout
 *******************************************************************************/
@@ -527,8 +532,8 @@ General Layout
   height: 600px;
   width: 1110px;
   padding: 0 10px 0 35px;
-  border: 1px black solid;
-  background: #fff;
+  /*border: 5px rgba(23, 23, 23, .5) solid;*/
+  background: rgba(253, 253, 253, .5);
 }
 
 .pane {

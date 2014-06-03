@@ -3,7 +3,7 @@
 # Set the cache directory
 bundle=com.packal.shawn.patrick.rice
 # file=$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow\ Data/$bundle/webserver/zombie
-file=/Users/Sven/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow\\\ Data/com.packal.shawn.patrick.rice/webserver/zombie
+file=/Users/Sven/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow\\\ Data/com.packal.shawn.patrick.rice/zombie
 # See if the time file exists; if so, check the time
 # Otherwise, kill the server (just in case)
 # And exit the script
@@ -17,7 +17,7 @@ echo "Waking up and starting the checks"
 while [ $alive -eq 1 ]
 do
 	echo "Doing a check..."
-	file=$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow\ Data/$bundle/webserver/zombie
+	file=$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow\ Data/$bundle/zombie
 	if [ -e "$file" ]
 	then 
 		# Find the UNIX Epoch time
@@ -32,7 +32,7 @@ do
 		# If the difference is greater than two minutes, then kill the webserver
 		if [ $diff -gt 120 ]
 			then
-				killall php-packal
+				killall php-5.5.13-cli
 				rm "$file"
 				echo "Killing the webserver"
 				alive=0
@@ -42,7 +42,7 @@ do
 		fi
 	else
 		# If the 
-		killall php-packal
+		killall php-5.5.13-cli
 		echo "Killing the webserver"
 		rm "$file"
 		alive=0

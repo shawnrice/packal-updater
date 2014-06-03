@@ -79,7 +79,7 @@ function setOption( $opt = array(), $value ) {
 }
 
 function validateAPI( $key ) {
-  // To be written.
+  // To be written, but not needed for this version.
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,6 @@ function checkUpdates( $opt = array() ) {
 
   print_r( $opt );
 
-
   if ( isset( $opt[0] ) ) {
     if ( $opt[0] == 1 )
       $yes = TRUE;
@@ -132,7 +131,6 @@ function checkUpdates( $opt = array() ) {
   } else {
     $force = FALSE;
   }
-
 
   $xml = simplexml_load_file( "$manifest" );
   $me  = getOption( array( 'username', TRUE ) );
@@ -216,6 +214,7 @@ function checkUpdates( $opt = array() ) {
     echo "Aborting.\n";
   }
 
+  // While this method is incomplete, it doesn't quite matter for current functionality.
 
 
 }

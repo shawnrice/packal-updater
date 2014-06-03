@@ -7,8 +7,8 @@
 
 // Set date/time to avoid warnings/errors.
 if ( ! ini_get('date.timezone') ) {
-$tz = exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' );
-ini_set( 'date.timezone', $tz );
+	$tz = exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' );
+	ini_set( 'date.timezone', $tz );
 }
   
 // Make the time
@@ -18,7 +18,7 @@ $time = time();
 $home = exec('echo $HOME');
 
 // Create the file path name
-$file = "$home/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/com.packal.shawn.patrick.rice/webserver/zombie";
+$file = "$home/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/com.packal.shawn.patrick.rice/zombie";
 
 // Place the file in the cache directory
 file_put_contents( $file , $time );

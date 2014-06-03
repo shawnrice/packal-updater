@@ -14,6 +14,7 @@ var keepMeAlive=setInterval( function() { keepAlive() }, 20000 );
  */
 function keepAlive() {
 	xmlhttp=new XMLHttpRequest();
-	xmlhttp.open( "GET","http://localhost:7893/gui/webserver-keep-alive-update.php" );
+	xmlhttp.open( "GET","http://localhost:7893/webserver-keep-alive-update.php" );
 	xmlhttp.send();
+	console.log( "Calling home.");
 }
