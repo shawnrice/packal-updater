@@ -75,38 +75,40 @@
         status();
         break;  
       default:
+      // Of course, we shouldn't get here because all the calls to this file
+      // are controlled.
         echo "<h1>$page</h1>";
+        echo "<p>You shouldn't be seeing this message. Some error has occured " .
+        "please contact the workflow author.</p>";
         break;
     endswitch;
   } else if ( isset( $action ) ) {
 
     switch ( $action ) :
-
-    case 'writeBlacklist' :
-      writeBlacklist();
-      die();
-      break;
-    case 'openDirectory' :
-      openDirectory();
-      die();
-      break;
-    case 'writeConfig' :
-      writeConfig();
-      break;
-    case 'updateManifest' :
-      updateManifest();
-      break;
-    case 'updateWorkflow' :
-      updateWorkflow();
-      break;
-    default:
-      echo "Action";
-      break;
+      case 'writeBlacklist' :
+        writeBlacklist();
+        die();
+        break;
+      case 'openDirectory' :
+        openDirectory();
+        die();
+        break;
+      case 'writeConfig' :
+        writeConfig();
+        break;
+      case 'updateManifest' :
+        updateManifest();
+        break;
+      case 'updateWorkflow' :
+        updateWorkflow();
+        break;
+      default:
+        echo "Action";
+        break;
     endswitch;
   }
+  // We should never really get here, so just die.
   die();
-
-
 
 ?>
 
@@ -125,9 +127,6 @@
       $file = "$workflowsDir/$d/icon.png";
     else
       $file = 'assets/images/package.png';
-
-
-
     ?>
     <div class = <?php echo "'$classes'"; ?> >
       <h3>
@@ -207,7 +206,6 @@ function backups() {
   </script>
   <?php
 }
-
 
 
 /**
@@ -296,8 +294,6 @@ These are your workflows that are found on Packal. We won't try to update them.<
       $file = TRUE;
     else
       $file = 'assets/images/package.png';
-
-
     ?>
     <div class = <?php echo "'$classes'"; ?> >
       <div><h3><?php echo $name; ?></h3></div>
@@ -489,9 +485,7 @@ function status() {
 
   endforeach;
 
-
   $time = getManifestModTime();
-
 
   foreach ( $workflows as $k => $v ) :
     if ( file_exists( "$workflowsDir/$v/packal/package.xml" ) && in_array( $k, $manifestBundles ) ) {
@@ -499,7 +493,6 @@ function status() {
 
     }
   endforeach;
-
 ?>
 
 <h1>Status</h1>
@@ -509,7 +502,6 @@ function status() {
   <p id='manifest-status'>The manifest was last updated <strong><?php echo "$time" ; ?></strong></p>
 <div class='update-manifest'>Update Manifest</div>
 </div>
-
 
 <div><p>You have <strong><?php echo count( $workflows ); ?></strong> workflows installed with Bundle IDs.</p></div>
 <div><p>Of those, <strong><?php echo count( $meta[ 'myWorkflows' ] ) ?></strong> are ones that you wrote.</p>
@@ -559,7 +551,6 @@ function status() {
       echo " ($m)" . "</p><div id='" . $wf[ $m ][ 'url' ] . 
         "' class='url-open'>View on Packal</div></div>";
       }
-
     endforeach;
         ?>
   </div>
@@ -822,7 +813,6 @@ function updates() {
     });
   </script>
   <?php
-
 }
 
 
@@ -857,8 +847,8 @@ function writeBlacklist() {
     $blacklist[] = $bundle;
 
   file_put_contents( "$data/config/blacklist.json", json_encode( $blacklist ) );
-
 }
+
 
 /**
  * Writes a Config Value
@@ -935,6 +925,7 @@ function deleteFile() {
   echo $file;
 }
 
+
 /*******************************************************************************
  * Utility Functions
  ******************************************************************************/
@@ -943,8 +934,8 @@ function sortWorkflowByName( $a, $b ) {
   return $a[ 'name' ] > $b[ 'name' ];
 }
 
-function getManifestModTime() {
 
+function getManifestModTime() {
   global $data;
 
     // Set date/time things here.
@@ -995,6 +986,7 @@ function getManifestModTime() {
   }
   return $time;
 }
+
 
 function printCopyrightYear() {
   $year = date( 'Y', mktime() );
