@@ -45,13 +45,13 @@
 
   // Grab manifest information.
   foreach ( $manifest as $m ) :
-    $manifestBundles[]             = $m->bundle;
+    $manifestBundles[]               = $m->bundle;
     $wf[ "$m->bundle" ][ 'name' ]    = $m->name;
     $wf[ "$m->bundle" ][ 'author' ]  = $m->author;
     $wf[ "$m->bundle" ][ 'version' ] = $m->version;
     $wf[ "$m->bundle" ][ 'short' ]   = $m->short;
     $wf[ "$m->bundle" ][ 'updated' ] = $m->updated;
-    $wf[ "$m->bundle" ][ 'url' ] = $m->url;
+    $wf[ "$m->bundle" ][ 'url' ]     = $m->url;
   endforeach;
 
   if ( isset( $page ) ) {
@@ -660,7 +660,30 @@ function about() {
     <input type="image" src="assets/images/paypal.gif" name="submit" alt="PayPal - The safer, easier way to pay online!">
     <img alt="" border="0" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==">
   </form>
-</div>
+  </div>
+  <h2>Anonymous Workflow Reporting</h2>
+  <p>
+    This workflow has the possibility to send the Packal website information 
+    about which workflows you have installed. The information sent includes only
+    the Bundle IDs of the workflows you have installed along with the names,
+    whether or not they are enabled/disabled, and whether or not they were downloaded
+    from Packal. The information is sent, at most, once per week, and the unique
+    identifier used comes from a random-ish string that has been hashed so that
+    there is no real way to get any real information from your computer. For a more
+    technical explanation, the unique identifier is a hashed (256) of the following
+    command:</p>
+<p>
+    <code>ioreg -rd1 -c IOPlatformExpertDevice | awk '/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }'</code>
+  </p>
+  <p>
+    Nothing else about your system is sent. And the reporting mechanism ignores workflows
+    without Bundle IDs. The information is used in order to determine the popularity of 
+    workflows in order to display better statistics for the workflows on Packal to be 
+    displayed for trending/popular workflows as well as for reports to workflow developers
+    about the popularity of their work. If you want a more detailed understanding of the
+    reporting mechanism, look at the file name <code>report-usage-data.php</code> in the
+    workflow root.
+  </p>
   <h2>License</h2>
   <p>Code is provided AS IS under the GPLv3 license.</p>
 
