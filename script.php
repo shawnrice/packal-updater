@@ -15,12 +15,33 @@ if ( ! file_exists( $data ) )
 if ( ! file_exists( $cache) )
   mkdir ( $cache );
 
+if ( ! file_exists( "$data/config" ) )
+  mkdir( "$data/config" );
+
+if ( ! file_exists( "$data/config/config.xml" ) ) {
+  $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
+  $config = new SimpleXMLElement( $d );  
+  $config->packalAccount = 0;
+  $config->forcePackal = 0;
+  $config->backups = 3;
+  $config->username = '';
+  $config->authorName = '';
+  $config->notifications = 'workflow';
+  $config->apiKey = '';
+  $config->asXML( "$data/config/config.xml" );
+  unset( $config );
+}
+
+if ( ! file_exists( "$data/manifest.xml" ) )
+  file_put_contents( "$data/manifest.xml", file_get_contents( "https://raw.github.com/packal/repository/master/manifest.xml" ) );
+
 // Update the manifest if past cache.
 exec( __DIR__ . "/cli/packal.sh update" );
 
 // Do the workflow reporting script as long as the config option is set.
-if ( $config->workflowReporting == 1 )
-  exec( "nohup php " . __DIR__ . "/report-usage-data.php  > /dev/null 2>&1 &" );
+// Disabled for testing.
+// if ( $config->workflowReporting == 1 )
+//   exec( "nohup php " . __DIR__ . "/report-usage-data.php  > /dev/null 2>&1 &" );
 
 $blacklist = json_decode( file_get_contents( "$data/config/blacklist.json" ), TRUE );
 $manifest  = simplexml_load_file( "$data/manifest.xml" );
@@ -85,18 +106,17 @@ if ( empty( $q[1] ) ) {
     $w->result( '', '', 'The manifest is out of date.', "Last updated $manifestTime", '', 'yes', '');
   }
 
-  $w->result( 'open-gui', 'open-gui', 'Open GUI', 'Open GUI', '', 'yes', '');
-  $w->result( '', '', 'Packal', "There are $count workflows in the manifest.", '', 'no', '');
-  $w->result( '', '', 'Packal', "Of which, you have " . count( $packal ) . " installed.", '', 'no', '');
-  $w->result( '', '', 'Packal', "And you wrote " . count( $mywf ) . " of those.", '', 'no', '');
+  $w->result( 'open-gui', 'open-gui', "Open Graphical 'Application'", 
+    'Configure this workflow, Update workflows, and learn about this workflow.', '', 'yes', '');
+  $w->result( '', '', 'Informational',
+    "There are $count workflows in the manifest," . 
+    " of which, you have " . count( $packal ) .
+    " installed, and you wrote " . count( $mywf ) . " of those.", '', 'no', '');
   
   echo $w->toxml();
   die();
 }
 
-// $pattern = "/[uU]{1}[pP]{1}/";
-// print_r( preg_match( $pattern, $q[1] ) );
-// if ( preg_match( $pattern, $q[1] ) ) {
 if ( strpos( $q[1], 'update' ) !== FALSE ) {
   if ( ! isset( $updates ) )
     $updates = array();
@@ -143,7 +163,6 @@ function return_backups( $dir, &$w ) {
 }
 
 function getManifestModTime() {
-
   global $data;
 
     // Set date/time things here.

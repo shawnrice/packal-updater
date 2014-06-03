@@ -66,16 +66,18 @@ file_put_contents( $file , $json );
 $data = array( 'info' => $json, 'unique' => $unique );
 
 $ch = curl_init();
-curl_setopt( $ch, CURLOPT_URL, 'http://api.packal.org' );
+curl_setopt( $ch, CURLOPT_URL, 'http://api.packal.org/index.php' );
 curl_setopt( $ch, CURLOPT_USERAGENT, 'packal-workflow-' . hash( 'sha256', $unique ) );
 curl_setopt( $ch, CURLOPT_POST, 1 );
 curl_setopt( $ch, CURLOPT_POSTFIELDS, $data );
-curl_setopt( $ch, CURLOPT_TIMEOUT, 4  );
-curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
+curl_setopt( $ch, CURLOPT_TIMEOUT, 15  );
+// curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
 $header = curl_getinfo ( $ch );
-$result = curl_exec( $ch );
+// $result = curl_exec( $ch );
+echo curl_exec( $ch );
 print_r( curl_error( $ch ) );
 curl_close($ch);
+die();
 if ( $result != ( 'Request Received and is valid. Signed: ' ) . hash( 'sha256', 'valid' ) )
 	unlink( $file );
 
