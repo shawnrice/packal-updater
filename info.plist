@@ -40,14 +40,6 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
 				<string>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</string>
 				<key>modifiers</key>
 				<integer>0</integer>
@@ -72,7 +64,7 @@
 				<key>lastpathcomponent</key>
 				<false/>
 				<key>onlyshowifquerypopulated</key>
-				<false/>
+				<true/>
 				<key>output</key>
 				<integer>2</integer>
 				<key>removeextension</key>
@@ -101,7 +93,7 @@
 				<key>keyword</key>
 				<string>packal</string>
 				<key>runningsubtext</key>
-				<string>Looking for new packages</string>
+				<string>Talking to server and processing data...</string>
 				<key>script</key>
 				<string>php script.php "{query}"</string>
 				<key>title</key>
@@ -144,14 +136,6 @@
 			<string>7E1A4F4B-A5EB-4D2A-807B-2C3AA5341204</string>
 			<key>version</key>
 			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>type</key>
-			<string>alfred.workflow.output.largetype</string>
-			<key>uid</key>
-			<string>AE61FC74-BE9B-40CB-A73B-EFEB7C10A19C</string>
-			<key>version</key>
-			<integer>0</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -212,11 +196,6 @@
 		<dict>
 			<key>ypos</key>
 			<real>10</real>
-		</dict>
-		<key>AE61FC74-BE9B-40CB-A73B-EFEB7C10A19C</key>
-		<dict>
-			<key>ypos</key>
-			<real>130</real>
 		</dict>
 		<key>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</key>
 		<dict>

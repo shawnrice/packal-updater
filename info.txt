@@ -1,4 +1,4 @@
-PHP 5.5.13 configured with "--enable-shared=no --enable-static=yes --enable-soap --with-zlib-dir --enable-embed=static --with-libedit --with-curl --with-zlib --with-gd --enable-mbstring  --with-openssl --with-mysqli --with-tidy --with-mysql --with-pdo-mysql --with-xmlrpc --with-bz2 --with-mcrypt --enable-zip"
+PHP 5.5.13 configured with "--enable-shared=no --enable-static=yes --enable-soap --with-zlib-dir --enable-embed=static --with-libedit --with-curl --with-zlib --with-gd --enable-mbstring  --with-openssl --with-mysqli --with-tidy --with-mysql --with-pdo-mysql --with-xmlrpc --with-bz2 --enable-zip --with-mcrypt=static"
 
 
 sw_vers | grep 'ProductVersion:' | grep -o '[0-9]*\.[0-9]*\.[0-9]*'

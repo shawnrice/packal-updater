@@ -3,7 +3,13 @@
 # important global variables
 bundle="com.packal.shawn.patrick.rice"
 manifest="https://raw.github.com/packal/repository/master/manifest.xml"
-path="$( cd "$(dirname "$0")" ; pwd -P ; cd - )"
+# echo `dirname "$0"`
+# exit
+# path="$( cd "$(dirname "$0")" ; pwd -P ; cd - )"
+# path=`pwd -P`
+# me=$(basename "$path")
+# path=`echo "$path"| sed 's|'"$me"'||g'`
+path="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P )"
 
 # Folders
 data="$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle"
@@ -75,37 +81,30 @@ isCacheValid() {
 
 generateMap() {
   # Creates a map of bundles and directories.
-
-  pushd `dirname $0` > /dev/null
-  path=`pwd -P`
-  popd > /dev/null
-
   endpoints="$data/endpoints"
-  dir=$(dirname "$path")
-  me=$(basename "$dir")
-  path=`echo $dir| sed 's|'"$me"'||g'`
-  
-if [ ! "$1" = "TRUE" ]; then
-    if [[ ! `checkModified "$endpoints/endpoints.json"` -lt `stat -f "%m" "$path/.."` ]]; then
+
+  if [ ! "$1" = "TRUE" ]; then
+    if [[ ! `checkModified "$endpoints/endpoints.json"` -lt `stat -f "%m" "$path"` ]]; then
       # Nothing new has been installed, so there is no reason to update the map
       exit 0
     fi
   fi
 
   echo "{" > "$endpoints/endpoints.json"
-  for w in "$path"*
+  for w in "$path/"*
   do
     local bundle=`$pb -c "Print :bundleid" "$w/info.plist" 2> /dev/null`
     if [ ! -z "$bundle" ]; then
       echo "\"$bundle\": \"$w\"," >> "$endpoints/endpoints.json"
     fi
   done
+
   echo `cat "$endpoints/endpoints.json" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' | sed -e '$s|,$|}|'`  > "$endpoints/endpoints.json"
 
   if [ -f "$endpoints/endpoints.list" ]; then
     rm "$endpoints/endpoints.list"
   fi
-  for w in "$path"*
+  for w in "$path/"*
   do
     local bundle=`$pb -c "Print :bundleid" "$w/info.plist" 2> /dev/null`
     if [ ! -z "$bundle" ]; then
@@ -154,6 +153,7 @@ backup() {
   name=`getOpt "$1" "name"`
   dir=`getDir "$1"`
   date=`date +"%Y-%m-%d-%H.%M.%S"`
+  path="$( cd "$(dirname "$0")" ; pwd -P ; cd - )"
 
   file=`echo $date-$name.alfredworkflow | tr '&' '_' | tr ' ' '_'`
   cd "$dir"
@@ -165,6 +165,8 @@ backup() {
 
   keep=`php "$path/packal.php" getOption backups`
 
+  echo "$keep"
+exit
   if [[ $backups -ge $keep ]]; then
     count=$backups
     files=`ls "$data/backups/$name" | grep alfredworkflow`

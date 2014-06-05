@@ -1,114 +1,119 @@
 <?php
 
-  // Set date/time to avoid warnings/errors.
-  if ( ! ini_get('date.timezone') ) {
-    $tz = exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' );
-    ini_set( 'date.timezone', $tz );
-  }
+require_once( '../functions.php' );
+firstRun();
 
-  $HOME = exec( 'echo $HOME' );
-  $data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice";
-  $workflowsDir = "../../";
-  // Start script.
-  if ( isset( $_GET[ 'action' ] ) )
-    $action = $_GET[ 'action' ];
-  else if ( isset( $_POST[ 'page' ] ) )
-    $page   = $_POST[ 'page' ];
-  else
-    $page   = 'updates';
+// Set date/time to avoid warnings/errors.
+if ( ! ini_get('date.timezone') ) {
+  $tz = exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' );
+  ini_set( 'date.timezone', $tz );
+}
 
-  if ( ! file_exists( "$data/config/config.xml" ) ) {
-    $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
-    $config = new SimpleXMLElement( $d );  
-    $config->packalAccount = 0;
-    $config->forcePackal = 0;
-    $config->backups = 3;
-    $config->username = '';
-    $config->authorName = '';
-    $config->notifications = 'workflow';
-    $config->apiKey = '';
-    $config->asXML( "$data/config/config.xml" );
-    unset( $config );
-  }
+$HOME = exec( 'echo $HOME' );
+$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice";
+
+$workflowsDir = realpath( __DIR__ . "/../../" );
+
+// Start script.
+if ( isset( $_GET[ 'action' ] ) )
+  $action = $_GET[ 'action' ];
+else if ( isset( $_POST[ 'page' ] ) )
+  $page   = $_POST[ 'page' ];
+else
+  $page   = 'status';
+
+if ( ! file_exists( "$data/config/config.xml" ) ) {
+  $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
+  $config = new SimpleXMLElement( $d );  
+  $config->packalAccount = 0;
+  $config->forcePackal = 0;
+  $config->backups = 3;
+  $config->username = '';
+  $config->authorName = '';
+  $config->notifications = 'workflow';
+  $config->apiKey = '';
+  $config->asXML( "$data/config/config.xml" );
+  unset( $config );
+}
 
 
-  $bundle    = 'com.packal.shawn.patrick.rice';
-  $config    = simplexml_load_file( "$data/config/config.xml" );
-  $me        = $config->username;
-  $end       = "$data/endpoints/endpoints.json";
-  $workflows = json_decode( file_get_contents( $end ), TRUE );
-  $manifest  = simplexml_load_file( "$data/manifest.xml" );
+$bundle    = 'com.packal.shawn.patrick.rice';
+$config    = simplexml_load_file( "$data/config/config.xml" );
+$me        = $config->username;
+$end       = "$data/endpoints/endpoints.json";
+$workflows = json_decode( file_get_contents( $end ), TRUE );
+$manifest  = simplexml_load_file( "$data/manifest.xml" );
 
-  if ( ! file_exists( "$data/config/blacklist.json" ) )
-    exec( "touch '$data/config/blacklist.json'" );
-  $blacklist = json_decode( file_get_contents( "$data/config/blacklist.json" ), TRUE );
+if ( ! file_exists( "$data/config/blacklist.json" ) )
+  exec( "touch '$data/config/blacklist.json'" );
+$blacklist = json_decode( file_get_contents( "$data/config/blacklist.json" ), TRUE );
 
-  // Grab manifest information.
-  foreach ( $manifest as $m ) :
-    $manifestBundles[]               = $m->bundle;
-    $wf[ "$m->bundle" ][ 'name' ]    = $m->name;
-    $wf[ "$m->bundle" ][ 'author' ]  = $m->author;
-    $wf[ "$m->bundle" ][ 'version' ] = $m->version;
-    $wf[ "$m->bundle" ][ 'short' ]   = $m->short;
-    $wf[ "$m->bundle" ][ 'updated' ] = $m->updated;
-    $wf[ "$m->bundle" ][ 'url' ]     = $m->url;
-  endforeach;
+// Grab manifest information.
+foreach ( $manifest as $m ) :
+  $manifestBundles[]               = $m->bundle;
+  $wf[ "$m->bundle" ][ 'name' ]    = $m->name;
+  $wf[ "$m->bundle" ][ 'author' ]  = $m->author;
+  $wf[ "$m->bundle" ][ 'version' ] = $m->version;
+  $wf[ "$m->bundle" ][ 'short' ]   = $m->short;
+  $wf[ "$m->bundle" ][ 'updated' ] = $m->updated;
+  $wf[ "$m->bundle" ][ 'url' ]     = $m->url;
+endforeach;
 
-  if ( isset( $page ) ) {
-    switch ( $page ):
-      case 'blacklist':
-        blacklist();
-        break;
-      case 'about' :
-        about();
-        break;
-      case 'settings':
-        settings();
-        break;
-      case 'backup' :
-        backups();
-        break;
-      case 'updates' :
-        updates();
-        break;
-      case 'status' :
-        status();
-        break;  
-      default:
-      // Of course, we shouldn't get here because all the calls to this file
-      // are controlled.
-        echo "<h1>$page</h1>";
-        echo "<p>You shouldn't be seeing this message. Some error has occured " .
-        "please contact the workflow author.</p>";
-        break;
-    endswitch;
-  } else if ( isset( $action ) ) {
+if ( isset( $page ) ) {
+  switch ( $page ):
+    case 'blacklist':
+      blacklist();
+      break;
+    case 'about' :
+      about();
+      break;
+    case 'settings':
+      settings();
+      break;
+    case 'backup' :
+      backups();
+      break;
+    case 'updates' :
+      updates();
+      break;
+    case 'status' :
+      status();
+      break;  
+    default:
+    // Of course, we shouldn't get here because all the calls to this file
+    // are controlled.
+      echo "<h1>$page</h1>";
+      echo "<p>You shouldn't be seeing this message. Some error has occured " .
+      "please contact the workflow author.</p>";
+      break;
+  endswitch;
+} else if ( isset( $action ) ) {
 
-    switch ( $action ) :
-      case 'writeBlacklist' :
-        writeBlacklist();
-        die();
-        break;
-      case 'openDirectory' :
-        openDirectory();
-        die();
-        break;
-      case 'writeConfig' :
-        writeConfig();
-        break;
-      case 'updateManifest' :
-        updateManifest();
-        break;
-      case 'updateWorkflow' :
-        updateWorkflow();
-        break;
-      default:
-        echo "Action";
-        break;
-    endswitch;
-  }
-  // We should never really get here, so just die.
-  die();
+  switch ( $action ) :
+    case 'writeBlacklist' :
+      writeBlacklist();
+      die();
+      break;
+    case 'openDirectory' :
+      openDirectory();
+      die();
+      break;
+    case 'writeConfig' :
+      writeConfig();
+      break;
+    case 'updateManifest' :
+      updateManifest();
+      break;
+    case 'updateWorkflow' :
+      updateWorkflow();
+      break;
+    default:
+      echo "Action";
+      break;
+  endswitch;
+}
+// We should never really get here, so just die.
+die();
 
 ?>
 
@@ -245,7 +250,7 @@ function blacklist() {
     foreach ( $eligible as $bundle => $w ) :
       $classes = "box blist $bundle";
 
-      if ( file_exists( $workflowsDir . $workflows[ $bundle ] ."/icon.png" ) )
+      if ( file_exists( $workflowsDir . '/' . $workflows[ $bundle ] ."/icon.png" ) )
         $file = TRUE;
       else
         $file = 'assets/images/package.png';
@@ -267,7 +272,7 @@ function blacklist() {
         <div><h3><?php echo $w['name']; ?></h3></div>
         <div class='short'><p> <?php echo $wf[ $bundle ][ 'short' ]; ?></p></div>
         <div class = 'wficon-container'>
-          <img alt='workflow icon' src=<?php if ( $file === TRUE ) echo "serve_image.php?file=" . __DIR__ . "/" . $workflowsDir . $workflows[ $bundle ] ."/icon.png"; ?> class = 'wficon' />
+          <img alt='workflow icon' src=<?php if ( $file === TRUE ) echo "serve_image.php?file=" . $workflowsDir . '/' . $workflows[ $bundle ] ."/icon.png"; ?> class = 'wficon' />
         </div>
       </div>
     
@@ -290,7 +295,7 @@ These are your workflows that are found on Packal. We won't try to update them.<
   foreach ( $mine as $bundle => $name ) :
     $classes = 'box disabled';
 
-    if ( file_exists( $workflowsDir . $workflows[ $bundle ] ."/icon.png" ) )
+    if ( file_exists( $workflowsDir . '/' . $workflows[ $bundle ] ."/icon.png" ) )
       $file = TRUE;
     else
       $file = 'assets/images/package.png';
@@ -299,7 +304,7 @@ These are your workflows that are found on Packal. We won't try to update them.<
       <div><h3><?php echo $name; ?></h3></div>
       <div class='short'><p> <?php echo $wf[ $bundle ][ 'short' ]; ?></p></div>
       <div class = 'wficon-container'>
-        <img alt='workflow icon' src=<?php if ( $file === TRUE ) echo "serve_image.php?file=" . __DIR__ . "/" . $workflowsDir . $workflows[ $bundle ] ."/icon.png"; else echo $file; ?> class = 'wficon' />
+        <img alt='workflow icon' src=<?php if ( $file === TRUE ) echo "serve_image.php?file=" . $workflowsDir . '/' . $workflows[ $bundle ] ."/icon.png"; else echo $file; ?> class = 'wficon' />
       </div>
     </div>
     <?php
@@ -351,7 +356,7 @@ function settings() {
         </select>
         have a Packal account<span class='packal-account'> with the username 
         <input name='username' type='text' placeholder='My Packal Username'
-        value=<?php echo "'$config->authorName'"; ?>></span>.
+        value=<?php echo "'$config->username'"; ?>></span>.
       </p>
       <p>
       Keep
@@ -453,7 +458,8 @@ function status() {
   global $wf, $config, $workflows, $blacklist, $manifestBundles, $me, $data, $workflowsDir;
 
   $meta = array();
-
+  $meta[ 'mineOnPackal' ] = array();
+  $meta[ 'myWorkflows' ] = array();
   if ( isset( $config->username ) && ( $config->username ) ) {
     foreach ( $wf as $bundle => $value ) :
       if ( $value[ 'author' ] == "$config->username" ) {
@@ -468,7 +474,7 @@ function status() {
     $meta[ 'installedWorkflows' ][] = $bundle;
     if ( isset( $config->authorName ) && ( $config->authorName ) ) {
       // Look here only if the user has set authorName value.
-        if ( exec( "/usr/libexec/PlistBuddy -c \"Print :createdby\" '$workflowsDir$dir/info.plist' &2> /dev/null" ) == $config->authorName )
+        if ( exec( "/usr/libexec/PlistBuddy -c \"Print :createdby\" '$workflowsDir/$dir/info.plist' &2> /dev/null" ) == $config->authorName )
           $meta[ 'myWorkflows' ][] = $bundle;
     }
 
@@ -504,24 +510,31 @@ function status() {
 </div>
 
 <div><p>You have <strong><?php echo count( $workflows ); ?></strong> workflows installed with Bundle IDs.</p></div>
-<div><p>Of those, <strong><?php echo count( $meta[ 'myWorkflows' ] ) ?></strong> are ones that you wrote.</p>
-<div id='myworkflows' class='detail-accordion'>
-  <h3>Details</h3>
-  <div class='detail-accordion'>
-      <?php
-        foreach ( $meta[ 'myWorkflows' ] as $m ) :
-          if ( isset( $wf[ $m ][ 'name' ] ) )
-            $name = $wf[ $m ][ 'name' ];
-          else {
-            $dir = $workflows[ $m ];
-            $name = exec( "/usr/libexec/PlistBuddy -c \"Print :name\" '$workflowsDir/$dir/info.plist' &2> /dev/null" );
-          }
-          echo '<p><strong>' . $name . '</strong> (' . $m . ")</p>";
-        endforeach;
-        ?>
-  </div>
+<?php 
+if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
+  ?>
+  <div><p>Of those, <strong><?php echo count( $meta[ 'myWorkflows' ] ) ?></strong> are ones that you wrote.</p>
+    <div id='myworkflows' class='detail-accordion'>
+      <h3>Details</h3>
+      <div class='detail-accordion'>
+          <?php
+            foreach ( $meta[ 'myWorkflows' ] as $m ) :
+              if ( isset( $wf[ $m ][ 'name' ] ) )
+                $name = $wf[ $m ][ 'name' ];
+              else {
+                $dir = $workflows[ $m ];
+                $name = exec( "/usr/libexec/PlistBuddy -c \"Print :name\" '$workflowsDir/$dir/info.plist' &2> /dev/null" );
+              }
+              echo '<p><strong>' . $name . '</strong> (' . $m . ")</p>";
+            endforeach;
+            ?>
+      </div>
+    </div>
 </div>
-</div>
+<?php
+}
+?>
+
 <div><p>You have installed <strong><?php echo count( $meta[ 'fromPackal' ] ); ?></strong> from Packal.</p>
 <div id='frompackal' class='detail-accordion'>
   <h3>Details</h3>
@@ -563,7 +576,9 @@ function status() {
       workflows available on Packal.
     </p>
   </div>
-
+<?php
+  if ( count( $meta[ 'mineOnPackal' ] ) > 0 ) {
+?>
   <div>
     <p>
       You've written 
@@ -571,6 +586,9 @@ function status() {
       of the ones on Packal.
     </p>
   </div>
+<?php
+}
+?>
 </div>
   <script type='text/javascript'>
   $( "#myworkflows" ).accordion({ active: false, collapsible: true });
@@ -592,6 +610,23 @@ function status() {
       $( '#manifest-status' ).html( data );
     });
   });
+
+  $( document ).ready( function() { 
+    if ( <?php echo date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) ); ?> > 86400 ) {
+      console.log( 'test' );
+      $.ajax({
+        url: 'packal.php',
+        beforeSend: function( xhr ) {
+          $( '#updating-overlay' ).show();
+        },
+        data: { action: 'updateManifest' },
+        }).done(function( data ) {
+          $( '#updating-overlay' ).hide();
+          $( '#manifest-status' ).html( data );
+      });
+    }
+  });
+
   </script>
 <?php
 }
@@ -811,6 +846,21 @@ function updates() {
         $( '#updating-overlay' ).hide();
       });
     });
+    $( document ).ready( function() { 
+    if ( <?php echo date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) ); ?> > 86400 ) {
+      $.ajax({
+        url: 'packal.php',
+        beforeSend: function( xhr ) {
+          $( '#updating-overlay' ).show();
+        },
+        data: { action: 'updateManifest' },
+        }).done(function( data ) {
+          $( '#updating-overlay' ).hide();
+      });
+      $( '.pane' ).load( 'packal.php', { page: 'updates' } ).hide().fadeIn('fast').delay(50);
+
+    }
+  });
   </script>
   <?php
 }
@@ -906,8 +956,12 @@ function openDirectory() {
 
 function updateManifest() {
   global $data;
+  if ( getManifest() == FALSE ) {
+    $time = getManifestModTime();
+    echo "The manifest was last updated <strong>$time</strong>, but it couldn't be updated.";  
+    die();
+  }
 
-  $call = exec( "../cli/packal.sh update TRUE TRUE");
   $time = getManifestModTime();
   echo "The manifest was last updated <strong>$time</strong>";
   die();
@@ -932,59 +986,6 @@ function deleteFile() {
 
 function sortWorkflowByName( $a, $b ) {
   return $a[ 'name' ] > $b[ 'name' ];
-}
-
-
-function getManifestModTime() {
-  global $data;
-
-    // Set date/time things here.
-  $m     = date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) );
-  $days  = floor( $m / 86400 );
-  $hours = floor( ( $m - ( $days * 86400 ) ) / 3600 );
-  $mins  = floor( ( $m - ( $hours * 3600 ) ) / 60 );
-  $secs  = floor( $m % 60 );
-
-  if ( $m > ( 60 * 60 * 24 ) ) {
-    if ( $m > ( 60 * 60 * 24 * 7) ) {
-      if ( $m > ( 60 * 60 * 24 * 7 * 30) ) {
-        if ( $m > ( 60 * 60 * 24 * 7 * 120) ) {
-          $time = "a really long time ago.";
-        }
-        $time = "over a month ago.";
-      }
-      $time = "over a week ago.";
-    } else {
-      $time = "over a day ago.";
-    }
-  } else {
-    $time = '';
-    if ( $hours > 0 ) {
-      $time .= $hours . ' hour';
-      if ( $hours > 1 )
-        $time .= 's, ';
-      else
-        $time .= ', ';
-    }
-    if ( $mins > 0 ) {
-      $time .=  $mins . ' minute';
-      if ( $mins > 1 )
-        $time .= 's';
-      else
-        $time .= '';
-    }
-    if ( $hours > 0 && $mins > 0 )
-      $time .= ', and ';
-    else if ( $hours > 0 || $mins > 0 )
-      $time .= ' and ';
-    if ( $secs > 0 ) {
-      $time .= $secs . ' second';
-      if ( $time > 1 )
-        $time .= 's';
-    }
-    $time .= ' ago.';
-  }
-  return $time;
 }
 
 

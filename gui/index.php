@@ -32,8 +32,9 @@
           <img alt='preloader' src='assets/images/preloader.gif' />
         </div>
       </div>
+      <div id='updating-overlay'><h2>Updating...</h2><img src='assets/images/preloader.gif'></div>
     </div>
-    <div id='updating-overlay'><h2>Updating...</h2><img src='assets/images/preloader.gif'></div>
+
     <script type='text/javascript' src='assets/js/jquery.min.js'></script>
     <script type='text/javascript' src='assets/js/classie.js'></script>
     <script type='text/javascript' src='assets/js/borderMenu.js'></script>
