@@ -32,7 +32,7 @@
           <img alt='preloader' src='assets/images/preloader.gif' />
         </div>
       </div>
-      <div id='updating-overlay'><h2>Updating...</h2><img src='assets/images/preloader.gif'></div>
+      <div id='updating-overlay'><div><h2>Updating...</h2><img src='assets/images/preloader.gif'></div></div>
     </div>
 
     <script type='text/javascript' src='assets/js/jquery.min.js'></script>
