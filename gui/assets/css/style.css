@@ -108,7 +108,6 @@ General Layout
   margin-top: 100px;
 }
 
-
 .box {
   position: relative;
   z-index: 0;
@@ -126,13 +125,10 @@ General Layout
     pointer-events: none;
 }
 
-
-
 .header h1 {
   margin: 10px 0 0 0;
   font-size: 3em;
 }
-
 
 .title {
   padding: 2em 0 0 0em;
@@ -323,7 +319,6 @@ General Layout
   margin-bottom: 1em;
 }
 
-
 /*******************************************************************************
  * About
  ******************************************************************************/
@@ -337,8 +332,6 @@ General Layout
 #about-section p {
   margin-left: 2em;
 }
-
-
 
 /*******************************************************************************
  * Updates
@@ -390,7 +383,6 @@ General Layout
 .update-icon img {
   max-width: 48px;
 }
-
 
 .update-content {
   position: relative;
@@ -498,6 +490,8 @@ Settings
   cursor: pointer;
 }
 
+#username,
+#authorName,
 #packal-username,
 #number-of-backups,
 #workflow-reporting,
@@ -505,7 +499,6 @@ Settings
 #notification-options {
   display: none;
 }
-
 
 /*******************************************************************************
   Menu
