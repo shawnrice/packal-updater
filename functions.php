@@ -1,22 +1,29 @@
 <?php
 
+$bundle = 'com.packal';
+
 function getManifest() {
+	global $bundle;
+
 	if ( checkConnection() === FALSE )
 		return FALSE;
 
 	$dir = exec( 'echo $HOME' ) . 
-		"/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice" .
+		"/Library/Application Support/Alfred 2/Workflow Data/$bundle" .
 		"/manifest.xml";
 
-	file_put_contents( "$dir", file_get_contents( 'https://raw.github.com/packal/repository/master/manifest.xml' ) );
+	file_put_contents( "$dir", 
+		file_get_contents( 'https://raw.github.com/packal/repository/master/manifest.xml' ) );
 
 	return TRUE;
 }
 
 function firstRun() {
+	global $bundle;
+
 	$HOME        = exec( 'echo $HOME' );
-	$data        = "$HOME/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice";
-	$cache       = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/com.packal.shawn.patrick.rice";
+	$data        = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
+	$cache       = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle";
 	$config      = "$data/config";
 	$endpoints   = "$data/endpoints";
 	$backups     = "$data/backups";
@@ -61,8 +68,10 @@ function firstRun() {
 }
 
 function generateEndpoints( $force = FALSE ) {
+	global $bundle;
+
 	$HOME = exec( 'echo $HOME' );
-	$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice";
+	$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
 	
 	if ( ! file_exists( "$data/endpoints" ) && is_dir( "$data/endpoints" ) ) {
 		mkdir( "$data/endpoints" );
@@ -101,7 +110,6 @@ function readPlistValue( $key, $plist ) {
 }
 
 function checkConnection() { 
-    //Initiates a socket connection to www.itechroom.com at port 80
     $connection = @fsockopen("www.google.com", 80, $errno, $errstr, 30);
 
     if ( $connection ) { 

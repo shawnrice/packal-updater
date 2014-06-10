@@ -1,20 +1,18 @@
 <?php
-require_once("../../scripts/first-run.php");
-require_once("../../scripts/config-functions.php");
-
-// Let's just double-check that the directory structure is there.
-checkCreateFolders();
-// Let's write a default config.
-writeConfig();
+// require_once("../first-run.php");
+require_once("../functions.php");
+firstRun();
 
 ?>
 <html>
 <head>
 <meta charset="UTF-8">
+<link href='assets/fonts/Montserrat/montserrat.css' rel='stylesheet' type='text/css'>
+<link href='assets/fonts/Source Sans Pro/source.sans.pro.css' rel='stylesheet' type='text/css'>
 <style>
 
 body {
-	font-family: 'Avenir Next';
+	font-family: 'Source Sans Pro';
 	font-size: 12px;
 	padding: 0;
 	margin: 0;
@@ -90,7 +88,6 @@ body {
 	height: 680px;
     width: 1100px;
     margin: 0px auto;
-    border: 5px gray solid;
     padding: 20px;
     
 }
@@ -98,6 +95,9 @@ body {
 #bot {
 	width: 140px; height: 240px; /* Basically the height of the image */
 	z-index: 1;
+}
+#bot img {
+	width: 140px; height: 240px;
 }
 
 #title, #bot, #body {
@@ -109,21 +109,11 @@ body {
 	height: 50%; width: 50%;
 	z-index: 0;
 	font-size: 15em;
-	left: 380px; top: 15px;
+	/*left: 380px; top: 15px;*/
 	color: #360758;
 	opacity: .6;
 	
 }
-
-/*
-
-W: 638px
-H: 178px
-
-250
-
-1140
-*/
 
 .bot-animation {
 		-webkit-animation:myfirst 3s;
@@ -170,7 +160,7 @@ to {
   50% {    -webkit-filter: opacity(0%) 		blur(4px);	left: 268px;  }
   80% {    -webkit-filter: opacity(60%)  	blur(1px);	left: 268px; color: #555}
   95% {    -webkit-filter: opacity(100%)  	blur(1px);	left: 268px; color: #360758}
- 100% {    -webkit-filter: opacity(100%) 	blur(1px); 	left: 380px; color: #360758 }
+ 100% {    -webkit-filter: opacity(100%) 	blur(1px); 	left: 250px; color: #360758 }
 }
 
 .fadeout {
@@ -260,7 +250,6 @@ text-align: center;
 	position: relative;
 	top: -4px;
 	   -webkit-appearance: none;
-/*    background: url('../images/arrow_down.png') no-repeat right #ddd; */
 
 }
 
@@ -269,8 +258,8 @@ text-align: center;
 }
 
 </style>
-<script src="http://localhost:7893/resources/js/jquery.min.js"></script>
-<script src="http://localhost:7893/resources/js/jquery-ui/ui/jquery-ui.js"></script>
+<script src="http://localhost:7893/assets/js/jquery.min.js"></script>
+<script src="http://localhost:7893/assets/js/jquery-ui/ui/jquery-ui.js"></script>
 
 <script>
 function slideleft() {
@@ -301,7 +290,7 @@ $(document).ready(function(){
 	<div id="animation">
 		<div id="title">Packal</div>
 		<div id="bot" class="first">
-			<img src="/resources/images/packal-man-large_Snapseed2.png">
+			<img src="assets/images/packal-man.jpg">
 		</div>
 	</div>
 	<div id="body">

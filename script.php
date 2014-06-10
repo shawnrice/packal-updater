@@ -40,6 +40,7 @@ if ( ! file_exists( "$data/config/blacklist.json" ) ) {
 
 generateEndpoints();
 
+// Not all of these are used right now.
 if ( ! file_exists( "$data/config/config.xml" ) ) {
   $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
   $config = new SimpleXMLElement( $d );  
@@ -69,7 +70,8 @@ if ( ! file_exists( "$data/manifest.xml" ) ) {
 
 // Update the manifest if past cache.
 // This is a potential failure spot.
-exec( "'" . __DIR__ . "/cli/packal.sh' update" );
+if ( checkConnection() !== FALSE )
+  exec( "'" . __DIR__ . "/cli/packal.sh' update" );
 
 // Do the workflow reporting script as long as the config option is set.
 // Disabled for testing.

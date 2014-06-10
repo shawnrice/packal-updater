@@ -1,6 +1,7 @@
 <?php
 
 require_once( __DIR__ . '/includes/plist-migration.php' );
+require_once( __DIR__ . '/../alfred.bundler.php' );
 $cliDir = __DIR__;
 $bundle   = "com.packal";
 $HOME     = exec( 'echo $HOME' );
@@ -151,8 +152,6 @@ function checkUpdates( $opt = array() ) {
       continue;
     }
 
-
-
     if ( file_exists( "$dir/packal/package.xml" ) ) {
       echo "Checking $i... $w->name ($w->bundle)";
 
@@ -259,7 +258,7 @@ function doUpdate( $bundle, $force = FALSE ) {
 
 
   $dir = trim( `"$cliDir/packal.sh" getDir "$bundle"` );
-  echo $dir;
+  // echo $dir;
   // The force variable means to download even if the original
   // is not from Packal. Obviously, since we don't have the
   // update data, this just means to download the update no
@@ -317,6 +316,9 @@ function doUpdate( $bundle, $force = FALSE ) {
   exec( "$cmd" );
 
   `rm -fR "$cache/update/$bundle"`;
+
+  $tn = __load( 'terminal-notifier' , 'default' , 'utility' );
+  exec( "$tn -title 'Packal Updater' -message '$xml->name has been updated to version $xml->version'" );
 
   echo "TRUE";
   return TRUE;

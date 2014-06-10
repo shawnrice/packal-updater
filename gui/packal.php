@@ -22,6 +22,9 @@ else if ( isset( $_POST[ 'page' ] ) )
 else
   $page   = 'status';
 
+if ( ! file_exists( "$data/config/firstRun" ) )
+  $page   = 'settings';
+
 if ( ! file_exists( "$data/config/config.xml" ) ) {
   $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
   $config = new SimpleXMLElement( $d );  
@@ -30,7 +33,7 @@ if ( ! file_exists( "$data/config/config.xml" ) ) {
   $config->backups = 3;
   $config->username = '';
   $config->authorName = '';
-  $config->notifications = 'workflow';
+  $config->notifications = '2';
   $config->apiKey = '';
   $config->asXML( "$data/config/config.xml" );
   unset( $config );
@@ -396,6 +399,16 @@ function settings() {
   global $config, $data, $workflowsDir;
   ?>
   <h1>Settings</h1>
+  <?php
+    if ( ! file_exists( "$data/config/firstRun" ) ) {
+      ?>
+      <div class='firstRun'>
+        <p>Since this is your first time using the updater, please fill out a few of these settings.</p>
+      </div>
+      <?php
+      file_put_contents( "$data/config/firstRun", "done" );
+    }
+  ?>
   <p class='clearfix'>&nbsp;</p>
   <div class='settings-form'>
       <p>
@@ -442,7 +455,7 @@ function settings() {
       </select>
       want Packal to update all my workflows (regardless of whether or not they were downloaded from Packal).
       </p> -->
-
+<!-- 
       <p>When updating workflows without the GUI, notify me
       <select name='notifications' class='notification-options'>
         <option <?php if ($config->notifications == 2) echo 'selected'; ?>>per workflow updated</option>
@@ -450,7 +463,7 @@ function settings() {
         <option <?php if ($config->notifications == 0) echo 'selected'; ?>>not at all</option>
       </select>
       .
-      </p>
+      </p> -->
       
     <span id='packal-username'></span>
     <span id='number-of-backups'></span>
@@ -501,6 +514,9 @@ function settings() {
         id = $( this ).attr( 'name' );
         $( '#' + id ).html( $( this ).val() );
         width = $( '#' + id ).textWidth();
+        if ( width < 100 ) {
+          width = 100;
+        }
         $( this ).css( 'width', width + 5 );
       });
       $( document ).ready( function() {
@@ -552,6 +568,9 @@ function settings() {
         id = $( this ).attr( 'name' );
         $( '#' + id ).html( $( this ).val() );
         width = $( '#' + id ).textWidth();
+        if ( width < 100 ) {
+          width = 100;
+        }
         $( this ).css( 'width', width + 5 );
       });
     </script>
@@ -636,8 +655,9 @@ function status() {
 <div>
   <p id='manifest-status'>The manifest was last updated <strong><?php echo "$time" ; ?></strong> <span class='update-manifest'>(Update)</span></p>
 </div>
-
+<p class='clearfix'> </p>
 <div><p>You have <strong><?php echo count( $workflows ); ?></strong> workflows installed with Bundle IDs.</p></div>
+<p class='clearfix'> </p>
 <?php 
 if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
   ?>
@@ -659,6 +679,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
       </div>
     </div>
 </div>
+<p class='clearfix'> </p>
 <?php
 }
 ?>
@@ -675,6 +696,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
   </div>
 </div>
 </div>
+<p class='clearfix'> </p>
 <div>
   <p>
     Of the others, 
@@ -696,6 +718,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
   </div>
 </div>
 </div>
+<p class='clearfix'> </p>
   <div>
     <p>
       There are 
@@ -703,6 +726,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
       workflows available on Packal.
     </p>
   </div>
+  <p class='clearfix'> </p>
 <?php
   if ( count( $meta[ 'mineOnPackal' ] ) > 0 ) {
 ?>
@@ -776,11 +800,11 @@ function about() {
 <div id='about-section'>
   <h2>How Does it Work?</h2>
   <p>
-    In a nutshell, it updates the workflows that you've downloaded from Packal.org.
+    In a nutshell, it updates the workflows that you've downloaded from <a href='http://www.packal.org' class='hijack'>Packal.org</a>.
   </p>
   <h3>Packal.org</h3>
   <p>
-    This workflow is a companion to Packal.org. It can update any workflows
+    This workflow is a companion to <a href='http://www.packal.org' class='hijack'>Packal.org</a>. It can update any workflows
     that you have downloaded from the site. However, it does not work with any
     other sources.
   </p>
@@ -826,7 +850,7 @@ function about() {
   </p>
   <h2>Support this Project</h2>
   <p>The Packal Updater Workflow is an extension of 
-    <a href='http://www.packal.org' class='hijack' >Packal.org</a>, which is 
+    <a href='http://www.packal.org' class='hijack'>Packal.org</a>, which is 
     developed, maintained, and <em>funded</em> by Shawn Patrick Rice. While 
     there are ads on the website, they don't cover the server costs. If you'd 
     like to chip in to help Packal running, then click the little, yellow button
@@ -867,10 +891,7 @@ function about() {
   </p>
 
   <h2>Credit Where Credit is Due</h2>
-  Fonts
-  Merrasat?
-  Lato?
-
+  <p>I have to thank <a href='http://www.packal.org/users/deanishe' class='hijack'>Dean Jackson</a> and <a href='http://www.packal.org/users/tyler-eich' class='hijack'>Tyler Eich</a> for feedback and testing.</p>
   <p>
     For the dynamic layout of this "application" code was used from the overly
     talented <a href='http://www.linkedin.com/in/manoela' class='hijack'>Manoela 
@@ -891,9 +912,7 @@ function about() {
   </p>
 
   <p>
-    The updater makes use of Terminal Notifier.
-    Zebra Tooltips
-    https://github.com/stefangabos/Zebra_Tooltips/
+    The updater makes use of <a href='https://github.com/alloy/terminal-notifier' class='hijack'>Terminal Notifier</a>.
   </p>
 
   <p>
