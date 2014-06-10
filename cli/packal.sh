@@ -3,12 +3,6 @@
 # important global variables
 bundle="com.packal"
 manifest="https://raw.github.com/packal/repository/master/manifest.xml"
-# echo `dirname "$0"`
-# exit
-# path="$( cd "$(dirname "$0")" ; pwd -P ; cd - )"
-# path=`pwd -P`
-# me=$(basename "$path")
-# path=`echo "$path"| sed 's|'"$me"'||g'`
 path="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P )"
 
 # Folders
