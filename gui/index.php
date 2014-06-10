@@ -44,18 +44,22 @@
       // Load the initial content.
       $( '.pane' ).load( 'packal.php' );
       $( '.nav' ).click( function() {
+        dest = $( this ).attr( 'id' );
         // An menu item has been clicked, so, start the callback to get the content.
         // Add in a preloader.
         $( '.pane' ).html("<div class='preloader'><h2>Loading...</h2><img alt='preloader' src='assets/images/preloader.gif' /></div>");
         // Actually grab the content and put it into the 'pane'
-        $( '.pane' ).load( 'packal.php', { page: $( this ).attr( 'id' ) } ).hide().fadeIn('fast').delay(50);
+        setTimeout(function() {
+          $( '.pane' ).load( 'packal.php', { page: dest } ).hide().fadeIn('fast');
+        }, 300);
+        
         // This just makes the menu go away when you select an option, basically duplicated from the borderMenu.js script.
         // Also, add a timeout so it's not too sudden.
         var menu = document.getElementById( 'bt-menu' );
         setTimeout( function() {
           classie.remove( menu, 'bt-menu-open' );
           classie.add( menu, 'bt-menu-close' );
-        }, 250);
+        }, 200);
       });
     </script>
   </body>

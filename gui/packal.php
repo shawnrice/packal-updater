@@ -10,7 +10,7 @@ if ( ! ini_get('date.timezone') ) {
 }
 
 $HOME = exec( 'echo $HOME' );
-$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice";
+$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
 
 $workflowsDir = realpath( __DIR__ . "/../../" );
 
@@ -37,7 +37,7 @@ if ( ! file_exists( "$data/config/config.xml" ) ) {
 }
 
 
-$bundle    = 'com.packal.shawn.patrick.rice';
+$bundle    = 'com.packal';
 $config    = simplexml_load_file( "$data/config/config.xml" );
 $me        = $config->username;
 $end       = "$data/endpoints/endpoints.json";
@@ -107,6 +107,9 @@ if ( isset( $page ) ) {
     case 'updateWorkflow' :
       updateWorkflow();
       break;
+    case 'deleteFile' :
+      deleteFile();
+      break; 
     default:
       echo "Action";
       break;
@@ -164,7 +167,7 @@ function backups() {
 ?>
 <h1>Backups</h1>
 <p class='clearfix'>&nbsp;</p>
-<div id='open-backup-dir'><h3>Open backups directory.</h3></div>
+<div id='' title=<?php echo "'$data/backups'";?> class='open-backup-dir'><h3>Open backups directory<i id='' title=<?php echo "'$data/backups'";?>  class='fa fa-folder-open fa-lg open-directory'></i></h3></div>
 
 <?php
  $backups = array_diff( scandir( "$data/backups" ), array( '.', '..', '.DS_Store') );
@@ -172,40 +175,90 @@ function backups() {
  foreach ( $backups as $b ) :
 
   ?> <div class='backup-box'> <?php
-   echo "<h2>$b <i id='$b' class='fa fa-search-plus fa-lg open-directory' style='margin-left: .5em;'></i></h2>";
+   echo "<h2>$b <i id='$b' title='$b' class='fa fa-folder-open fa-lg open-directory'></i></h2>";
    $dir = array_diff( scandir( "$data/backups/$b" ), array( '.', '..', '.DS_Store') );
-   echo "<ul class='backups fa-ul'>";
-   foreach ( $dir as $d ) :
-     $d = str_replace( '.alfredworkflow', '', $d );
-     $file = $d;
-     $pattern = "/([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{2})\.([0-9]{2})\.([0-9]{2})-/";
-     preg_match( $pattern, $d, $matches);
-     if ( isset( $matches[0] ) ) {
-       $d = str_replace( $matches[0], '', $d );
-       $date = date( 'M d, Y H:i', strtotime( "$matches[2]/$matches[3]/$matches[1] $matches[4]:$matches[5]:$matches[6]" ) );
-       echo "<li class=''><i id='$file' class='fa fa-times-circle delete-backup'></i> &nbsp;From $date</li>";
+   if ( count( $dir ) > 0 ) {
+      echo "<ul class='backups fa-ul'>";
+      foreach ( $dir as $d ) :
+        $d = str_replace( '.alfredworkflow', '', $d );
+        $file = $d;
+        $pattern = "/([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{2})\.([0-9]{2})\.([0-9]{2})-/";
+        preg_match( $pattern, $d, $matches);
+        if ( isset( $matches[0] ) ) {
+          $d = str_replace( $matches[0], '', $d );
+          $date = date( 'M d, Y H:i', strtotime( "$matches[2]/$matches[3]/$matches[1] $matches[4]:$matches[5]:$matches[6]" ) );
+          echo "<li class=''><i id='$b/$file' title='$file' class='fa fa-times-circle delete-backup'></i> &nbsp;From $date</li>";
+       } else {
+         echo "<li>$d</li>";
+       }
+      endforeach;
+      echo '</ul>';
     } else {
-      echo "<li>$d</li>";
+      echo '<h3>No backups found.</h3>';
     }
-   endforeach;
-   echo '</ul>';
    ?></div><?php
  endforeach;
   ?>
+  <div id='open-dir-dialog'>This is text</div>
+  <div id='delete-backup-dialog'>This is text</div>
   <p class='clearfix'>&nbsp;</p><p class='clearfix'>&nbsp;</p>
   <script type='text/javascript'>
     $( '.fa-times-circle' ).click( function() {
-      confirm( 'Delete backup file "' + $( this ).attr( 'id' ) + '.alfredworkflow"?' );
+      directory = <?php echo "'/$data/backups/'"; ?> + $( this ).attr( 'id' ) + '.alfredworkflow';
+      $( '.ui-dialog-content' ).html( 'Delete <code>`' + $( this ).attr( 'title' ) + '.alfredworkflow`</code>?' );
+      $( '.ui-dialog-content' ).attr( 'title', directory );
+      $( "#delete-backup-dialog" ).dialog( 'open' );   
     });
-    $( '.fa-search-plus' ).click( function() {
-      if ( confirm( 'Open the "' + $( this ).attr( 'id' ) + '" backups folder.' ) ) {
-        directory = <?php echo "'/$data/backups/'"; ?> + $( this ).attr( 'id' );
-        $.get( "packal.php", { action: 'openDirectory', 'directory': directory } );
+    $( '.fa-folder-open' ).click( function() {
+      directory = <?php echo "'/$data/backups/'"; ?> + $( this ).attr( 'id' );
+      content = $( this ).attr( 'title' ) + ' backup directory';
+      if ( $( this ).attr( 'id' ) == '' ) {
+        content = 'backups directory'
+      }
+      $( '.ui-dialog-content' ).html( 'Open <code>`' + content + '`</code>?' );
+      $( '.ui-dialog-content' ).attr( 'title', directory );
+      $( "#open-dir-dialog" ).dialog( 'open' );
+    });
+    $( "#open-dir-dialog" ).dialog({
+      modal: true,
+      autoOpen: false,
+      dialogClass: "no-close",
+      position: { my: 'top', at: 'top+50', of: '.pane'},
+      hide: { effect: "fade", duration: 150 },
+      show: { effect: "fade", duration: 150 },
+      minWidth: 500,
+      // minHeight: 150,
+      resizable: false,
+      buttons: {
+        Yes: function() {
+          $.get( "packal.php", { action: 'openDirectory', 'directory': $( this ).attr( 'title' ) } );
+          $( this ).dialog( "close" );
+        },
+        No: function() {
+          $( this ).dialog( 'close' );
+        }
       }
     });
-    $( '#open-backup-dir' ).click( function() {
-      if ( confirm( 'Open the backups directory?' ) ) {
-        $.get( "packal.php", { action: 'openDirectory', 'directory': <?php echo "'$data/backups'";?> } );
+    $( "#delete-backup-dialog" ).dialog({
+      modal: true,
+      autoOpen: false,
+      dialogClass: "no-close",
+      hide: { effect: "fade", duration: 150 },
+      show: { effect: "fade", duration: 150 },
+      minWidth: 500,
+      resizable: false,
+      buttons: {
+        Yes: function() {
+          $.get( "packal.php", { action: 'deleteFile', 'file': $( this ).attr( 'title' ) }, 
+              function() { 
+                $( '.pane' ).load( 'packal.php', { 'page': 'backup' } ); 
+              } 
+            );
+          $( this ).dialog( "close" );
+        },
+        No: function() {
+          $( this ).dialog( 'close' );
+        }
       }
     });
   </script>
@@ -267,7 +320,7 @@ function blacklist() {
       
       <div id=<?php echo "'$bundleFix'"; ?> class = <?php echo "'$classes'"; ?> >
         <div id=<?php echo "'disabled-$bundleFix'"?> class=<?php echo "'blacklisted$disabled $bundle'"?>>
-          <i class=<?php echo "'fa fa-times'"?> style='line-height: 190px; font-size: 250px; padding-left: 20%;'></i>
+          <i class=<?php echo "'fa fa-times disabled-x'"?>></i>
         </div>
         <div><h3><?php echo $w['name']; ?></h3></div>
         <div class='short'><p> <?php echo $wf[ $bundle ][ 'short' ]; ?></p></div>
@@ -347,7 +400,7 @@ function settings() {
   <div class='settings-form'>
       <p>
         When I write my workflows, I use <input name='authorName' type='text' placeholder='My Author Name'
-          value=<?php echo "'$config->authorName'"; ?>> as the name.
+          value=<?php echo "'$config->authorName'"; ?> title='This is the name you put into the workflow via the Alfred Workflow GUI.'> as the name.
       </p>
       <p>
       I <select name='packalAccount' class='packal-username' >
@@ -356,7 +409,7 @@ function settings() {
         </select>
         have a Packal account<span class='packal-account'> with the username 
         <input name='username' type='text' placeholder='My Packal Username'
-        value=<?php echo "'$config->username'"; ?>></span>.
+        value=<?php echo "'$config->username'"; ?> title='This is your Packal Username.'></span>.
       </p>
       <p>
       Keep
@@ -375,16 +428,20 @@ function settings() {
         <option <?php if ($config->workflowReporting == 1) echo 'selected'; ?>>do</option>
         <option <?php if ($config->workflowReporting == 0) echo 'selected'; ?>>do not</option>
       </select>
-      send anonymous workflow data to Packal.<sup><i class="fa fa-question" style="opacity: .5;"></i></sup>
+      send anonymous workflow data to Packal.<a href='#' 
+      title='This workflow will send information about which workflows you have installed, whether
+       or not they are enabled or disabled, and whether or not you downloaded them from Packal.
+       The reporting is as anonymous as possible. For more information, click the "about" tab.'>
+      <sup><i class="fa fa-question" style="opacity: .5; color: purple;"></i></sup></a>
       </p>
 
-      <p>
+    <!--   <p>
       I <select name='forcePackal' class='force-packal'>
         <option <?php if ($config->forcePackal == 0) echo 'selected'; ?>>do not</option>
         <option <?php if ($config->forcePackal == 1) echo 'selected'; ?>>do</option>
       </select>
       want Packal to update all my workflows (regardless of whether or not they were downloaded from Packal).
-      </p>
+      </p> -->
 
       <p>When updating workflows without the GUI, notify me
       <select name='notifications' class='notification-options'>
@@ -414,17 +471,32 @@ function settings() {
         var html_calcS = '<span>' + html_org + '</span>';
         jQuery('body').append(html_calcS);
         var _lastspan = jQuery('span').last();
-        //console.log(_lastspan, html_calc);
         _lastspan.css({
             'font-size' : _t.css('font-size')
             ,'font-family' : _t.css('font-family')
         })
         var width =_lastspan.width() + 5;
-        //_t.html(html_org);
         _lastspan.remove();
         return width;
       };
-
+      $(function() {
+        $( document ).tooltip({
+          show: { effect: "fade", duration: 200, delay: 500 },
+          hide: { effect: "fade", duration: 200 },
+          position: {
+            my: "center bottom-5",
+            at: "left+18 top",
+            using: function( position, feedback ) {
+              $( this ).css( position );
+              $( "<div>" )
+                .addClass( "arrow" )
+                .addClass( feedback.vertical )
+                .addClass( feedback.horizontal )
+                .appendTo( this );
+            }
+          }
+        });
+      });
       $( 'input[type="text"]' ).each( function() {
         id = $( this ).attr( 'name' );
         $( '#' + id ).html( $( this ).val() );
@@ -476,7 +548,6 @@ function settings() {
       function resizeInput() {
         $( this ).attr( 'size', $( this ).val().length);
       }
- 
       $( 'input[type="text"]' ).keyup( function() {
         id = $( this ).attr( 'name' );
         $( '#' + id ).html( $( this ).val() );
@@ -487,11 +558,24 @@ function settings() {
   </div>
 
   <?php
-
 }
 
 function status() {
   global $wf, $config, $workflows, $blacklist, $manifestBundles, $me, $data, $workflowsDir;
+  $endpoints = json_decode( file_get_contents( "$data/endpoints/endpoints.json" ), TRUE );
+
+  $updates = FALSE;
+  foreach ( $endpoints as $k => $v ) :
+    if ( file_exists( "$v/packal/package.xml" ) ) {
+      $w = simplexml_load_file( "$v/packal/package.xml" );
+      if ( in_array( $k, $manifestBundles ) ) {
+        if ( ($wf[ "$k" ][ 'updated' ] ) > $w->updated + 500 && ( ! in_array( $k, $blacklist ) ) ) {
+          $updates = TRUE;
+          break;
+        }
+    }
+  }
+  endforeach;
 
   $meta = array();
   $meta[ 'mineOnPackal' ] = array();
@@ -532,7 +616,6 @@ function status() {
   foreach ( $workflows as $k => $v ) :
     if ( file_exists( "$workflowsDir/$v/packal/package.xml" ) && in_array( $k, $manifestBundles ) ) {
       $packal[] = $k;
-
     }
   endforeach;
 ?>
@@ -540,9 +623,18 @@ function status() {
 <h1>Status</h1>
 
 <div class='status-body'>
+<?php 
+  if ( $updates ) {
+?>
+<div class='updates-available'>
+  <p><h4>Updates are available.</h4></p>
+  <p class='clearfix'> </p>
+</div>
+<?php
+  }
+?>
 <div>
-  <p id='manifest-status'>The manifest was last updated <strong><?php echo "$time" ; ?></strong></p>
-<div class='update-manifest'>Update Manifest</div>
+  <p id='manifest-status'>The manifest was last updated <strong><?php echo "$time" ; ?></strong> <span class='update-manifest'>(Update)</span></p>
 </div>
 
 <div><p>You have <strong><?php echo count( $workflows ); ?></strong> workflows installed with Bundle IDs.</p></div>
@@ -589,10 +681,9 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
     <strong><?php echo count( $meta[ 'availableOnPackal' ] ); ?></strong>
     can be downloaded and updated from Packal.
   </p>
-</div>
 <div id='availableOnPackal' class='detail-accordion'>
-  <h3 class='detail-accordion2'>Details</h3>
-  <div>
+  <h3>Details</h3>
+  <div class='detail-accordion2'>
       <?php
     foreach ( $meta[ 'availableOnPackal' ] as $m ) :
       if ( ! empty( $m ) ) {
@@ -604,7 +695,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
         ?>
   </div>
 </div>
-
+</div>
   <div>
     <p>
       There are 
@@ -646,7 +737,13 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
       $( '#manifest-status' ).html( data );
     });
   });
-
+  $( '.updates-available' ).click( function() {
+    $( '.pane' ).html("<div class='preloader'><h2>Loading...</h2><img alt='preloader' src='assets/images/preloader.gif' /></div>");
+    setTimeout(function() {
+      $( '.pane' ).load( 'packal.php', { 'page': 'updates' } );
+    }, 1000);
+    
+  });
   $( document ).ready( function() { 
     if ( <?php echo date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) ); ?> > 86400 ) {
       console.log( 'test' );
@@ -842,7 +939,7 @@ function updates() {
           <div class='update-icon'>
           <?php
           if ( file_exists( "$workflowsDir/$v/icon.png" ) )
-            echo "<img src='serve_image.php?file=" . __DIR__ . "/" . $workflowsDir . $v ."/icon.png'>";
+            echo "<img src='" . "serve_image.php?file=" . $workflowsDir . "/" . $v ."/icon.png'>";
           ?>
           </div>
           <div class='update-content'>
@@ -1012,7 +1109,7 @@ function updateWorkflow() {
 
 function deleteFile() {
   $file = $_GET[ 'file' ];
-  echo $file;
+  exec( "rm '$file'" );
 }
 
 

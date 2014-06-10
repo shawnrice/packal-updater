@@ -20,10 +20,12 @@ if ( ! ini_get('date.timezone') ) {
 	ini_set( 'date.timezone', $tz );
 }
 
+$bundle = 'com.packal';
+
 // Set the user's home directory
 $HOME = exec( 'echo $HOME' );
 // The location of the data directory
-$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice/usage";
+$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle/usage";
 
 // Check if the usage directory exists; make it if it doesn't.
 if ( ! file_exists( $data ) ) {

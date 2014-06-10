@@ -5,7 +5,7 @@
  * This is the file that receives the input from the script filter and then starts everything.
  * 
  */
-
+$bundle = 'com.packal';
 require_once( 'functions.php' );
 firstRun();
 
@@ -45,7 +45,7 @@ if ( $q == 'open-gui' ) {
 	exec( "nohup open '$dir/resources/applications/viewer.app' --args http://localhost:7893  > /dev/null 2>&1 &" );
 
 } else if ( strpos( $q, 'update-' ) !== FALSE ) {
-	$workflows = json_decode( file_get_contents( "$HOME/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice/endpoints/endpoints.json" ), TRUE );
+	$workflows = json_decode( file_get_contents( "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle/endpoints/endpoints.json" ), TRUE );
 	$wf = array_keys( $workflows );
 	if ( in_array( str_replace( 'update-', '', $q ), $wf ) ) {
 		$result = exec( 'php cli/packal.php doUpdate ' . str_replace( 'update-', '', $q ) );

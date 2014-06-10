@@ -2,7 +2,7 @@
 
 require_once( __DIR__ . '/includes/plist-migration.php' );
 $cliDir = __DIR__;
-$bundle   = "com.packal.shawn.patrick.rice";
+$bundle   = "com.packal";
 $HOME     = exec( 'echo $HOME' );
 $data     = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
 $cache    = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle";
@@ -259,7 +259,7 @@ function doUpdate( $bundle, $force = FALSE ) {
 
 
   $dir = trim( `"$cliDir/packal.sh" getDir "$bundle"` );
-echo $dir;
+  echo $dir;
   // The force variable means to download even if the original
   // is not from Packal. Obviously, since we don't have the
   // update data, this just means to download the update no
@@ -276,10 +276,8 @@ echo $dir;
   foreach ( $xml as $x ) :
     if ( "$x->bundle" != "$bundle" )
       continue;
-
     $xml = $x;
     break;
-
   endforeach;
 
   // Make the temporary directories.

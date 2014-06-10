@@ -1,13 +1,16 @@
 <?php
 
+$bundle = 'com.packal';
+
 function checkCreateFolders() {
+	global $bundle;
 
 	// Set the user's home directory
 	$home = exec('echo $HOME');
 	// The location of the config file
-	$data = "$home/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice/";
+	$data = "$home/Library/Application Support/Alfred 2/Workflow Data/$bundle/";
 	// Create the file path name
-	$cache = "$home/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/com.packal.shawn.patrick.rice/";
+	$cache = "$home/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle/";
 
 	// Make the cache directory
 	if (! file_exists( $cache ) ) {
@@ -65,12 +68,14 @@ function checkCreateFolders() {
 }
 
 function firstRun() {
+	global $bundle;
+
 	// Set the user's home directory
 	$home = exec('echo $HOME');
 	// The location of the data directory
-	$data = "$home/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice/";
+	$data = "$home/Library/Application Support/Alfred 2/Workflow Data/$bundle/";
 	// Create the file path name
-	$cache = "$home/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/com.packal.shawn.patrick.rice/";
+	$cache = "$home/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle/";
 
 	// Download a copy of the manifest so that we can continue our configuration
 	// Currently, we're getting it directly from Packal, but we'll change this to Github later.

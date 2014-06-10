@@ -1,4 +1,18 @@
 PHP 5.5.13 configured with "--enable-shared=no --enable-static=yes --enable-soap --with-zlib-dir --enable-embed=static --with-libedit --with-curl --with-zlib --with-gd --enable-mbstring  --with-openssl --with-mysqli --with-tidy --with-mysql --with-pdo-mysql --with-xmlrpc --with-bz2 --enable-zip --with-mcrypt=static"
-
-
+ --with-mysql=static 
+ --with-zlib-dir=/usr/local/Cellar/zlib/1.2.8/lib/
+ --with-gd=static
+--with-pdo-mysql=static
+ --with-tidy=static
 sw_vers | grep 'ProductVersion:' | grep -o '[0-9]*\.[0-9]*\.[0-9]*'
+
+
+--enable-shared=no --enable-static=yes --enable-soap --enable-embed=static --with-libedit=static --with-curl=static --with-zlib  --enable-mbstring=static  --with-openssl --with-mysqli  --with-xmlrpc=static --with-bz2=static --enable-zip --with-mcrypt=static --without-pear
+
+
+--enable-shared=no --enable-static=yes --enable-soap=static --enable-embed=static --with-libedit=static --with-curl --with-zlib --with-zib-dir=/usr/lib/ --enable-mbstring=static  --with-openssl --with-mysqli --with-tidy --with-mysql --with-pdo-mysql --with-xmlrpc --with-bz2=static --enable-zip --with-libdir=/usr/lib --with-iconv-dir=/usr/include/
+
+
+
+
+--with-gd 

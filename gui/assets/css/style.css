@@ -5,7 +5,7 @@ html {
 }
 
 body {
-  background: rgba(253, 253, 253, .5);
+  background: rgba(233, 233, 233, .5);
   user-select: none;
     -webkit-user-select: none;
 }
@@ -16,6 +16,11 @@ pre {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Montserrat';
+  color: #333;
+}
+
+.title h1 {
+  color: purple;
 }
 
 table tr:nth-child(even) {
@@ -37,6 +42,11 @@ a:hover { color: #0AF; }
     box-sizing: border-box;
 }
 
+code {
+  font-family: Monaco;
+  font-size: .75em;
+  font-weight: 300;
+}
 .clearfix:before,
 .clearfix:after {
   display: table;
@@ -62,19 +72,21 @@ General Layout
 
 .header {
   position: relative;
-  margin: 0 0 25px 0;  
+  /*margin: 0 0 25px 0;  */
   padding-bottom: 20px;
   max-height: 100px;
   width: inherit;
-  height: 10%;
+  height: 17%;
   min-width: 600px;
+  border-bottom: 5px #900080 solid !important;
 }
 
 .pane {
   overflow: scroll;
   padding: 0 0em 0 0em;
   width: 100%;
-  height: 86%;
+  height: 83%;
+  border-top: 2px solid black;
 }
 
 .preloader {
@@ -86,6 +98,7 @@ General Layout
 .preloader h2 {
   margin-bottom: 28px;
   margin-left: -32px;
+  color: black;
 }
 
 #updating-overlay {
@@ -101,10 +114,10 @@ General Layout
   text-align: center;
   opacity: .8;
   top: 15%;
-  
 }
 
 #updating-overlay h2 {
+  color: black;
   margin-top: 20%;
 }
 
@@ -117,7 +130,6 @@ General Layout
   width: 30%;
   height: 200px;
   border: 1px black solid;
-
 }
 
 .disabled {
@@ -170,8 +182,18 @@ General Layout
   height: 100%;
   background: #ccc;
   opacity: .3;
-
+  display: block;
+  text-align: center;
+  padding: 0;
 }
+
+.disabled-x {
+  /*float: left;*/
+
+  font-size: 18em;
+  /*margin: 0 30%;*/
+}
+/*'line-height: 190px; font-size: 250px; padding-left: 20%;'*/
 
 .hide {
   display: none;
@@ -230,13 +252,92 @@ General Layout
 
 }
 
+.backup-box h2 {
+  color: black;
+}
+
+.backup-box {
+  border-color: black;
+}
+
 .delete-backup {
   cursor: pointer;
+}
+
+.open-backup-dir h3 {
+  color: black;
+  cursor: pointer;
+}
+
+.open-directory:hover {
+  color: #800080;
+  transition: color .25s;
+}
+
+.open-directory {
+  color: black;
+  margin-left: .5em;
+  transition: color .25s;
+}
+
+/**** Dialogs ****/
+.ui-dialog {
+  border: 4px solid black;
+  border-top: 5px solid black;
+  padding: 1em 3em;
+  width: auto;
+  max-width: 100%;
+  background: rgba(233, 233, 233, 1);
+}
+
+.ui-dialog-titlebar, .ui-dialog-titlebar-close, .ui-dialog-title {
+  display: none;
+}
+
+.ui-dialog-content {
+  text-align: center;
+  font-size: 2em;
+  line-height: 1em;
+  padding: .5em 0 0 0;
+  font-family: 'Source Sans Pro';
+}
+
+#delete-backup-dialog {
+  font-size: 1.5em;
+}
+
+.ui-dialog-buttonpane {
+  text-align: right;
+}
+
+.ui-dialog-buttonset {
+  outline: none;
+}
+
+.ui-dialog-buttonset button {
+ outline: none;
+ background: none;
+ font-size: 1.5em;
+ border-radius:6px;
+ border: 3px solid black;
+ padding: .15em 1em .25em 1em;
+ margin: 0 1em 0 0;
+ background: #800080;
+ color: #efefef;
+ transition: background .25s,color .25s;
+}
+
+.ui-dialog-buttonset button:hover {
+ background:  #efefef;
+ color: #800080;
+ transition: background .25s,color .25s;
 }
 
 .fa {
   opacity: .8;
 }
+
+
 
 .delete-backup:hover {
   color: #A60000;
@@ -247,7 +348,9 @@ General Layout
 /*******************************************************************************
  * Status 
  *******************************************************************************/
-
+.updates-available {
+  cursor: pointer
+}
 .detail-accordion > h3 {
   margin-bottom: 1em;
   margin-left: 2em;
@@ -275,20 +378,14 @@ General Layout
   font-size: .75em;
   line-height: 1.5em;
 }
-.detail-accordion2 {
-  margin-top: -1em !important;
-}
+
 .ui-accordion .ui-accordion-content{
   overflow: auto;
 }
 
 .url-open, .update-manifest {
-  position: relative !important;
-  float: right !important;
   clear: none !important;
-  margin: -2.5em .5em 0 0 !important;
-  padding: 0 !important;
-  width: 100px !important;
+  width: 90px;
   border: none !important;
   border-bottom: 1px gray dashed !important;
   color: gray;
@@ -296,11 +393,6 @@ General Layout
 }
 
 .update-manifest {
-  position: relative !important;
-  float: right !important;
- clear: none !important;
-  margin: -1.9em 9em 0 0 !important;
-  padding: 0 !important;
   width: 126px !important;
   border: none !important;
   border-bottom: 1px gray dashed !important;
@@ -404,32 +496,18 @@ General Layout
 
 button.css3button {
   padding: 10px 20px;
-  border: 5px solid #000000;
-  -webkit-border-radius: 30px;
-  -moz-border-radius: 30px;
-  border-radius: 30px;
-  background: -moz-linear-gradient(
-    top,
-    #8426ff 0%,
-    #8426ff);
-  background: -webkit-gradient(
-    linear, left top, left bottom,
-    from(#8426ff),
-    to(#8426ff));
-  -webkit-box-shadow:
-    0px 1px 3px rgba(000,000,000,0.5),
-    inset 0px 0px 1px rgba(255,255,255,0.7);
-  -moz-box-shadow:
-    0px 1px 3px rgba(000,000,000,0.5),
-    inset 0px 0px 1px rgba(255,255,255,0.7);
-  box-shadow:
-    0px 1px 3px rgba(000,000,000,0.5),
-    inset 0px 0px 1px rgba(255,255,255,0.7);
+  border: 3px solid black;
+  background: #800080;
   color: #e6e6e6;
-  text-shadow:
-    0px -1px 0px rgba(20,1,31,0.2),
-    0px 1px 0px rgba(214,169,214,0.3);
-  font-size: 14px;
+  font-size: 1.25em;
+  transition: background .25s, color .25s, border-color .25s;
+}
+
+button.css3button:hover {
+  background: #ccc;
+  color: black;
+  border-color: black;
+  transition: background .25s, color .25s, border-color .25s;
 }
 
 /*******************************************************************************
@@ -481,7 +559,8 @@ Settings
   margin: 0 .25em;
   padding: 0;
   border-bottom: 1px dashed #b14943;
-  color: #b14943;
+  /*color: #b14943;*/
+  color: purple;
   line-height: 1.2em;
   cursor: pointer;
 }
@@ -496,6 +575,60 @@ Settings
 #notification-options {
   display: none;
 }
+
+/*******************************************************************************
+Tooltips
+*******************************************************************************/
+  .ui-tooltip, .arrow:after {
+    background-color: rgba(128, 0, 128, 0.8);
+    border: 2px solid #cfcfcf;
+  }
+  .ui-tooltip {
+    padding: 10px 10px;
+    color: white;
+    border-radius: 20px;
+    max-width: 20em;
+    text-align: justify;
+    /*font: bold 14px "Helvetica Neue", Sans-Serif;*/
+    /*text-transform: uppercase;*/
+    box-shadow: 0 0 3px black;
+  }
+  .arrow {
+    width: 70px;
+    height: 16px;
+    overflow: hidden;
+    position: absolute;
+    left: 50%;
+    margin-left: -35px;
+    bottom: -16px;
+  }
+  .arrow.top {
+    top: -16px;
+    bottom: auto;
+  }
+  .arrow.left {
+    left: 20%;
+  }
+  .arrow:after {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: -20px;
+    width: 25px;
+    height: 25px;
+    box-shadow: 6px 5px 9px -9px black;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    tranform: rotate(45deg);
+  }
+  .arrow.top:after {
+    bottom: -20px;
+    top: auto;
+  }
+
+
 
 /*******************************************************************************
   Menu
@@ -558,7 +691,7 @@ Settings
   display: block;
   width: 100%;
   height: 8%;
-  background-color: #000;
+  background-color: purple;
   font-size: 0px;
   -webkit-transition: background-color 0.3s;
   transition: background-color 0.3s;
@@ -577,7 +710,7 @@ Settings
   left: 0;
   width: 100%;
   height: 100%;
-  background: #000;
+  background: purple;
   content: '';
   -webkit-transition: -webkit-transform 0.3s, background-color 0.3s;
   transition: transform 0.3s, background-color 0.3s;

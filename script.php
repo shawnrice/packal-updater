@@ -16,12 +16,12 @@ $osx = exec( "sw_vers | grep 'ProductVersion:' | grep -o '10\.[0-9]*'" );
 
 firstRun();
 
-
+$bundle = 'com.packal';
 $q     = $argv;
 $w     = new Workflows;
 $HOME  = exec( 'echo $HOME' );
-$data  = "$HOME/Library/Application Support/Alfred 2/Workflow Data/com.packal.shawn.patrick.rice";
-$cache = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/com.packal.shawn.patrick.rice";
+$data  = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
+$cache = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle";
 
 if ( ! file_exists( $data ) )
   mkdir( "$data" );

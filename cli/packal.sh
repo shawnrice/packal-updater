@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # important global variables
-bundle="com.packal.shawn.patrick.rice"
+bundle="com.packal"
 manifest="https://raw.github.com/packal/repository/master/manifest.xml"
 # echo `dirname "$0"`
 # exit
@@ -153,7 +153,6 @@ backup() {
   name=`getOpt "$1" "name"`
   dir=`getDir "$1"`
   date=`date +"%Y-%m-%d-%H.%M.%S"`
-  path="$( cd "$(dirname "$0")" ; pwd -P ; cd - )"
 
   file=`echo $date-$name.alfredworkflow | tr '&' '_' | tr ' ' '_'`
   cd "$dir"
@@ -162,11 +161,11 @@ backup() {
   dir "$data/backups/$name"
 
   backups=`ls "$data/backups/$name" | grep alfredworkflow | wc -l`
+  me="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P )"
 
-  keep=`php "$path/packal.php" getOption backups`
+  keep=`php "$me/cli/packal.php" getOption backups`
 
-  echo "$keep"
-exit
+  
   if [[ $backups -ge $keep ]]; then
     count=$backups
     files=`ls "$data/backups/$name" | grep alfredworkflow`
