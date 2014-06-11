@@ -653,7 +653,13 @@ function status() {
   }
 ?>
 <div>
-  <p id='manifest-status'>The manifest was last updated <strong><?php echo "$time" ; ?></strong> <span class='update-manifest'>(Update)</span></p>
+  <p id='manifest-status'>
+    The manifest was last updated <strong><?php echo "$time" ; ?></strong>
+    <?php
+      if ( checkConnection() !== FALSE )
+        echo "<span class='update-manifest'>(Update)</span>";    
+    ?>
+  </p>
 </div>
 <p class='clearfix'> </p>
 <div><p>You have <strong><?php echo count( $workflows ); ?></strong> workflows installed with Bundle IDs.</p></div>
@@ -893,7 +899,7 @@ function about() {
   <h2>Credit Where Credit is Due</h2>
   <p>I have to thank <a href='http://www.packal.org/users/deanishe' class='hijack'>Dean Jackson</a> and <a href='http://www.packal.org/users/tyler-eich' class='hijack'>Tyler Eich</a> for feedback and testing.</p>
   <p>
-    For the dynamic layout of this "application" code was used from the overly
+    For the dynamic layout of this "application," code was used from the overly
     talented <a href='http://www.linkedin.com/in/manoela' class='hijack'>Manoela 
     "Mary Lou" Ilic</a> from 
     <a href='http://tympanus.net/codrops/' class='hijack'>Codrops</a>.
@@ -901,16 +907,20 @@ function about() {
   <p>
     Specifically, the 
     <a href='http://tympanus.net/codrops/2013/09/30/animated-border-menus/'
-     class='hijack'>menus</a> were adapted as was the 
+     class='hijack'>menus</a> were adapted as was a bit of the 
     <a href='http://tympanus.net/codrops/2013/05/21/natural-language-form-with-custom-input-elements/' 
      class='hijack'>settings form</a>.
   </p>
   <p>
-    Icons from 
+    GUI icons from 
     <a href='http://fortawesome.github.io/Font-Awesome/' class='hijack'>
     Font Awesome</a>.
   </p>
-
+  <p>
+    The workflow icons from the 
+    <a href='http://www.archlinux.org/packages/extra/any/oxygen-icons/download' class='hijack'>
+    Oxygen set</a>.
+  </p>
   <p>
     The updater makes use of <a href='https://github.com/alloy/terminal-notifier' class='hijack'>Terminal Notifier</a>.
   </p>
@@ -1135,10 +1145,6 @@ function deleteFile() {
 /*******************************************************************************
  * Utility Functions
  ******************************************************************************/
-
-function sortWorkflowByName( $a, $b ) {
-  return $a[ 'name' ] > $b[ 'name' ];
-}
 
 
 function printCopyrightYear() {

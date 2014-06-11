@@ -2,6 +2,9 @@
 
 // Must be in workflow root directory.
 
+// @TODO: Rewrite all of this as a class so that we can use more persistent variables
+// and test connections fewer times.
+
 require_once( 'libraries/workflows.php' );
 require_once( 'functions.php' );
 
@@ -11,8 +14,14 @@ if ( ! ini_get('date.timezone') ) {
   ini_set( 'date.timezone', $tz );
 }
 
-// Get the version of OSX; if we aren't using Mavericks, then we'll need to download the PHP binary.
+
+
+// Get the version of OSX; if we aren't using Mavericks, then they don't get access to the GUI.
 $osx = exec( "sw_vers | grep 'ProductVersion:' | grep -o '10\.[0-9]*'" );
+
+// So, they can use the GUI if they're using Mavericks or Yosemite.
+if ( ( $osx == '10.9') || ( $osx == '10.10' ) )
+  $gui = TRUE;
 
 firstRun();
 
@@ -22,6 +31,13 @@ $w     = new Workflows;
 $HOME  = exec( 'echo $HOME' );
 $data  = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
 $cache = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle";
+
+$connection = checkConnection();
+
+if ( $connection === FALSE ) {
+      $w->result( '', '', 'Warning: no viable Internet connection', 
+      'Some features of this workflow will be unavailable without a solid Internet connection', 'assets/icons/task-attention.png', 'no', '');
+}
 
 if ( ! file_exists( $data ) )
   mkdir( "$data" );
@@ -62,7 +78,7 @@ if ( ! file_exists( "$data/manifest.xml" ) ) {
   // but the redundancy is fine.
     if ( getManifest() == FALSE ) {
       $w->result( '', '', 'Error: Packal Updater', 
-        'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', '', 'no', '');
+        'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', 'assets/icons/task-reject.png', 'no', '');
       echo $w->toxml();
       die();
     }
@@ -70,7 +86,7 @@ if ( ! file_exists( "$data/manifest.xml" ) ) {
 
 // Update the manifest if past cache.
 // This is a potential failure spot.
-if ( checkConnection() !== FALSE )
+if ( $connection !== FALSE )
   exec( "'" . __DIR__ . "/cli/packal.sh' update" );
 
 // Do the workflow reporting script as long as the config option is set.
@@ -83,9 +99,9 @@ $manifest  = @simplexml_load_file( "$data/manifest.xml" );
 
 // The manifest is not valid. Let's try to get it before we fail.
 if ( empty( $manifest ) ) {
-  if ( getManifest() == FALSE ) {
+  if ( getManifest() === FALSE ) {
     $w->result( '', '', 'Error: Packal Updater', 
-      'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', '', 'no', '');
+      'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', 'assets/icons/task-reject.png', 'no', '');
     echo $w->toxml();
     die();
   }
@@ -93,12 +109,13 @@ if ( empty( $manifest ) ) {
   $manifest = @simplexml_load_file( "$data/manifest.xml" );
   if ( empty( $manifest ) ) {
     $w->result( '', '', 'Error: Packal Updater', 
-      'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', '', 'no', '');
+      'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', 'assets/icons/task-reject.png', 'no', '');
     echo $w->toxml();
     die();
   }
 }
-    // Okay, we're good. Or, at least we should be.
+
+// Okay, we're good. Or, at least we should be.
 
 $json      = json_decode( file_get_contents( "$data/endpoints/endpoints.json" ), TRUE );
 $mine      = array_keys( $json );
@@ -149,7 +166,7 @@ endforeach;
 
 if ( empty( $q[1] ) ) {
   if ( ! isset( $updates ) )
-    $w->result( 'updates', 'updates', 'All of your workflows are up to date.', "", '', 'no', 'update');
+    $w->result( 'updates', 'updates', 'All of your workflows are up to date.', "", 'assets/icons/task-complete.png', 'no', 'update');
   else  {
     if ( count( $updates ) > 1 )
       $message = "There are " . count( $updates ) . " updates pending.";
@@ -161,21 +178,39 @@ if ( empty( $q[1] ) ) {
 
   if ( ( date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) < 86400 ) ) ) {
     $manifestTime = getManifestModTime();
-    $w->result( '', '', 'The manifest is up to date.', "Last updated $manifestTime", '', 'yes', '');
+    $w->result( '', '', 'The manifest is up to date.', "Last updated $manifestTime", 'assets/icons/task-complete.png', 'no', '');
   } else {
-    $w->result( '', '', 'The manifest is out of date.', "Last updated $manifestTime", '', 'yes', '');
+    $w->result( '', '', 'The manifest is out of date.', "Last updated $manifestTime", 'assets/icons/task-attention.png', 'yes', '');
   }
 
-  $w->result( 'open-gui', 'open-gui', "Open Graphical 'Application'", 
-    'Configure this workflow, Update workflows, and learn about this workflow.', '', 'yes', '');
+  if ( $gui === TRUE ) {
+    $w->result( 'open-gui', 'open-gui', "Open Graphical 'Application'", 
+    'Configure this workflow, Update workflows, and learn about this workflow. (RECOMMENDED)', 'assets/icons/applications-education-miscellaneous.png', 'yes', '');
+  } else {
+    $w->result( '', '', "GUI Not Available'", 
+    'A GUI to configure and operate this workflow is available if you have OS X 10.9 or 10.10.', 'assets/icons/applications-education-miscellaneous.png', 'no', '');
+  }
+
   if ( isset( $mywf ) )
     $mywf = count( $mywf );
   else
     $mywf = 0;
+
+  // if ( isset( $config->authorName ) && ( ! empty( $config->authorName ) ) {
+  //   $w->result( '', '', 'Informational',
+  //     "There are $count workflows in the manifest," . 
+  //     " of which, you have " . count( $packal ) .
+  //     " installed, and you wrote " . $mywf . " of those.", '', 'no', '');    
+  // }
+
+  $w->result( 'blacklist', 'blacklist', 'Manage Blacklist', 'Configure which workflows Packal updates', 'assets/icons/flag-black.png', 'no', 'blacklist' );
+
   $w->result( '', '', 'Informational',
     "There are $count workflows in the manifest," . 
     " of which, you have " . count( $packal ) .
-    " installed, and you wrote " . $mywf . " of those.", '', 'no', '');
+    " installed, and you wrote " . $mywf . " of those.", 'assets/icons/help-about.png', 'no', '');
+
+    $w->result( '', 'setup', 'Configure', 'Make this workflow work best for you.', 'assets/icons/applications-system.png', 'no', 'setup');
   
   echo $w->toxml();
   die();
@@ -186,19 +221,102 @@ if ( strpos( $q[1], 'update' ) !== FALSE ) {
     $updates = array();
   if ( count( $updates ) > 0 ) {
     if ( count( $updates ) > 1 ) {
-      $w->result( 'update-all', 'update-all', "Update all workflows", '', '', '', '');
+      $w->result( 'update-all', 'update-all', "Update all workflows", '', '', 'yes', '');
     }
     foreach( $updates as $k => $v ) :
+      if ( file_exists( $v[ 'path' ] . "/icon.png" ) )
+        $icon = $v[ 'path' ] . "/icon.png";
+      else
+        $icon = 'assets/icons/package.png';
       $w->result( "update-$k", "update-$k", "Update " . $v[ 'name' ], "Update from version " . $v[ 'version' ] . " to " . $wf[ $k ][ 'version' ], $v[ 'path' ] . "/icon.png", '', '');
     endforeach;
   } else {
-    $w->result( '', '', "All of your workflows are up to date.", '', '', 'no', '');
+    $w->result( '', '', "All of your workflows are up to date.", '', 'assets/icons/task-complete.png', 'no', '');
   }
   echo $w->toxml();
   die();
 }
 
+if ( strpos( $q[1], 'setup' ) !== FALSE ) {
 
+  // The next argument removes the forced-setup option.
+  if ( ( ! file_exists( "$data/config/first-run-alfred" ) ) && ( ! file_exists( "$data/config/first-run" ) ) )
+    file_put_contents( "$data/config/first-run-alfred", 'done' );
+
+  $options = array(
+    'authorName' => 'What name do you use when you write workflows?',
+    'packalAccount' => 'Do you have an account on Packal?',
+    'username' => 'What is your Packal username?',
+    'workflowReporting' => 'Would you like to send anonymous data about your installed workflows to Packal.org?',
+    'backups' => 'How many backups of workflows would you like to keep?'
+  );
+  foreach ( $options as $k => $v ) :
+    if ( isset( $config->$k ) ) {
+      if ( ( $config->$k == '1' ) && ( $k != 'backups' ) ) {
+          $message = "Current value: Yes";
+      } else if ( ( $config->$k == '0' ) && ( $k != 'backups' ) ) {
+          $message = "Current value: No";
+      } else {
+        $message = "Current value: " . $config->$k;
+      }
+    } else {
+        $message = "Not set.";
+    }
+    
+    $icon = 'assets/icons/';
+    switch ( $k ) :
+      case 'authorName':
+        $icon .= 'code-context.png';
+        break;
+      case 'username' :
+        $icon .= 'im-user.png';
+        break;
+      case 'workflowReporting' :
+        $icon .= 'svn-commit.png';
+        break;
+      case 'backups' :
+        $icon .= 'player-time.png';
+        break;
+      case 'packalAccount' :
+        $icon .= 'flag.png';
+        break;
+    endswitch;
+
+    if ( ( $k == 'username' ) && ( $config->packalAccount == 1 ) ) {
+        $w->result( "set-$k", "set-$k", $v, $message, $icon, 'yes', '');
+    } else if ( ( $k == 'packalAccount' ) && ( $config->packalAccount == 1 ) ) {
+      continue;
+    } else if ( ! ( $k == 'username' ) ) {
+      $w->result( "set-$k", "set-$k", $v, $message, $icon, 'yes', '');
+    }
+  endforeach;
+
+  echo $w->toxml();
+  die();
+
+} else if ( strpos( $q[1], 'blacklist' ) !== FALSE ) {
+  // Option to Blacklist a workflow
+  
+  // @TODO: Sort the workflows by name.
+  foreach ( $json as $k => $v ) :
+    if ( file_exists( "../$v/packal/package.xml" ) ) {
+      if ( in_array( $k, $manifestBundles ) ) {
+        if ( ! in_array( $k, $blacklist ) ) {
+          $w->result( "blacklist-$k", "blacklist-$k", "Add '" . $wf[ $k ][ 'name' ] . "' to blacklist", "Prevent Packal from updating '" . $wf[ $k ][ 'name' ] . "' ($k)", 'assets/icons/user-online.png', 'yes', '');
+        } else {
+          $w->result( "whitelist-$k", "whitelist-$k", "Remove '" . $wf[ $k ][ 'name' ] . "' from blacklist", "Let Packal update '" . $wf[ $k ][ 'name' ] . "' ($k)", 'assets/icons/user-offline.png', 'yes', '');
+        }
+      }
+    }
+  endforeach;
+
+  echo $w->toxml();
+  die();
+}
+
+// For all good measures....
+echo $w->toxml();
+die();
 
 
   

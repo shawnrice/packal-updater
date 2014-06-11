@@ -110,7 +110,15 @@ function readPlistValue( $key, $plist ) {
 }
 
 function checkConnection() { 
-    $connection = @fsockopen("www.google.com", 80, $errno, $errstr, 30);
+	ini_set( 'default_socket_timeout', 1);
+
+	// First test
+	exec( "ping -c 1 -t 1 www.google.com", $pingResponse, $pingError);
+	if ( $pingError == 14 )
+		return FALSE;
+
+	// Second Test
+    $connection = @fsockopen("www.google.com", 80, $errno, $errstr, 1);
 
     if ( $connection ) { 
         $status = TRUE;  
@@ -201,4 +209,8 @@ function getManifestModTime() {
   	$time = 'just now.';
   }
   return $time;
+}
+
+function sortWorkflowByName( $a, $b ) {
+  return $a[ 'name' ] > $b[ 'name' ];
 }

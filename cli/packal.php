@@ -45,22 +45,27 @@ function getOption( $opt = array() ) {
 
 }
 
-function setOption( $opt = array(), $value ) {
-
+function setOption( $opt = array() ) {
   global $config;
 
-  $options = array( 'backup',
+  $value = $opt[1];
+  if ( $value == 'null' )
+    $value = '';
+  
+  $options = array( 'backups',
                     'auto_add',
-                    'report',
+                    'workflowReporting',
                     'notify',
                     'username',
+                    'authorName',
                     'api_key' );
 
   $bool   = array(  'auto_add',
                     'report',
-                    'notify' );
+                    'notify',
+                    'packalAccount' );
 
-  if ( ! in_array( $opt[0] ) ) {
+  if ( ( ! in_array( $opt[0], $options ) ) && ( ! in_array( $opt[0], $bool ) ) ) {
     echo "Error: invalid option.";
     return FALSE;
   } else if ( in_array( $opt[0], $bool ) && ( ! ( $value == 0 || $value == 1 ) ) ) {
@@ -323,6 +328,47 @@ function doUpdate( $bundle, $force = FALSE ) {
   echo "TRUE";
   return TRUE;
 
+}
+
+function doUpdateAll() {
+  global $manifest, $cache, $cliDir;
+
+  $xml = simplexml_load_file( "$manifest" );
+  $me  = getOption( array( 'username', TRUE ) );
+
+  foreach( $xml as $w ) :
+    $dir = trim( `"$cliDir/packal.sh" getDir "$w->bundle" 2> /dev/null` );
+
+    if ( $dir === "FALSE" )
+      continue;
+
+    if ( "$w->author" == "$me" ) {
+      continue;
+    }
+
+    if ( file_exists( "$dir/packal/package.xml" ) ) {
+      $wf = simplexml_load_file( "$dir/packal/package.xml" );
+      $wf->updated += 120; // Compensation for time in the generated packages.
+
+      if ( "$w->updated" > "$wf->updated" ) {
+        $updatable[] = array( (string) $w->name, (string) $wf->version, (string) $w->version, (string) $w->bundle );
+      }
+    } else {
+      if ( $force == FALSE )
+        continue;
+
+      $updatable[] = array( (string) $w->name, "Forced Update", (string) $w->version, (string) $w->bundle );
+    
+    }
+    
+  endforeach;
+
+  if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) )
+    return FALSE;
+
+  foreach ( $updatable as $u ) :
+    doUpdate( $u[3] );
+  endforeach;
 }
 
 /**

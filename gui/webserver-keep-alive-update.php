@@ -5,6 +5,8 @@
  * that contains the time.
  */
 
+$bundle = 'com.packal';
+
 // Set date/time to avoid warnings/errors.
 if ( ! ini_get('date.timezone') ) {
 	$tz = exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' );
@@ -18,10 +20,10 @@ $time = time();
 $home = exec('echo $HOME');
 
 // Create the file path name
-$file = "$home/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/com.packal.shawn.patrick.rice/zombie";
+$file = "$home/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle/zombie";
 
 // Place the file in the cache directory
-file_put_contents( $file , $time );
+file_put_contents( $file, $time );
 
 // C'est fini! This script will be run, probably, in another 30 seconds.
 

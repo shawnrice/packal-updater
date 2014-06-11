@@ -22,8 +22,7 @@ do
 		# Find the UNIX Epoch time
 		now=`date +%s`
 		# Get the last update of the webserver in Unix Epoch time (read from file)
-		# file="/Users/Sven/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow\\ Data/com.packal.shawn.patrick.rice/webserver/zombie"
-		cmd="cat ""$file"
+		# file="/Users/Sven/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow\\ Data/com.packal/webserver/zombie"
 		date=`cat "$file"`
 
 		# Find the difference
