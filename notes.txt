@@ -21,3 +21,5 @@ The code here is a bit messy and uncommented. Some of it is hacky. Some extra im
 @TODO: Implement Alphred library
 @TODO: Finish writing Alphred library
 @TODO: Get better icons
+
+@TODO: Fix typo when no Internet connection is available on status page of GUI
