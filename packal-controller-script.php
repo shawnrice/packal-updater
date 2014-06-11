@@ -53,7 +53,7 @@ if ( $q == 'open-gui' ) {
 		$viewer = substr( $viewer, 0, strlen( $viewer ) - 6 );
 
 	// Open the gui in the viewer
-	exec( "nohup open '$viewer' --args http://localhost:7893  > /dev/null 2>&1 &" );
+	exec( "nohup open $viewer --args http://localhost:7893  > /dev/null 2>&1 &" );
 	die();
 }
 
