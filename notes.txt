@@ -1,0 +1,23 @@
+Note to self and anyone else who happens to read this:
+
+The code here is a bit messy and uncommented. Some of it is hacky. Some extra images are included, but those are for possible future use. They're small.
+
+@TODO: Comment Code
+@TODO: Rewrite as class to reuse code and limit outgoing calls to bare minimum
+@TODO: Finish non-essential CLI functionality
+@TODO: Clean up CLI scripts
+@TODO: Re-implement 'Notification Options'
+@TODO: Re-implement 'Force Packal' option
+@TODO: Create viable webserver that works Pre-Mavericks
+@TODO: Reorganize paths and prune extra files
+@TODO: Better error handling (fail more gracefully)
+@TODO: Make sorting better in workflow
+@TODO: Implement workflow reporting more elegantly
+@TODO: Re-implement API key functionality
+@TODO: Create Push-to-Packal functionality
+@TODO: Add in more extenal triggers for better manipulation of workflow
+@TODO: Refine language used throughout GUI and workflow
+@TODO: Reorganize for better lazy-loading of longer calls
+@TODO: Implement Alphred library
+@TODO: Finish writing Alphred library
+@TODO: Get better icons
