@@ -155,7 +155,7 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 		die();
 	}
 
-	$cmd = ( "php cli/packal.php setOption " . $set[0] . " " . $set[1] );
+	$cmd = ( "php cli/packal.php setOption " . $set[0] . " '" . $set[1] . "'" );
 	exec( $cmd );
 
 	switch ( $set[0] ) :
@@ -216,6 +216,12 @@ if ( strpos( $q, 'whitelist-' ) !== FALSE ) {
 	$name = exec( "/usr/libexec/PlistBuddy -c \"Print :name\" '$plist' 2> /dev/null" );
 	exec( "$tn -title 'Packal Updater' -message '$name has been removed from the blacklist.'" );
 	die();
+}
+
+if ( strpos( $q, 'install-cron-script' ) !== FALSE ) {
+	$dir = escapeshellcmd( exec( 'pwd' ) );
+	exec( "'$dir/install-alfred-cron-script.sh'" );
+	exec( "$tn -title 'Packal Updater' -message 'Alfred Cron will now check for workflow updates.'" );
 }
 
 ?>

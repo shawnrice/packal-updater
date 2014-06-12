@@ -214,6 +214,16 @@ if ( empty( $q[1] ) ) {
 
     $w->result( '', 'setup', 'Configure', 'Make this workflow work best for you.', 'assets/icons/applications-system.png', 'no', 'setup');
   
+  // Option to install a cron script
+  // 
+  if ( file_exists( '../' . $json[ 'alfred.cron.spr' ] ) && 
+        ( ! file_exists( "$HOME/Library/Application Support/Alfred 2/Workflow Data/alfred.cron.spr/scripts/packal_updater") ) ) {
+    $plist = '../' . $json[ 'alfred.cron.spr' ] . '/info.plist';
+    $icon = '../' . $json[ 'alfred.cron.spr' ] . '/icons/timer.png';
+    if ( exec( "/usr/libexec/PlistBuddy -c \"Print :disabled\" '$plist' 2> /dev/null" ) != 'true' )
+      $w->result( '', 'install-cron-script', 'Install Alfred Cron Script', 'Make Alfred Cron check for updates for you.', "$icon", 'yes', '');
+  }
+
   echo $w->toxml();
   die();
 }
