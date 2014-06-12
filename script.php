@@ -264,7 +264,10 @@ if ( strpos( $q[1], 'setup' ) !== FALSE ) {
       } else if ( ( (string) $config->$k == '0' ) && ( $k != 'backups' ) ) {
           $message = "Current value: No";
       } else {
-        $message = "Current value: " . $config->$k;
+        if ( ! empty( $config->$k ) )
+          $message = "Current value: " . $config->$k;
+        else
+          $message = "< not set >";  
       }
     } else {
         $message = "Not set.";

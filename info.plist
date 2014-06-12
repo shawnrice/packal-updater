@@ -27,36 +27,12 @@
 				<key>modifiersubtext</key>
 				<string></string>
 			</dict>
-			<dict>
-				<key>destinationuid</key>
-				<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
-				<string>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-			</dict>
 		</array>
 		<key>75EA4D1A-6D61-4028-8023-81F9AFFEA680</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
 				<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
-				<string>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -79,14 +55,6 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
-				<string>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -115,31 +83,6 @@
 	<string>Packal</string>
 	<key>objects</key>
 	<array>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>lastpathcomponent</key>
-				<false/>
-				<key>onlyshowifquerypopulated</key>
-				<true/>
-				<key>output</key>
-				<integer>2</integer>
-				<key>removeextension</key>
-				<false/>
-				<key>sticky</key>
-				<false/>
-				<key>text</key>
-				<string>{query}</string>
-				<key>title</key>
-				<string>Packal</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.output.notification</string>
-			<key>uid</key>
-			<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -253,15 +196,25 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>autopaste</key>
+				<key>lastpathcomponent</key>
 				<false/>
-				<key>clipboardtext</key>
+				<key>onlyshowifquerypopulated</key>
+				<true/>
+				<key>output</key>
+				<integer>2</integer>
+				<key>removeextension</key>
+				<false/>
+				<key>sticky</key>
+				<false/>
+				<key>text</key>
 				<string>{query}</string>
+				<key>title</key>
+				<string>Packal</string>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.output.clipboard</string>
+			<string>alfred.workflow.output.notification</string>
 			<key>uid</key>
-			<string>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</string>
+			<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -288,7 +241,7 @@
 		<key>7955C2E8-A67A-423F-AF99-078BB269996F</key>
 		<dict>
 			<key>ypos</key>
-			<real>370</real>
+			<real>310</real>
 		</dict>
 		<key>BD4CD001-D2F2-4403-ADAE-991B88EF9C43</key>
 		<dict>
@@ -303,12 +256,7 @@
 		<key>F3825148-0DEF-4920-8AA9-2675D7B90496</key>
 		<dict>
 			<key>ypos</key>
-			<real>10</real>
-		</dict>
-		<key>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</key>
-		<dict>
-			<key>ypos</key>
-			<real>370</real>
+			<real>330</real>
 		</dict>
 	</dict>
 	<key>webaddress</key>

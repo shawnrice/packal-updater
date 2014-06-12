@@ -96,8 +96,8 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 		die();
 	}
 
-	// if ( empty( $set[1] ) )
-	//    $set[1] = 'null';
+	if ( empty( $set[1] ) )
+	   $set[1] = 'null';
 
 	// Just in case something wasn't quoted correctly.
 	$set[1] = str_replace( '\ ', ' ', $set[1] );
@@ -107,8 +107,10 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 		exec( $cmd );
 		$cmd = ( "php cli/packal.php setOption username ''" );
 		exec( $cmd );
+		exec( "$tn -title 'Packal Updater' -message 'You no longer have a Packal username set.' -group 'packal-updater-settings'" );
+
 		die();
-	}	
+	}
 	if ( ( $set[0] == 'packalAccount') && ( $set[1] == '1' ) ) {
 		$cmd = ( "php cli/packal.php setOption packalAccount 1" );
 		exec( $cmd );
@@ -122,6 +124,14 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 		exec( $cmd );
 		$cmd = ( "php cli/packal.php setOption username ''" );
 		exec( $cmd );
+		exec( "$tn -title 'Packal Updater' -message 'You no longer have a Packal username set.' -group 'packal-updater-settings'" );
+		die();
+	}
+	if ( ( $set[0] == 'authorName' ) && ( $set[1] == 'null' ) ) {
+		$cmd = ( "php cli/packal.php setOption authorName ''" );
+		exec( $cmd );
+		exec( "$tn -title 'Packal Updater' -message 'You no longer have a author name set.' -group 'packal-updater-settings'" );
+
 		die();
 	}
 
@@ -130,7 +140,13 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 
 	switch ( $set[0] ) :
 		case 'backups' :
-			$message = 'The updater will now keep ' . $set[1] . ' backups of workflows.';
+			$message = "The updater will now keep " . $set[1] . " backups of workflows.";
+			break;
+		case 'authorName' :
+			$message = "Your author name is now set to " . $set[1] . ".";
+			break;
+		case 'username' :
+			$message = "Your Packal.org username is now set to " . $set[1] . ".";
 			break;
 	endswitch;
 
@@ -147,11 +163,8 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 		else
 			exec( "$tn -title 'Packal Updater' -message 'You will __not__ send anonymous usage data to Packal.org.' -group 'packal-updater-settings'" );
 	}
-	exec( "php clear-messages.php" );
-	// echo "$tn -remove 'packal-updater-settings'";
-	// die();
-	// sleep(5);
-	// exec( "$tn -remove 'packal-updater-settings'" );
+
+
 	// @TODO: Add in Terminal Notifier notification.
 	die();
 
