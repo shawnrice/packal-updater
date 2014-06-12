@@ -495,7 +495,7 @@ function settings() {
       $(function() {
         $( document ).tooltip({
           show: { effect: "fade", duration: 200, delay: 500 },
-          hide: { effect: "fade", duration: 200 },
+          hide: { effect: "fade", duration: 50 },
           position: {
             my: "center bottom-5",
             at: "left+18 top",
@@ -508,6 +508,14 @@ function settings() {
                 .appendTo( this );
             }
           }
+          // If we create the tooltip on the fly (rather than how we do it here, then we can
+          // use something like this to avoid the weird jumping around when things go to far
+          // in and out).
+          // ,
+          // open: function( event, ui ) {
+          //   var $id = $( ui.tooltip ).attr( 'id' );
+          //   $( 'div.ui-tooltip' ).not( '#' + $id ).remove();
+          // }
         });
       });
       $( 'input[type="text"]' ).each( function() {

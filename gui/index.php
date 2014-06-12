@@ -61,6 +61,56 @@
           classie.add( menu, 'bt-menu-close' );
         }, 200);
       });
+
+      $( '.bt-menu-trigger' ).tooltip({
+        items: 'a.bt-menu-trigger',
+        content: 'This is a menu. Click it.',
+        show: { effect: "fade", duration: 200, delay: 1500 },
+          // hide: { effect: "fade", duration: 200 },
+        open: function( event, ui ) {
+          if ( typeof( event.originalEvent ) === 'undefined' ) {
+            return false;
+          }
+          id = $( ui.tooltip ).attr( 'id' );
+          $( 'div.ui-tooltip' ).not( '#' + id ).remove();
+        },
+        close: function( event, ui ) {
+          ui.tooltip.hover( function() {
+              $( this ).stop( true ).fadeTo( 400, 1 ); 
+          },
+          function() {
+            $( this ).fadeOut( '200', function() {
+              $( this ).remove();
+            });
+          });
+          $( '.bt-menu-trigger' ).click( function() {
+            $( 'div.ui-tooltip' ).fadeOut( '200', function() {
+              $( 'div.ui-tooltip' ).remove();
+            });
+          });
+        },
+        position: {
+            my: "center bottom-5",
+            at: "left+18 top",
+            using: function( position, feedback ) {
+              $( this ).css( position );
+              $( "<div>" )
+                .addClass( "arrow" )
+                .addClass( feedback.vertical )
+                .addClass( feedback.horizontal )
+                .appendTo( this );
+            }
+          }
+    });
+      
+
+
+      // $( '.bt-menu-trigger' ).hover( function() {
+      //   var content = $( ".selector" ).tooltip( "option", "content" );
+      // }
+
+      // });
+      // )
     </script>
   </body>
 </html>
