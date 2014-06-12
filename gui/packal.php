@@ -307,7 +307,7 @@ function blacklist() {
       $classes = "box blist $bundle";
 
       if ( file_exists( $workflowsDir . '/' . $workflows[ $bundle ] ."/icon.png" ) )
-        $file = TRUE;
+        $file = "$workflowsDir/" . $workflows[ $bundle ] ."/icon.png";
       else
         $file = 'assets/images/package.png';
 
@@ -328,7 +328,7 @@ function blacklist() {
         <div><h3><?php echo $w['name']; ?></h3></div>
         <div class='short'><p> <?php echo $wf[ $bundle ][ 'short' ]; ?></p></div>
         <div class = 'wficon-container'>
-          <img alt='workflow icon' src=<?php if ( $file === TRUE ) echo "serve_image.php?file=" . $workflowsDir . '/' . $workflows[ $bundle ] ."/icon.png"; ?> class = 'wficon' />
+          <img alt='workflow icon' src=<?php echo "'serve_image.php?file=$file'"; ?> class = 'wficon' />
         </div>
       </div>
     
@@ -352,7 +352,7 @@ These are your workflows that are found on Packal. We won't try to update them.<
     $classes = 'box disabled';
 
     if ( file_exists( $workflowsDir . '/' . $workflows[ $bundle ] ."/icon.png" ) )
-      $file = TRUE;
+      $file = "$workflowsDir/" . $workflows[ $bundle ] ."/icon.png";
     else
       $file = 'assets/images/package.png';
     ?>
@@ -360,7 +360,7 @@ These are your workflows that are found on Packal. We won't try to update them.<
       <div><h3><?php echo $name; ?></h3></div>
       <div class='short'><p> <?php echo $wf[ $bundle ][ 'short' ]; ?></p></div>
       <div class = 'wficon-container'>
-        <img alt='workflow icon' src=<?php if ( $file === TRUE ) echo "serve_image.php?file=" . $workflowsDir . '/' . $workflows[ $bundle ] ."/icon.png"; else echo $file; ?> class = 'wficon' />
+        <img alt='workflow icon' src=<?php echo "'serve_image.php?file=$file'"; ?> class = 'wficon' />
       </div>
     </div>
     <?php
@@ -595,10 +595,13 @@ function status() {
   foreach ( $endpoints as $k => $v ) :
     if ( file_exists( "$v/packal/package.xml" ) ) {
       $w = simplexml_load_file( "$v/packal/package.xml" );
+
       if ( in_array( $k, $manifestBundles ) ) {
-        if ( ($wf[ "$k" ][ 'updated' ] ) > $w->updated + 500 && ( ! in_array( $k, $blacklist ) ) ) {
-          $updates = TRUE;
-          break;
+        if ( $wf[ "$k" ][ 'version' ] != (string) $w->version ) {
+          if ( ! in_array( $k, $blacklist ) ) {
+            $updates = TRUE;
+            break;
+          }
         }
     }
   }
@@ -820,7 +823,7 @@ function about() {
   <p>
     This workflow is a companion to <a href='http://www.packal.org' class='hijack'>Packal.org</a>. It can update any workflows
     that you have downloaded from the site. However, it does not work with any
-    other sources.
+    other sources. See the <a href='http://www.packal.org/terms-service' class='hijack'>Terms of Service</a> for more about Packal.org.
   </p>
 
   <h3>Code Signing</h3>
@@ -905,13 +908,28 @@ function about() {
   </p>
 
   <h2>Credit Where Credit is Due</h2>
-  <p>I have to thank <a href='http://www.packal.org/users/deanishe' class='hijack'>Dean Jackson</a> and <a href='http://www.packal.org/users/tyler-eich' class='hijack'>Tyler Eich</a> for feedback and testing.</p>
+  <p>
+    I have to thank <a href='http://www.packal.org/users/deanishe' class='hijack'>Dean Jackson</a> and 
+    <a href='http://www.packal.org/users/tyler-eich' class='hijack'>Tyler Eich</a> for feedback and testing.
+  </p>
+  
+  <p>
+    This workflow uses <a href='http://dferg.us/'>David Ferguson</a>'s <a href='http://dferg.us/workflows-class/' class='hijack'>Workflows Class</a>.
+  </p>
+
+  <p>
+    It also uses <a href='http://rodneyrehm.de/en/' class='hijack'>Rodney Rehm</a>'s and 
+    <a href='https://github.com/ckruse' class='hijack'>Christian Kruse</a>'s 
+    <a href='https://github.com/rodneyrehm/CFPropertyList' class='hijack'>CFProperty List</a> class to aid with plist migration.
+  </p>
+
   <p>
     For the dynamic layout of this "application," code was used from the overly
     talented <a href='http://www.linkedin.com/in/manoela' class='hijack'>Manoela 
     "Mary Lou" Ilic</a> from 
     <a href='http://tympanus.net/codrops/' class='hijack'>Codrops</a>.
   </p>
+
   <p>
     Specifically, the 
     <a href='http://tympanus.net/codrops/2013/09/30/animated-border-menus/'
@@ -934,8 +952,13 @@ function about() {
   </p>
 
   <p>
-    And, of course, <a href='http://www.alfredapp.com' class='hijack'>Alfred</a>
-    itself without which none of this would be possible — or practical.
+    All of the workflow and theme authors who have contributed their work on Packal.org.
+  </p>
+
+  <p>
+    And, of course, <a href='https://twitter.com/preppeller' class='hijack'>Andrew</a> and <a href='http://thatcanadiangirl.co.uk/' class='hijack'>Vero</a> Pepperrell,
+    affectionately known as the <a href='http://www.alfredapp.com' class='hijack'>Alfred</a> team,
+    without whom none of this would be possible — or practical.
   </p>
 </div>
 <script>
@@ -1129,7 +1152,7 @@ function updateManifest() {
   global $data;
   if ( getManifest() == FALSE ) {
     $time = getManifestModTime();
-    echo "The manifest was last updated <strong>$time</strong>, but it couldn't be updated.";  
+    echo "The manifest was last updated <strong>$time</strong> However it couldn't be updated because of no viable Internet connection.";  
     die();
   }
 
