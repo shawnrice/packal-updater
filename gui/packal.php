@@ -959,29 +959,30 @@ function updates() {
     if ( file_exists( "$workflowsDir/$v/packal/package.xml" ) ) {
       $w = simplexml_load_file( "$workflowsDir/$v/packal/package.xml" );
       if ( in_array( $k, $manifestBundles ) ) {
-        if ( ($wf[ "$k" ][ 'updated' ] ) > $w->updated + 500 && ( ! in_array( $k, $blacklist ) ) ) {
-          // These are the ones that need updating.
-          $updates[] = $wf[ "$k" ][ 'name' ];
-          ?>
-          <div class="update-box">
-          
-          <div class='update-icon'>
-          <?php
-          if ( file_exists( "$workflowsDir/$v/icon.png" ) )
-            echo "<img src='" . "serve_image.php?file=" . $workflowsDir . "/" . $v ."/icon.png'>";
-          ?>
-          </div>
-          <div class='update-content'>
-          <h1><?php echo $wf[ "$k" ][ 'name' ]; ?></h1>
-          <p><small>(<?php echo $k; ?>)</small></p>
-          <p><h3>Current: <span style='font-size: 1.25em'><?php echo $w->version; ?></span> <i class="fa fa-long-arrow-right fa-lg"></i> Proposed: <span style='font-size: 1.25em'><?php echo $wf[ "$k" ][ 'version' ]; ?></span></h3></p>
-          </div>
-          <div class='update-button'>
-            <button type="button" name="" value=<?php echo "'$k'"; ?> class="css3button">Update</button>
-          </div>
-          </div>
+        if ( $wf[ "$k" ][ 'version' ] != (string) $w->version ) {
+          if ( ! in_array( $k, $blacklist ) ) {
+            // These are the ones that need updating.
+            $updates[] = $wf[ "$k" ][ 'name' ];
+            ?>
+            <div class="update-box">
+              <div class='update-icon'>
+<?php
+            if ( file_exists( "$workflowsDir/$v/icon.png" ) )
+              echo "<img src='" . "serve_image.php?file=" . $workflowsDir . "/" . $v ."/icon.png'>";
+?>
+              </div>
+              <div class='update-content'>
+                <h1><?php echo $wf[ "$k" ][ 'name' ]; ?></h1>
+                <p><small>(<?php echo $k; ?>)</small></p>
+                <p><h3>Current: <span style='font-size: 1.25em'><?php echo $w->version; ?></span> <i class="fa fa-long-arrow-right fa-lg"></i> Proposed: <span style='font-size: 1.25em'><?php echo $wf[ "$k" ][ 'version' ]; ?></span></h3></p>
+              </div>
+              <div class='update-button'>
+                <button type="button" name="" value=<?php echo "'$k'"; ?> class="css3button">Update</button>
+              </div>
+            </div>
 
-          <?php
+            <?php
+          }
         }
       }
     }
@@ -1131,7 +1132,7 @@ function updateManifest() {
 
 function updateWorkflow() {
   $bundle = $_GET[ 'workflow' ];
-  $call = exec( "php " . __DIR__ . "/../cli/packal.php doUpdate '$bundle'");
+  $call = exec( "php '" . __DIR__ . "/../cli/packal.php' doUpdate '$bundle'");
   echo $call;
   die();
 }

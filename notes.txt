@@ -23,3 +23,6 @@ The code here is a bit messy and uncommented. Some of it is hacky. Some extra im
 @TODO: Get better icons
 
 @TODO: Fix typo when no Internet connection is available on status page of GUI
+
+
+nohup sleep 10 > /dev/null 2>&1 ; '/Users/Sven/Library/Application Support/Alfred 2/Workflow Data/alfred.bundler-aries/assets/utility/terminal-notifier/default/terminal-notifier.app/Contents/MacOS/terminal-notifier' -message 'packal-updater-settings' > /dev/null 2>&1 &

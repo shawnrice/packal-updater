@@ -317,7 +317,8 @@ function doUpdate( $bundle, $force = FALSE ) {
 
   // Backup the bundle.
   echo `"$cliDir/packal.sh" backup "$bundle"`;
-  $cmd = "$cliDir/packal.sh replaceFiles \"$dir\" \"$cache/update/$bundle/tmp/\"";
+  $cmd = "'" . __DIR__ . "/packal.sh' replaceFiles " . escapeshellarg( $dir ) . ' ' . escapeshellarg( $cache . '/update/' . "$bundle/tmp/");
+  
   exec( "$cmd" );
 
   `rm -fR "$cache/update/$bundle"`;
@@ -330,7 +331,7 @@ function doUpdate( $bundle, $force = FALSE ) {
 
 }
 
-function doUpdateAll() {
+function doUpdateAll( $force = FALSE ) {
   global $manifest, $cache, $cliDir;
 
   $xml = simplexml_load_file( "$manifest" );
@@ -406,7 +407,7 @@ function verifySignature( $appcast , $package , $key ) {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Strongarm functions
-
+// This isn't implemented currently. For the future.
 function forcePackal() {
 global $manifest, $cache;
 

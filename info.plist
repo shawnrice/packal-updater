@@ -27,6 +27,22 @@
 				<key>modifiersubtext</key>
 				<string></string>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>F3825148-0DEF-4920-8AA9-2675D7B90496</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
 		</array>
 		<key>75EA4D1A-6D61-4028-8023-81F9AFFEA680</key>
 		<array>
@@ -127,6 +143,23 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>escaping</key>
+				<integer>127</integer>
+				<key>script</key>
+				<string>php packal-controller-script.php "{query}"</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>75EA4D1A-6D61-4028-8023-81F9AFFEA680</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>triggerid</key>
 				<string>com.packal.start</string>
 			</dict>
@@ -184,21 +217,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>autopaste</key>
-				<false/>
-				<key>clipboardtext</key>
-				<string>{query}</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.output.clipboard</string>
-			<key>uid</key>
-			<string>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>argumenttype</key>
 				<integer>0</integer>
 				<key>escaping</key>
@@ -222,23 +240,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>escaping</key>
-				<integer>127</integer>
-				<key>script</key>
-				<string>php packal-controller-script.php "{query}"</string>
-				<key>type</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>75EA4D1A-6D61-4028-8023-81F9AFFEA680</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>triggerid</key>
 				<string>set-option</string>
 			</dict>
@@ -246,6 +247,21 @@
 			<string>alfred.workflow.trigger.external</string>
 			<key>uid</key>
 			<string>7955C2E8-A67A-423F-AF99-078BB269996F</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -262,12 +278,12 @@
 		<key>47D96588-97DE-4BD3-BCD4-E23FC751B881</key>
 		<dict>
 			<key>ypos</key>
-			<real>370</real>
+			<real>310</real>
 		</dict>
 		<key>75EA4D1A-6D61-4028-8023-81F9AFFEA680</key>
 		<dict>
 			<key>ypos</key>
-			<real>370</real>
+			<real>10</real>
 		</dict>
 		<key>7955C2E8-A67A-423F-AF99-078BB269996F</key>
 		<dict>
@@ -292,7 +308,7 @@
 		<key>FF28304B-BBFF-4FA8-B84D-B97EB66A1BE6</key>
 		<dict>
 			<key>ypos</key>
-			<real>250</real>
+			<real>370</real>
 		</dict>
 	</dict>
 	<key>webaddress</key>

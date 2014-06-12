@@ -24,10 +24,11 @@ $data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
 
 // Implement bundler.
 // Mod to handle more args.
+$osx = exec( "sw_vers | grep 'ProductVersion:' | grep -o '10\.[0-9]*'" );
 
 if ( $q == 'open-gui' ) {
 	$dir = escapeshellcmd( exec( 'pwd' ) );
-	$osx = exec( "sw_vers | grep 'ProductVersion:' | grep -o '10\.[0-9]*'" );
+
 
 	// Start the webserver
 	if ( ( strpos( $osx, '10.9' ) !== FALSE ) || ( strpos( $osx, '10.10' ) !== FALSE ) ) {
@@ -65,7 +66,8 @@ if ( strpos( $q, 'update-' ) !== FALSE ) {
 		$result = exec( 'php cli/packal.php doUpdateAll ');
 	} else {
 		if ( in_array( str_replace( 'update-', '', $q ), $wf ) ) {
-			$result = exec( 'php cli/packal.php doUpdate ' . str_replace( 'update-', '', $q ) );
+			$cmd = 'php cli/packal.php doUpdate ' . str_replace( 'update-', '', $q );
+			$result = exec( $cmd );
 			if ( $result == 'TRUE' ) {
 				$plist = $workflows[ str_replace( 'update-', '', $q ) ] . '/info.plist';
 				$name = exec( "/usr/libexec/PlistBuddy -c \"Print :name\" '$plist' 2> /dev/null" );
@@ -83,17 +85,19 @@ if ( strpos( $q, 'update-' ) !== FALSE ) {
 $tn = __load( 'terminal-notifier' , 'default' , 'utility' );
 $endpoints = json_decode( file_get_contents( "$data/endpoints/endpoints.json" ), TRUE );
 
+
 if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 	$set = str_replace( 'option-set-', '', $q );
 	$set = explode( '-', $set );
+	$set[1] = (string) $set[1];
 
 	if ( count( $set ) > 2 ) {
 		echo "Too many hyphens.";
 		die();
 	}
 
-	if ( empty( $set[1] ) )
-	   $set[1] = 'null';
+	// if ( empty( $set[1] ) )
+	//    $set[1] = 'null';
 
 	// Just in case something wasn't quoted correctly.
 	$set[1] = str_replace( '\ ', ' ', $set[1] );
@@ -101,16 +105,53 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 	if ( ( $set[0] == 'username' ) && ( $set[1] == 'null' ) ) {
 		$cmd = ( "php cli/packal.php setOption packalAccount 0" );
 		exec( $cmd );
+		$cmd = ( "php cli/packal.php setOption username ''" );
+		exec( $cmd );
 		die();
 	}	
-	if ( ( $set[0] == 'packalAccount') && ( $set[1] == 1 ) ) {
-		$script = 'tell application "Alfred 2" to run trigger "set-option" in workflow "com.packal" with argument "username: "';
+	if ( ( $set[0] == 'packalAccount') && ( $set[1] == '1' ) ) {
+		$cmd = ( "php cli/packal.php setOption packalAccount 1" );
+		exec( $cmd );
+		$script = 'tell application "Alfred 2" to run trigger "set-option" in workflow "com.packal" with argument "username:"';
 		exec( "osascript -e '$script'" );
 		die();
 	}
 
-	$cmd = ( "php cli/packal.php setOption '" . $set[0] . "' '" . $set[1] . "'" );
+	if ( ( $set[0] == 'packalAccount') && ( $set[1] == '0' ) ) {
+		$cmd = ( "php cli/packal.php setOption packalAccount 0" );
+		exec( $cmd );
+		$cmd = ( "php cli/packal.php setOption username ''" );
+		exec( $cmd );
+		die();
+	}
+
+	$cmd = ( "php cli/packal.php setOption " . $set[0] . " '" . $set[1] . "'" );
 	exec( $cmd );
+
+	switch ( $set[0] ) :
+		case 'backups' :
+			$message = 'The updater will now keep ' . $set[1] . ' backups of workflows.';
+			break;
+	endswitch;
+
+	if ( isset( $message ) )
+		exec( "$tn -title 'Packal Updater' -message '$message' -group 'packal-updater-settings'" );
+
+	// Option to set a custom icon. It doesn't seem to be working right now, so commented out.
+	// if ( $osx == '10.9' || $osx == '10.10' )
+		// $tnicon = "-appIcon '" . __DIR__ . "assets/icons/package.png'";
+
+	if ( $set[0] == 'workflowReporting' ) {
+		if ( $set[1] == 1 )
+			exec( "$tn -title 'Packal Updater' -message 'You will now send anonymous usage data to Packal.org.' -group 'packal-updater-settings'" );
+		else
+			exec( "$tn -title 'Packal Updater' -message 'You will __not__ send anonymous usage data to Packal.org.' -group 'packal-updater-settings'" );
+	}
+	exec( "php clear-messages.php" );
+	// echo "$tn -remove 'packal-updater-settings'";
+	// die();
+	// sleep(5);
+	// exec( "$tn -remove 'packal-updater-settings'" );
 	// @TODO: Add in Terminal Notifier notification.
 	die();
 

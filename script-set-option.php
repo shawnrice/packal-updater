@@ -36,8 +36,13 @@ function setOption() {
 
 	if ( in_array( $option, $bool ) ) {
 		if ( $option == 'workflowReporting' ) {
-			$w->result( 'option-set-workflowReporting-1', '', 'Send anonymous data to Packal.org.', "", '', 'yes', '' );
-			$w->result( 'option-set-workflowReporting-0', '', 'Do not send anonymous data to Packal.org.', "", '', 'yes', '' );
+			if ( $config->workflowReporting == 1 ) {
+				$w->result( 'option-set-workflowReporting-1', 'option-set-workflowReporting-1', 'Send anonymous data to Packal.org.', "Currently selected", 'assets/icons/svn-commit.png', 'yes', '' );
+				$w->result( 'option-set-workflowReporting-0', 'option-set-workflowReporting-0', 'Do not send anonymous data to Packal.org.', "", '', 'yes', '' );
+			} else {
+				$w->result( 'option-set-workflowReporting-1', 'option-set-workflowReporting-1', 'Send anonymous data to Packal.org.', "", 'assets/icons/svn-commit.png', 'yes', '' );
+				$w->result( 'option-set-workflowReporting-0', 'option-set-workflowReporting-0', 'Do not send anonymous data to Packal.org.', "Currently selected", '', 'yes', '' );
+			}
 		} else if ( $option == 'packalAccount' ) {
 			$w->result( 'option-set-packalAccount-1', 'option-set-packalAccount-1', 'I do have an account on Packal.org', "", '', 'yes', '' );
 			$w->result( 'option-set-packalAccount-0', 'option-set-packalAccount-0', 'I do not have an account on Packal.org', "", '', 'yes', '' );

@@ -155,10 +155,12 @@ foreach ( $json as $k => $v ) :
   if ( file_exists( "../$v/packal/package.xml" ) ) {
     $p = simplexml_load_file( "../$v/packal/package.xml" );
     if ( in_array( $k, $manifestBundles ) ) {
-      if ( ($wf[ "$k" ][ 'updated' ] ) > $p->updated + 500 && ( ! in_array( $k, $blacklist ) ) ) {
-        $updates[ $k ][ 'name' ] = (string) $p->name;
-        $updates[ $k ][ 'path' ] = "../$v";
-        $updates[ $k ][ 'version' ] = (string) $p->version;
+      if ( (string) $p->version != $wf[ "$k" ]['version'] ) {
+        if ( ! in_array( $k, $blacklist ) ) {
+          $updates[ $k ][ 'name' ] = (string) $p->name;
+          $updates[ $k ][ 'path' ] = "../$v";
+          $updates[ $k ][ 'version' ] = (string) $p->version;
+        }
       }
     }
   }
@@ -166,7 +168,7 @@ endforeach;
 
 if ( empty( $q[1] ) ) {
   if ( ! isset( $updates ) )
-    $w->result( 'updates', 'updates', 'All of your workflows are up to date.', "", 'assets/icons/task-complete.png', 'no', 'update');
+    $w->result( 'updates', 'updates', 'All of your workflows are up to date.', "", 'assets/icons/task-complete.png', 'no', '');
   else  {
     if ( count( $updates ) > 1 )
       $message = "There are " . count( $updates ) . " updates pending.";
@@ -178,9 +180,9 @@ if ( empty( $q[1] ) ) {
 
   if ( ( date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) < 86400 ) ) ) {
     $manifestTime = getManifestModTime();
-    $w->result( '', '', 'The manifest is up to date.', "Last updated $manifestTime", 'assets/icons/task-complete.png', 'no', '');
+    $w->result( '', 'manifest-update', 'The manifest is up to date.', "Last updated $manifestTime", 'assets/icons/task-complete.png', 'yes', '');
   } else {
-    $w->result( '', '', 'The manifest is out of date.', "Last updated $manifestTime", 'assets/icons/task-attention.png', 'yes', '');
+    $w->result( '', 'manifest-update', 'The manifest is out of date.', "Last updated $manifestTime", 'assets/icons/task-attention.png', 'yes', '');
   }
 
   if ( $gui === TRUE ) {
@@ -224,16 +226,21 @@ if ( strpos( $q[1], 'update' ) !== FALSE ) {
       $w->result( 'update-all', 'update-all', "Update all workflows", '', '', 'yes', '');
     }
     foreach( $updates as $k => $v ) :
+
+      // Get the workflow icon, if it exists, otherwise, fallback to package icon
       if ( file_exists( $v[ 'path' ] . "/icon.png" ) )
         $icon = $v[ 'path' ] . "/icon.png";
       else
         $icon = 'assets/icons/package.png';
-      $w->result( "update-$k", "update-$k", "Update " . $v[ 'name' ], "Update from version " . $v[ 'version' ] . " to " . $wf[ $k ][ 'version' ], $v[ 'path' ] . "/icon.png", '', '');
+
+      $w->result( "update-$k", "update-$k", "Update " . $v[ 'name' ], "Update version " . $v[ 'version' ] . " => " . $wf[ $k ][ 'version' ], $v[ 'path' ] . "/icon.png", '', '');
     endforeach;
   } else {
     $w->result( '', '', "All of your workflows are up to date.", '', 'assets/icons/task-complete.png', 'no', '');
   }
+
   echo $w->toxml();
+  // We're done here.
   die();
 }
 
@@ -252,9 +259,9 @@ if ( strpos( $q[1], 'setup' ) !== FALSE ) {
   );
   foreach ( $options as $k => $v ) :
     if ( isset( $config->$k ) ) {
-      if ( ( $config->$k == '1' ) && ( $k != 'backups' ) ) {
+      if ( ( (string) $config->$k == '1' ) && ( $k != 'backups' ) ) {
           $message = "Current value: Yes";
-      } else if ( ( $config->$k == '0' ) && ( $k != 'backups' ) ) {
+      } else if ( ( (string) $config->$k == '0' ) && ( $k != 'backups' ) ) {
           $message = "Current value: No";
       } else {
         $message = "Current value: " . $config->$k;
@@ -263,6 +270,7 @@ if ( strpos( $q[1], 'setup' ) !== FALSE ) {
         $message = "Not set.";
     }
     
+    // Setup icons per option
     $icon = 'assets/icons/';
     switch ( $k ) :
       case 'authorName':
@@ -279,6 +287,9 @@ if ( strpos( $q[1], 'setup' ) !== FALSE ) {
         break;
       case 'packalAccount' :
         $icon .= 'flag.png';
+        break;
+      default:
+        $icon = '';
         break;
     endswitch;
 
