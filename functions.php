@@ -44,7 +44,8 @@ function firstRun() {
 	  $config->backups = 3;
 	  $config->username = '';
 	  $config->authorName = '';
-	  $config->notifications = 'workflow';
+	  $config->notifications = '2';
+	  $config->workflowReporting = '1';
 	  $config->apiKey = '';
 	  $config->asXML( "$data/config/config.xml" );
 	  unset( $config );

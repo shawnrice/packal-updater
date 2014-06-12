@@ -135,7 +135,27 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 		die();
 	}
 
-	$cmd = ( "php cli/packal.php setOption " . $set[0] . " '" . $set[1] . "'" );
+	if ( $set[0] == 'workflowReporting' ) {
+		
+		// Possible Data Correction
+		if ( $set[1] == 'null' )
+			$set[1] = 0;
+
+		// Set the value
+		$cmd = "php cli/packal.php setOption workflowReporting " . $set[1];
+		exec( $cmd );
+
+		// Send the notification
+		if ( $set[1] == 1 )
+			exec( "$tn -title 'Packal Updater' -message 'You will now send anonymous usage data to Packal.org.' -group 'packal-updater-settings'" );
+		else
+			exec( "$tn -title 'Packal Updater' -message 'You will __not__ send anonymous usage data to Packal.org.' -group 'packal-updater-settings'" );
+
+		// Die. Die. Die.
+		die();
+	}
+
+	$cmd = ( "php cli/packal.php setOption " . $set[0] . " " . $set[1] );
 	exec( $cmd );
 
 	switch ( $set[0] ) :
@@ -157,12 +177,7 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 	// if ( $osx == '10.9' || $osx == '10.10' )
 		// $tnicon = "-appIcon '" . __DIR__ . "assets/icons/package.png'";
 
-	if ( $set[0] == 'workflowReporting' ) {
-		if ( $set[1] == 1 )
-			exec( "$tn -title 'Packal Updater' -message 'You will now send anonymous usage data to Packal.org.' -group 'packal-updater-settings'" );
-		else
-			exec( "$tn -title 'Packal Updater' -message 'You will __not__ send anonymous usage data to Packal.org.' -group 'packal-updater-settings'" );
-	}
+
 
 
 	// @TODO: Add in Terminal Notifier notification.

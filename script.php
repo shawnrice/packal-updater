@@ -26,11 +26,11 @@ if ( ( $osx == '10.9') || ( $osx == '10.10' ) )
 firstRun();
 
 $bundle = 'com.packal';
-$q     = $argv;
-$w     = new Workflows;
-$HOME  = exec( 'echo $HOME' );
-$data  = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
-$cache = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle";
+$q      = $argv;
+$w      = new Workflows;
+$HOME   = exec( 'echo $HOME' );
+$data   = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
+$cache  = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle";
 
 $connection = checkConnection();
 
@@ -65,7 +65,8 @@ if ( ! file_exists( "$data/config/config.xml" ) ) {
   $config->backups = 3;
   $config->username = '';
   $config->authorName = '';
-  $config->notifications = 'workflow';
+  $config->workflowReporting = '1';
+  $config->notifications = '2';
   $config->apiKey = '';
   $config->asXML( "$data/config/config.xml" );
   unset( $config );
@@ -90,9 +91,8 @@ if ( $connection !== FALSE )
   exec( "'" . __DIR__ . "/cli/packal.sh' update" );
 
 // Do the workflow reporting script as long as the config option is set.
-// Disabled for testing.
-// if ( $config->workflowReporting == 1 )
-//   exec( "nohup php " . __DIR__ . "/report-usage-data.php  > /dev/null 2>&1 &" );
+if ( $config->workflowReporting == '1' )
+  exec( "nohup php '" . __DIR__ . "/report-usage-data.php'  > /dev/null 2>&1 &" );
 
 $blacklist = json_decode( file_get_contents( "$data/config/blacklist.json" ), TRUE );
 $manifest  = @simplexml_load_file( "$data/manifest.xml" );
@@ -223,7 +223,9 @@ if ( strpos( $q[1], 'update' ) !== FALSE ) {
     $updates = array();
   if ( count( $updates ) > 0 ) {
     if ( count( $updates ) > 1 ) {
-      $w->result( 'update-all', 'update-all', "Update all workflows", '', '', 'yes', '');
+      // Don't allow the updates if there is no internet connection.
+      if ( $connection !== FALSE )
+        $w->result( 'update-all', 'update-all', "Update all workflows", '', '', 'yes', '');
     }
     foreach( $updates as $k => $v ) :
 
@@ -232,8 +234,10 @@ if ( strpos( $q[1], 'update' ) !== FALSE ) {
         $icon = $v[ 'path' ] . "/icon.png";
       else
         $icon = 'assets/icons/package.png';
-
-      $w->result( "update-$k", "update-$k", "Update " . $v[ 'name' ], "Update version " . $v[ 'version' ] . " => " . $wf[ $k ][ 'version' ], $v[ 'path' ] . "/icon.png", '', '');
+      if ( $connection !== FALSE )
+        $w->result( "update-$k", "update-$k", "Update " . $v[ 'name' ], "Update version " . $v[ 'version' ] . " => " . $wf[ $k ][ 'version' ], $v[ 'path' ] . "/icon.png", '', '');
+      else
+        $w->result( "update-$k", '', "An update for " . $v[ 'name' ] . ' is available.', "Update version " . $v[ 'version' ] . " => " . $wf[ $k ][ 'version' ] . '. << Exception: no viable Internet connection. Update impossible. >>' , $v[ 'path' ] . "/icon.png", 'no', '');
     endforeach;
   } else {
     $w->result( '', '', "All of your workflows are up to date.", '', 'assets/icons/task-complete.png', 'no', '');
