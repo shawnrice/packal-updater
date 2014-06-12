@@ -4,6 +4,8 @@
 <dict>
 	<key>bundleid</key>
 	<string>com.packal</string>
+	<key>category</key>
+	<string>Tools</string>
 	<key>connections</key>
 	<dict>
 		<key>1F4D4C11-58BD-413E-9E17-D93F880D403C</key>
@@ -80,7 +82,7 @@
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>Packal</string>
+	<string>Packal Updater</string>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -220,7 +222,8 @@
 		</dict>
 	</array>
 	<key>readme</key>
-	<string></string>
+	<string>See https://github.com/shawnrice/packal
+Or http://www.packal.org</string>
 	<key>uidata</key>
 	<dict>
 		<key>1F4D4C11-58BD-413E-9E17-D93F880D403C</key>
@@ -260,6 +263,6 @@
 		</dict>
 	</dict>
 	<key>webaddress</key>
-	<string>http://packal.org</string>
+	<string>http://www.packal.org</string>
 </dict>
 </plist>
