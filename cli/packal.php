@@ -351,7 +351,7 @@ function doUpdateAll( $force = FALSE ) {
       $wf = simplexml_load_file( "$dir/packal/package.xml" );
       $wf->updated += 120; // Compensation for time in the generated packages.
 
-      if ( "$w->updated" > "$wf->updated" ) {
+      if ( "$w->version" != "$wf->version" ) {
         $updatable[] = array( (string) $w->name, (string) $wf->version, (string) $w->version, (string) $w->bundle );
       }
     } else {
