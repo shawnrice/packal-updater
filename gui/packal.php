@@ -522,8 +522,10 @@ function settings() {
         id = $( this ).attr( 'name' );
         $( '#' + id ).html( $( this ).val() );
         width = $( '#' + id ).textWidth();
-        if ( width < 100 ) {
-          width = 100;
+        if ( $( this ).val() == '' ) {
+          width = 150;
+        } else if ( width < 90 ) {
+          width = 90;
         }
         $( this ).css( 'width', width + 5 );
       });
@@ -576,8 +578,10 @@ function settings() {
         id = $( this ).attr( 'name' );
         $( '#' + id ).html( $( this ).val() );
         width = $( '#' + id ).textWidth();
-        if ( width < 100 ) {
-          width = 100;
+        if ( $( this ).val() == '' ) {
+          width = 150;
+        } else if ( width < 90 ) {
+          width = 90;
         }
         $( this ).css( 'width', width + 5 );
       });
@@ -713,6 +717,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
   </div>
 </div>
 </div>
+<?php if ( isset( $meta[ 'availableOnPackal' ] ) && ( count( $meta[ 'availableOnPackal' ] ) > 0 ) ) : ?>
 <p class='clearfix'> </p>
 <div>
   <p>
@@ -735,6 +740,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
   </div>
 </div>
 </div>
+<?php endif; ?>
 <p class='clearfix'> </p>
   <div>
     <p>
@@ -875,15 +881,9 @@ function about() {
   </p>
   <p class='clearfix'></p>
   <div style='text-align: center;'>
-  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-    <input type="hidden" name="cmd" value="_donations">
-    <input type="hidden" name="business" value="rice@shawnrice.org">
-    <input type="hidden" name="item_name" value="Donation">
-    <input type="hidden" name="currency_code" value="USD">
-    <input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_LG.gif:NonHostedGuest">
-    <input type="image" src="assets/images/paypal.gif" name="submit" alt="PayPal - The safer, easier way to pay online!">
-    <img alt="" border="0" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==">
-  </form>
+  <a href='https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=rice@shawnrice.com' class='hijack'>
+    <img src='assets/images/paypal.gif' alt="PayPal - The safer, easier way to pay online!" />
+  </a>
   </div>
   <h2>License</h2>
   <p>Code is provided AS IS under the GPLv3 license.</p>
@@ -1090,7 +1090,7 @@ function writeBlacklist() {
   else
     $blacklist[] = $bundle;
 
-  file_put_contents( "$data/config/blacklist.json", json_encode( $blacklist ) );
+  file_put_contents( "$data/config/blacklist.json", utf8_encode( json_encode( $blacklist ) ) );
 }
 
 

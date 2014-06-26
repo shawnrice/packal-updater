@@ -93,7 +93,7 @@ $post[ 'meta' ] = array( 'date' => $date , 'total' => $total );
 
 // Add the Workflows to the post array
 $post[ 'workflows' ] = $report;
-$json = json_encode( $post );
+$json = utf8_encode( json_encode( $post ) );
 
 $data = array( 'info' => $json, 'unique' => $unique, 'task' => 'reporting', 'date' => $date );
 
@@ -131,7 +131,9 @@ die();
 
 function getWorkflowData( $dir ) {
 	$plist = "$dir/info.plist";	
-
+	if ( ! file_exists( $plist ) )
+		return FALSE;
+	
 	$bundle = utf8_encode( trim( readPlistValue( 'bundleid', $plist ) ) );
 	
 	if ( ! $bundle )

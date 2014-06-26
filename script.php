@@ -51,7 +51,7 @@ if ( ! file_exists( "$data/endpoints" ) )
 if ( ! file_exists( "$data/config/blacklist.json" ) ) {
   // Make an empty blacklist file if one doesn't exist.
   $blacklist = array();
-  file_put_contents( "$data/config/blacklist.json", json_encode( $blacklist ) );
+  file_put_contents( "$data/config/blacklist.json", utf8_encode( json_encode( $blacklist ) ) );
 }
 
 generateEndpoints();

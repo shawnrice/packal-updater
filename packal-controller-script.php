@@ -55,6 +55,10 @@ if ( $q == 'open-gui' ) {
 
 	// Open the gui in the viewer
 	exec( "nohup open $viewer --args http://localhost:7893  > /dev/null 2>&1 &" );
+
+	$script = 'tell application "System Events" to set frontmost of process "Application Stub" to true';
+	exec( "osascript -e '$script'" );
+
 	die();
 }
 
@@ -197,7 +201,7 @@ if ( strpos( $q, 'blacklist-' ) !== FALSE ) {
 	$blacklist = json_decode( file_get_contents( "$data/config/blacklist.json" ), TRUE );
 	if ( ! in_array( $workflow, $blacklist ) ) {
 		$blacklist[] = $workflow;
-		file_put_contents( "$data/config/blacklist.json", json_encode( $blacklist ) );
+		file_put_contents( "$data/config/blacklist.json", utf8_encode( json_encode( $blacklist ) ) );
 	}
 	$plist = $endpoints[ $workflow ] . '/info.plist';
 	$name = exec( "/usr/libexec/PlistBuddy -c \"Print :name\" '$plist' 2> /dev/null" );
@@ -210,7 +214,7 @@ if ( strpos( $q, 'whitelist-' ) !== FALSE ) {
 	$blacklist = json_decode( file_get_contents( "$data/config/blacklist.json" ), TRUE );
 	if ( in_array( $workflow, $blacklist ) ) {
 		unset( $blacklist[ array_search( $workflow, $blacklist ) ] );
-		file_put_contents( "$data/config/blacklist.json", json_encode( $blacklist ) );
+		file_put_contents( "$data/config/blacklist.json", utf8_encode( json_encode( $blacklist ) ) );
 	}
 	$plist = $endpoints[ $workflow ] . '/info.plist';
 	$name = exec( "/usr/libexec/PlistBuddy -c \"Print :name\" '$plist' 2> /dev/null" );

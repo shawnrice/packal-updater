@@ -53,7 +53,7 @@ function firstRun() {
 
 	// Generate Empty Blacklist File
 	if ( ! file_exists( "$data/config/blacklist.json" ) ) {
-		file_put_contents( "$data/config/blacklist.json", json_encode( array() ) );
+		file_put_contents( "$data/config/blacklist.json", utf8_encode( json_encode( array() ) ) );
 	}
 
 	if ( ! file_exists( "$data/manifest.xml" ) ) {
@@ -100,7 +100,7 @@ function generateEndpoints( $force = FALSE ) {
 				fwrite( $fp , "\"$bundle\"=\"$d\"\n" );
 		endforeach;
 
-		file_put_contents( "$data/endpoints/endpoints.json", json_encode( $endpoints ) );
+		file_put_contents( "$data/endpoints/endpoints.json", utf8_encode( json_encode( $endpoints ) ) );
 		fclose( $fp );
 	} else
 		return FALSE;
