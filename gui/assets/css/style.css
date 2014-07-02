@@ -845,3 +845,22 @@ Tooltips
 }
 
 /************ /MENU *************/
+
+#fusion_ad {
+  font-size: .7em;
+  max-width: 135px;
+  position: absolute;
+  right: 5em;
+}
+.fusionentire > a {
+  clear: both;
+  display: inline-block;
+
+}
+.fusionimg {
+  margin-bottom: 5px;
+}
+.bsap {
+  margin-top: 2px;
+  margin-bottom: 1em;  
+}
