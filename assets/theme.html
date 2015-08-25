@@ -1,0 +1,834 @@
+<html>
+
+<head>
+ <meta charset="UTF-8">
+<style>
+.themeareainput {
+	width: 500px;
+	margin: 50px;
+}
+
+
+.baselayer {
+	margin: 0 auto;
+	background-image: url(#drop-shadow);
+	z-index: 1;
+}
+#canvas {
+	margin: 2em;
+	padding: 2em;
+	display: block;
+	position: relative;
+	/*background-image: url("pattern.png");*/
+	background-color: rgba(255,155,23,.25);
+	background-color: rgba(255,155,155,.25);
+	filter:blur(5px);
+
+}
+
+#canvas::before {
+  content: "";
+  background-image: url("images/pattern.png");
+  opacity: .75;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;
+  filter: blur(100px);
+}
+
+#alfred-window {
+	z-index:2;
+	width: 800px;
+	border: 12px solid green;
+	padding: 12px 12px 0 12px;
+	text-align: left;
+	/*filter: drop-shadow(5px 5px 5px #000);
+	-webkit-filter: drop-shadow(5px 5px 5px #000);*/
+	/*filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=12, OffY=12,Color='#444')";
+  filter: url(#drop-shadow);
+  -webkit-filter: drop-shadow(12px 12px 7px rgba(0,0,0,0.5));
+  filter: drop-shadow(12px 12px 7px rgba(0,0,0,0.5));*/
+}
+
+#alfred-window div {
+	/*float: left;*/
+	position: relative;
+	overflow: hidden;
+}
+
+.icon-image {
+	width: 36px;
+}
+
+.search {
+	top: -12px;
+	padding: 10px 10px;
+}
+.result {
+	padding: 3px 8px;
+	clear: both;
+	border-top: 1px solid black;
+
+
+}
+.result-last {
+	border-bottom: 1px solid black;
+	margin-bottom: 12px;
+}
+
+.result-text {
+	text-overflow: hidden;
+	width: 100%;
+
+}
+.title-and-subtitle, .shortcut, .icon {
+	float: left;
+	position: relative;
+	text-overflow: hidden;
+	display: table-cell;
+	clear: none;
+}
+.result-subtext {
+	clear: right;
+	max-width: 100%;
+	width: 100%;
+}
+
+.result-text, .result-subtext, .selected-text, .selected-subtext {
+	word-break: break-all;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	hyphens: auto;
+	max-height: 1.2em;
+	max-width: 100%;
+	min-width: 30%;
+}
+
+.selected-text {
+	overflow: hidden;
+	width: 100%;
+}
+
+.selected-subtext {
+	text-overflow: hidden;
+	width: 100%;
+}
+
+.icon {
+	margin-right: 10px;
+}
+
+.cog {
+	height: 24px;
+	width:24px;
+	padding-top: 2px;
+	padding-right: 2px;
+	position: absolute;
+	border-radius: 24px;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	background-color: white;
+	left: 800px;
+	z-index: 100;
+}
+
+.shortcut {
+	float: right;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	line-height: 3em;
+}
+
+.scrollbar {
+	/*position: absolute;
+	float: right;
+	width: 2px;
+	height: 9em;
+	z-index: 99;
+	top: 3.5em;
+	left: /*700px;*/
+
+	/*background-color: black;*/
+}
+
+
+/* Initial Styling */
+.search {
+	color:rgba(136,156,68,1.00);
+	background-color:rgba(252,236,209,1.00);
+}
+
+.result-subtext {
+	font-size:12px;
+	font-weight:300;
+	font-family:"Helvetica Neue";
+	color:rgba(198,157,138,1.00);
+	max-width:600px;
+}
+
+.icon-image {
+	width:42px;
+}
+
+.result {
+	border-color:rgba(0,0,0,0.00);
+}
+
+.result-selected {
+	background-color:rgba(229,199,163,1.00);
+	color:rgba(227,47,79,1.00);
+}
+
+.shortcut {
+	color:rgba(251,156,0,1.00);
+	font-size:14px;
+	font-weight:300;
+	font-family:"Helvetica Neue";
+}
+
+#cog {
+	fill:rgba(0,0,0,0.5);
+}
+
+#alfred-window {
+	background-color:rgba(252,236,209,1.00);
+	width:700px;
+	border-radius:5px;
+	border-color:rgba(194,77,89,0.00);
+}
+
+.cog {
+	background-color:rgba(252,236,209,1.00);
+	left:682px;
+}
+
+.search-text {
+	font-size:28px;
+	font-weight:300;
+	font-family:"Helvetica Neue";
+	padding-bottom:2px;
+}
+
+.result-text {
+	font-size:18px;
+	font-weight:300;
+	font-family:"Helvetica Neue";
+	color:rgba(251,156,0,1.00);
+	padding-bottom:2px;
+}
+
+.result-selected-subtext {
+	color:rgba(198,157,138,1.00);
+}
+
+.shortcut-selected {
+	color:rgba(227,47,79,1.00);
+}
+
+.baselayer {
+	width:748px;
+	background-color:rgba(194,77,89,0.00);
+	border-radius:5px;
+}
+</style>
+</head>
+<body>
+<h2>
+	<div id='themename'>
+	Theme Name
+	</div>
+</h2>
+<h3>
+	<div id='themeauthor'>
+	Author
+	</div>
+</h3>
+<div id='themeurl'>
+<p>Copy / Paste an Alfred 2 Theme URL in the box, and press 'Apply Theme'</p>
+<p>This is mostly accurate, but there are some discrepancies; also, it currently doesn't use the scroll bar and
+mis-applies the settings to the preferences cog-wheel. Other things might be a bit off.
+</p>
+<p>Also, if we install `pageres` (https://github.com/sindresorhus/pageres), then we can take screenshots:
+pageres file://path/to/theme.html --selector '#canvas'
+</p>
+<textarea id='themeurltextarea' name='themeurl' rows='10' cols='120' class='themeareainput'>
+alfred://theme/searchForegroundColor=rgba(136,156,68,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(229,199,163,1.00)&shortcutColor=rgba(251,156,0,1.00)&scrollbarColor=rgba(170,170,170,1.00)&imageStyle=3&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(252,236,209,1.00)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(198,157,138,1.00)&searchBackgroundColor=rgba(252,236,209,1.00)&name=Kimbie&resultTextFontSize=3&resultSelectedSubtextColor=rgba(198,157,138,1.00)&shortcutSelectedColor=rgba(227,47,79,1.00)&widthSize=4&border=rgba(194,77,89,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(251,156,0,1.00)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=1&credits=Thibault%20Maekelbergh&searchSelectionBackgroundColor=rgba(66,120,245,1.00)&resultSelectedTextColor=rgba(227,47,79,1.00)&resultPaddingSize=1&shortcutFont=Helvetica%20Neue%20Light
+</textarea>
+<br />
+<button id='applyTheme' name='applyTheme' value='Apply Theme'>Apply Theme</button>
+<button id='applyTheme1' name='applyTheme1' value='Apply Theme1'>Apply Preset 1</button>
+<button id='applyTheme2' name='applyTheme2' value='Apply Theme2'>Apply Preset 2</button>
+<button id='applyTheme3' name='applyTheme3' value='Apply Theme3'>Apply Preset 3</button>
+<button id='applyTheme4' name='applyTheme4' value='Apply Theme4'>Apply Preset 4</button>
+<button id='applyTheme5' name='applyTheme5' value='Apply Theme5'>Apply Preset 5</button>
+<hr />
+<button value='alfred://theme/searchForegroundColor=rgba(252,252,252,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(87,98,102,1.00)&separatorColor=rgba(255,255,255,0.00)&resultSelectedBackgroundColor=rgba(208,195,167,0.26)&shortcutColor=rgba(102,103,108,0.27)&scrollbarColor=rgba(255,255,255,0.50)&imageStyle=1&resultSubtextFont=Helvetica&background=rgba(0,0,0,0.50)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(24,112,137,1.00)&searchBackgroundColor=rgba(6,4,8,0.00)&name=Mostly%20Transparent&resultTextFontSize=3&resultSelectedSubtextColor=rgba(87,98,102,1.00)&shortcutSelectedColor=rgba(87,98,102,1.00)&widthSize=3&border=rgba(156,146,138,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(170,159,124,0.78)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=0&credits=Shawn%20Patrick%20Rice&searchSelectionBackgroundColor=rgba(203,203,203,1.00)&resultSelectedTextColor=rgba(252,252,252,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Mostly Transparent</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(204,204,204,0.00)&resultSelectedBackgroundColor=rgba(53,110,243,1.00)&shortcutColor=rgba(128,128,128,1.00)&scrollbarColor=rgba(127,127,127,1.00)&imageStyle=7&resultSubtextFont=Lucida%20Grande&background=rgba(12,12,12,0.85)&shortcutFontSize=1&searchFontSize=3&resultSubtextColor=rgba(127,127,127,1.00)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Unibody%20Dark&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=1&border=rgba(255,255,255,0.20)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(255,255,255,1.00)&cornerRoundness=3&searchFont=Lucida%20Grande&searchPaddingSize=0&credits=Tyler%20Eich&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=1&shortcutFont=Lucida%20Grande' class='theme-option'>Unibody Dark</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(223,101,101,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(249,38,114,1.00)&separatorColor=rgba(117,113,94,1.00)&resultSelectedBackgroundColor=rgba(38,38,38,1.00)&shortcutColor=rgba(140,182,225,1.00)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=8&resultSubtextFont=Helvetica&background=rgba(0,0,0,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(167,168,167,1.00)&searchBackgroundColor=rgba(0,0,0,1.00)&name=Tomorrow%20Night%20Bright&resultTextFontSize=4&resultSelectedSubtextColor=rgba(238,238,238,1.00)&shortcutSelectedColor=rgba(140,182,225,1.00)&widthSize=4&border=rgba(53,52,45,0.50)&resultTextFont=Helvetica&resultTextColor=rgba(140,182,225,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=0&credits=cmchap&searchSelectionBackgroundColor=rgba(35,35,29,1.00)&resultSelectedTextColor=rgba(207,171,223,1.00)&resultPaddingSize=4&shortcutFont=Helvetica' class='theme-option'>Tomorrow Night Bright</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=2&searchSelectionForegroundColor=rgba(50,50,50,1.00)&separatorColor=rgba(226,233,240,1.00)&resultSelectedBackgroundColor=rgba(57,6,85,1.00)&shortcutColor=rgba(175,40,109,1.00)&scrollbarColor=rgba(175,40,109,0.50)&imageStyle=4&resultSubtextFont=Helvetica&background=rgba(245,245,245,1.00)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(30,82,129,1.00)&searchBackgroundColor=rgba(245,245,245,1.00)&name=Alfred%20Forum&resultTextFontSize=4&resultSelectedSubtextColor=rgba(178,149,203,1.00)&shortcutSelectedColor=rgba(219,222,224,1.00)&widthSize=4&border=rgba(103,44,152,0.50)&resultTextFont=Helvetica&resultTextColor=rgba(91,39,134,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=0&credits=Benzi%20Ahamed&searchSelectionBackgroundColor=rgba(201,201,201,1.00)&resultSelectedTextColor=rgba(255,255,244,1.00)&resultPaddingSize=3&shortcutFont=Helvetica' class='theme-option'>Alfred Forum</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(204,116,64,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(204,116,64,0.20)&resultSelectedBackgroundColor=rgba(105,175,255,0.50)&shortcutColor=rgba(126,124,153,1.00)&scrollbarColor=rgba(105,175,255,1.00)&imageStyle=4&resultSubtextFont=Geneva&background=rgba(255,214,169,1.00)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(126,124,153,1.00)&searchBackgroundColor=rgba(72,64,204,0.10)&name=Southwest&resultTextFontSize=1&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=4&border=rgba(204,116,64,1.00)&resultTextFont=Monaco&resultTextColor=rgba(204,116,64,1.00)&cornerRoundness=1&searchFont=Monaco&searchPaddingSize=4&credits=Shawn%20Patrick%20Rice&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=1&shortcutFont=Lucida%20Grande' class='theme-option'>Southwest</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(236,235,237,1.00)&separatorColor=rgba(187,206,227,0.00)&resultSelectedBackgroundColor=rgba(212,212,212,0.00)&shortcutColor=rgba(64,64,64,0.00)&scrollbarColor=rgba(213,213,213,0.00)&imageStyle=1&resultSubtextFont=Lucida%20Grande&background=rgba(230,229,231,1.00)&shortcutFontSize=3&searchFontSize=3&resultSubtextColor=rgba(141,141,141,1.00)&searchBackgroundColor=rgba(242,241,241,0.00)&name=Minimal%20Mac&resultTextFontSize=2&resultSelectedSubtextColor=rgba(66,66,66,1.00)&shortcutSelectedColor=rgba(0,0,0,1.00)&widthSize=3&border=rgba(25,25,25,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(85,84,85,1.00)&cornerRoundness=0&searchFont=Lucida%20Grande&searchPaddingSize=4&credits=Caleb%20Grove&searchSelectionBackgroundColor=rgba(44,44,44,1.00)&resultSelectedTextColor=rgba(0,0,0,1.00)&resultPaddingSize=2&shortcutFont=Lucida%20Grande' class='theme-option'>Minimal Light</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(173,170,159,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(112,111,107,1.00)&resultSelectedBackgroundColor=rgba(86,84,80,1.00)&shortcutColor=rgba(166,165,158,1.00)&scrollbarColor=rgba(170,170,170,0.00)&imageStyle=9&resultSubtextFont=Courier&background=rgba(102,99,94,1.00)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(138,137,130,1.00)&searchBackgroundColor=rgba(73,72,67,1.00)&name=Vintage%20OD&resultTextFontSize=2&resultSelectedSubtextColor=rgba(172,173,166,1.00)&shortcutSelectedColor=rgba(209,207,199,1.00)&widthSize=3&border=rgba(214,214,214,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(176,174,166,1.00)&cornerRoundness=0&searchFont=Lucida%20Grande&searchPaddingSize=2&credits=Caleb%20Grove%20%28%40sircalebgrove%29&searchSelectionBackgroundColor=rgba(102,122,140,1.00)&resultSelectedTextColor=rgba(209,207,198,1.00)&resultPaddingSize=3&shortcutFont=Lucida%20Grande' class='theme-option'>Olive Drab</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(215,170,0,1.00)&resultSubtextFontSize=1&separatorColor=rgba(213,213,213,0.19)&resultSelectedBackgroundColor=rgba(255,245,230,1.00)&shortcutColor=rgba(226,199,161,1.00)&scrollbarColor=rgba(225,199,163,1.00)&imageStyle=3&resultSubtextFont=Lucida%20Grande&background=rgba(249,241,217,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(189,179,124,0.80)&searchBackgroundColor=rgba(249,241,217,1.00)&name=Simple%20Gold&resultTextFontSize=2&resultSelectedSubtextColor=rgba(202,170,103,1.00)&shortcutSelectedColor=rgba(162,158,151,1.00)&widthSize=2&border=rgba(249,241,217,0.38)&resultTextFont=Helvetica&resultTextColor=rgba(153,143,75,1.00)&cornerRoundness=0&searchFont=Futura&searchPaddingSize=3&credits=Ian%20Soper&shortcutFont=Courier&resultSelectedTextColor=rgba(42,41,35,1.00)&resultPaddingSize=3' class='theme-option'>Simple Gold</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(227,225,227,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(43,46,54,1.00)&resultSelectedBackgroundColor=rgba(158,55,62,1.00)&shortcutColor=rgba(166,166,166,1.00)&scrollbarColor=rgba(191,191,191,0.40)&imageStyle=8&resultSubtextFont=Helvetica&background=rgba(43,46,54,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(166,166,166,1.00)&searchBackgroundColor=rgba(16,16,16,0.16)&name=Mil&resultTextFontSize=2&resultSelectedSubtextColor=rgba(217,217,217,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=3&border=rgba(43,46,54,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(166,166,166,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=3&credits=V%EDtor%20Galv%E3o&searchSelectionBackgroundColor=rgba(102,122,140,1.00)&resultSelectedTextColor=rgba(255,255,248,1.00)&resultPaddingSize=1&shortcutFont=Helvetica' class='theme-option'>Mil</button>
+
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(204,204,204,0.00)&resultSelectedBackgroundColor=rgba(53,110,243,1.00)&shortcutColor=rgba(159,160,159,1.00)&scrollbarColor=rgba(159,160,159,1.00)&imageStyle=2&resultSubtextFont=Lucida%20Grande&background=rgba(255,255,255,0.95)&shortcutFontSize=1&searchFontSize=3&resultSubtextColor=rgba(159,160,159,1.00)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Unibody%20Light&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=2&border=rgba(13,13,13,0.20)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(0,0,0,1.00)&cornerRoundness=3&searchFont=Lucida%20Grande&searchPaddingSize=0&credits=Tyler%20Eich&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=1&shortcutFont=Lucida%20Grande' class='theme-option'>Unibody Light</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(51,51,51,1.00)&resultSubtextFontSize=2&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(214,214,214,0.50)&resultSelectedBackgroundColor=rgba(254,186,68,1.00)&shortcutColor=rgba(66,66,66,1.00)&scrollbarColor=rgba(0,0,0,0.00)&imageStyle=4&resultSubtextFont=Helvetica&background=rgba(0,0,0,0.00)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(112,112,113,1.00)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Orange%20Milkshake&resultTextFontSize=3&resultSelectedSubtextColor=rgba(0,0,0,1.00)&shortcutSelectedColor=rgba(66,66,66,1.00)&widthSize=3&border=rgba(238,238,238,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(25,25,25,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=3&credits=Vladimir%20Novikov&searchSelectionBackgroundColor=rgba(255,210,129,1.00)&resultSelectedTextColor=rgba(0,0,0,1.00)&resultPaddingSize=1&shortcutFont=Helvetica' class='theme-option'>Orange Milkshake</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(227,225,227,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(227,224,227,1.00)&separatorColor=rgba(69,69,69,0.40)&resultSelectedBackgroundColor=rgba(106,140,151,1.00)&shortcutColor=rgba(166,166,166,1.00)&scrollbarColor=rgba(191,191,191,0.40)&imageStyle=2&resultSubtextFont=Lucida%20Grande&background=rgba(0,51,69,1.00)&shortcutFontSize=1&searchFontSize=3&resultSubtextColor=rgba(166,166,166,1.00)&searchBackgroundColor=rgba(35,73,85,1.00)&name=Smooth%20Teal&resultTextFontSize=2&resultSelectedSubtextColor=rgba(217,217,217,1.00)&shortcutSelectedColor=rgba(147,17,24,1.00)&widthSize=1&border=rgba(197,197,197,0.25)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(215,215,215,1.00)&cornerRoundness=3&searchFont=Lucida%20Grande&searchPaddingSize=0&credits=Vero&searchSelectionBackgroundColor=rgba(107,140,150,1.00)&resultSelectedTextColor=rgba(130,18,71,1.00)&resultPaddingSize=0&shortcutFont=Lucida%20Grande' class='theme-option'>Smooth Teal</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&separatorColor=rgba(255,255,255,0.00)&resultSelectedBackgroundColor=rgba(10,10,10,0.80)&shortcutColor=rgba(255,255,255,1.00)&scrollbarColor=rgba(0,250,0,1.00)&imageStyle=4&resultSubtextFont=Lucida%20Grande&background=rgba(25,29,46,0.85)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(255,255,255,0.24)&searchBackgroundColor=rgba(86,85,87,0.00)&name=Smoked&resultTextFontSize=1&resultSelectedSubtextColor=rgba(255,255,255,0.59)&shortcutSelectedColor=rgba(170,170,170,1.00)&widthSize=2&border=rgba(25,25,25,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(231,231,231,1.00)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=0&credits=Jeremy%20Bunting&shortcutFont=Lucida%20Grande&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=0' class='theme-option'>Smoked</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(66,66,66,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(26,163,206,1.00)&separatorColor=rgba(146,146,146,0.00)&resultSelectedBackgroundColor=rgba(66,66,66,1.00)&shortcutColor=rgba(214,214,214,1.00)&scrollbarColor=rgba(26,163,206,1.00)&imageStyle=2&resultSubtextFont=Helvetica&background=rgba(102,102,102,1.00)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(66,66,66,1.00)&searchBackgroundColor=rgba(26,163,206,1.00)&name=ClearLightMind&resultTextFontSize=2&resultSelectedSubtextColor=rgba(26,163,206,1.00)&shortcutSelectedColor=rgba(26,163,206,1.00)&widthSize=4&border=rgba(66,66,66,1.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(193,193,193,1.00)&cornerRoundness=2&searchFont=Lucida%20Grande&searchPaddingSize=0&credits=Chris%20Knox&searchSelectionBackgroundColor=rgba(66,66,66,1.00)&resultSelectedTextColor=rgba(214,214,214,1.00)&resultPaddingSize=1&shortcutFont=Lucida%20Grande' class='theme-option'>Clear Light Mind</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(51,51,51,1.00)&resultSelectedBackgroundColor=rgba(58,58,58,1.00)&shortcutColor=rgba(93,25,133,1.00)&scrollbarColor=rgba(51,51,51,1.00)&imageStyle=8&resultSubtextFont=Lucida%20Grande&background=rgba(0,0,0,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(102,102,102,1.00)&searchBackgroundColor=rgba(58,58,58,1.00)&name=Dark&resultTextFontSize=2&resultSelectedSubtextColor=rgba(153,153,153,1.00)&shortcutSelectedColor=rgba(35,12,53,1.00)&widthSize=3&border=rgba(127,127,127,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(185,185,185,1.00)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=0&credits=Dave&searchSelectionBackgroundColor=rgba(139,165,200,1.00)&resultSelectedTextColor=rgba(243,243,243,1.00)&resultPaddingSize=1&shortcutFont=Helvetica' class='theme-option'>Dark²</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(236,236,236,0.00)&resultSelectedBackgroundColor=rgba(2,198,174,1.00)&shortcutColor=rgba(153,231,222,1.00)&scrollbarColor=rgba(111,111,111,1.00)&imageStyle=9&resultSubtextFont=Courier&background=rgba(255,255,255,0.93)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(69,96,93,1.00)&searchBackgroundColor=rgba(255,255,255,0.00)&name=Shiori%20Style&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(245,245,245,1.00)&widthSize=3&border=rgba(255,255,255,0.00)&resultTextFont=Courier&resultTextColor=rgba(0,0,0,1.00)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=0&credits=Katie&searchSelectionBackgroundColor=rgba(40,171,221,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=2&shortcutFont=Courier' class='theme-option'>Shiori Style</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(16,16,16,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(16,16,16,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(0,0,0,0.00)&shortcutColor=rgba(160,160,160,1.00)&scrollbarColor=rgba(0,0,0,0.00)&imageStyle=0&resultSubtextFont=Lucida%20Grande&background=rgba(240,240,240,0.95)&shortcutFontSize=0&searchFontSize=2&resultSubtextColor=rgba(160,160,160,1.00)&searchBackgroundColor=rgba(0,0,0,0.00)&name=lightel&resultTextFontSize=1&resultSelectedSubtextColor=rgba(16,16,16,1.00)&shortcutSelectedColor=rgba(16,16,16,1.00)&widthSize=4&border=rgba(0,0,0,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(160,160,160,1.00)&cornerRoundness=3&searchFont=Lucida%20Grande&searchPaddingSize=0&credits=elseym&searchSelectionBackgroundColor=rgba(160,160,160,1.00)&resultSelectedTextColor=rgba(16,16,16,1.00)&resultPaddingSize=0&shortcutFont=Lucida%20Grande' class='theme-option'>lightel</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(240,240,240,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(240,240,240,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(0,0,0,0.00)&shortcutColor=rgba(96,96,96,1.00)&scrollbarColor=rgba(0,0,0,0.00)&imageStyle=0&resultSubtextFont=Lucida%20Grande&background=rgba(16,16,16,0.95)&shortcutFontSize=0&searchFontSize=2&resultSubtextColor=rgba(96,96,96,1.00)&searchBackgroundColor=rgba(0,0,0,0.00)&name=darkel&resultTextFontSize=1&resultSelectedSubtextColor=rgba(240,240,240,1.00)&shortcutSelectedColor=rgba(240,240,240,1.00)&widthSize=4&border=rgba(0,0,0,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(96,96,96,1.00)&cornerRoundness=3&searchFont=Lucida%20Grande&searchPaddingSize=0&credits=elseym&searchSelectionBackgroundColor=rgba(96,96,96,1.00)&resultSelectedTextColor=rgba(240,240,240,1.00)&resultPaddingSize=0&shortcutFont=Lucida%20Grande' class='theme-option'>darkel</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(66,144,227,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(66,144,227,1.00)&separatorColor=rgba(40,96,156,0.05)&resultSelectedBackgroundColor=rgba(255,255,255,1.00)&shortcutColor=rgba(117,117,117,0.50)&scrollbarColor=rgba(66,144,227,0.00)&imageStyle=4&resultSubtextFont=Geneva&background=rgba(255,255,255,0.37)&shortcutFontSize=0&searchFontSize=3&resultSubtextColor=rgba(117,117,117,0.50)&searchBackgroundColor=rgba(247,248,249,0.00)&name=Blue%20Subdued&resultTextFontSize=2&resultSelectedSubtextColor=rgba(54,125,201,0.85)&shortcutSelectedColor=rgba(66,144,227,1.00)&widthSize=3&border=rgba(239,239,239,0.92)&resultTextFont=Helvetica&resultTextColor=rgba(0,0,0,0.30)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=3&credits=Rafe%20Goldberg&searchSelectionBackgroundColor=rgba(255,255,255,0.75)&resultSelectedTextColor=rgba(66,144,227,1.00)&resultPaddingSize=1&shortcutFont=Helvetica' class='theme-option'>Subdued Blue</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(42,161,152,1.00)&resultSubtextFontSize=1&separatorColor=rgba(255,255,255,0.00)&resultSelectedBackgroundColor=rgba(253,246,227,0.70)&shortcutColor=rgba(38,139,210,1.00)&scrollbarColor=rgba(203,75,22,1.00)&imageStyle=9&resultSubtextFont=Helvetica&background=rgba(238,232,213,0.80)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(101,123,131,1.00)&searchBackgroundColor=rgba(238,232,213,0.00)&name=Lookfar%20Solarized%20Light&resultTextFontSize=1&resultSelectedSubtextColor=rgba(88,110,117,1.00)&shortcutSelectedColor=rgba(133,153,1,1.00)&widthSize=2&border=rgba(25,25,25,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(211,54,130,1.00)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=0&credits=nilblank&shortcutFont=Helvetica&resultSelectedTextColor=rgba(181,137,0,1.00)&resultPaddingSize=0' class='theme-option'>Lookfar Solarized Light</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(203,75,22,1.00)&resultSubtextFontSize=1&separatorColor=rgba(255,255,255,0.00)&resultSelectedBackgroundColor=rgba(1,43,54,0.50)&shortcutColor=rgba(211,54,130,1.00)&scrollbarColor=rgba(238,232,213,1.00)&imageStyle=9&resultSubtextFont=Helvetica&background=rgba(7,54,66,0.90)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(88,110,117,1.00)&searchBackgroundColor=rgba(7,54,66,0.00)&name=Lookfar%20Solarized%20Dark&resultTextFontSize=1&resultSelectedSubtextColor=rgba(42,161,152,1.00)&shortcutSelectedColor=rgba(133,153,1,1.00)&widthSize=2&border=rgba(25,25,25,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(38,139,210,1.00)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=0&credits=nilblank&shortcutFont=Helvetica&resultSelectedTextColor=rgba(181,137,0,1.00)&resultPaddingSize=0' class='theme-option'>Lookfar Solarized Dark</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(0,0,0,0.00)&shortcutColor=rgba(255,255,255,0.00)&scrollbarColor=rgba(141,141,141,0.25)&imageStyle=4&resultSubtextFont=Helvetica&background=rgba(255,255,255,0.00)&shortcutFontSize=1&searchFontSize=3&resultSubtextColor=rgba(255,255,255,0.00)&searchBackgroundColor=rgba(255,255,255,0.00)&name=SmokeHUD&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,0.50)&shortcutSelectedColor=rgba(255,255,255,0.00)&widthSize=4&border=rgba(0,0,0,0.90)&resultTextFont=Helvetica&resultTextColor=rgba(146,146,146,0.40)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=0&credits=Ritashugisha&shortcutFont=Helvetica&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=0' class='theme-option'>SmokeHUD</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(0,139,139,0.10)&shortcutColor=rgba(255,255,255,0.00)&scrollbarColor=rgba(146,146,146,0.20)&imageStyle=8&resultSubtextFont=Didot&background=rgba(240,255,255,1.00)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(255,255,255,0.00)&searchBackgroundColor=rgba(240,255,255,1.00)&name=Azure&resultTextFontSize=3&resultSelectedSubtextColor=rgba(121,121,121,1.00)&shortcutSelectedColor=rgba(255,255,255,0.00)&widthSize=2&border=rgba(250,235,215,0.00)&resultTextFont=Didot&resultTextColor=rgba(146,146,146,1.00)&cornerRoundness=3&searchFont=Didot&searchPaddingSize=0&credits=Ritashugisha&shortcutFont=Didot&resultSelectedTextColor=rgba(0,0,0,1.00)&resultPaddingSize=0' class='theme-option'>Azure</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=2&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(51,51,51,0.00)&resultSelectedBackgroundColor=rgba(114,125,135,1.00)&shortcutColor=rgba(140,140,149,1.00)&scrollbarColor=rgba(121,121,121,1.00)&imageStyle=3&resultSubtextFont=Helvetica&background=rgba(240,240,240,0.00)&shortcutFontSize=2&searchFontSize=2&resultSubtextColor=rgba(140,140,149,1.00)&searchBackgroundColor=rgba(255,255,255,0.00)&name=FP%3A%20Spotlight&resultTextFontSize=3&resultSelectedSubtextColor=rgba(213,213,213,1.00)&shortcutSelectedColor=rgba(213,213,213,1.00)&widthSize=3&border=rgba(240,240,240,0.95)&resultTextFont=Helvetica&resultTextColor=rgba(0,0,0,1.00)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=2&credits=FirePanther&searchSelectionBackgroundColor=rgba(233,184,255,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=3&shortcutFont=Helvetica' class='theme-option'>FP: Spotlight</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(82,27,147,1.00)&resultSubtextFontSize=2&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(51,51,51,1.00)&resultSelectedBackgroundColor=rgba(148,17,0,0.76)&shortcutColor=rgba(255,38,0,0.69)&scrollbarColor=rgba(51,51,51,1.00)&imageStyle=8&resultSubtextFont=Helvetica&background=rgba(213,252,121,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(148,82,0,1.00)&searchBackgroundColor=rgba(255,255,255,1.00)&name=Spring%20is%20in%20the%20Air&resultTextFontSize=2&resultSelectedSubtextColor=rgba(214,214,214,1.00)&shortcutSelectedColor=rgba(35,12,53,1.00)&widthSize=3&border=rgba(148,82,0,0.53)&resultTextFont=Helvetica&resultTextColor=rgba(0,0,0,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=3&credits=David%20and%20Dumitru&searchSelectionBackgroundColor=rgba(255,177,140,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=1&shortcutFont=Helvetica' class='theme-option'>Spring is in the air</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(14,3,25,0.80)&shortcutColor=rgba(255,255,255,1.00)&scrollbarColor=rgba(255,255,255,0.50)&imageStyle=4&resultSubtextFont=Lucida%20Grande&background=rgba(40,5,55,0.90)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(255,255,255,0.24)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Alfred%20Purple&resultTextFontSize=3&resultSelectedSubtextColor=rgba(255,255,255,0.59)&shortcutSelectedColor=rgba(170,170,170,1.00)&widthSize=3&border=rgba(0,0,0,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(231,231,231,1.00)&cornerRoundness=2&searchFont=Lucida%20Grande&searchPaddingSize=1&credits=Ian%20Isted&shortcutFont=Lucida%20Grande&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=2' class='theme-option'>Alfred Purple</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,0.75)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(9,44,59,0.80)&separatorColor=rgba(62,128,163,0.00)&resultSelectedBackgroundColor=rgba(193,48,61,0.90)&shortcutColor=rgba(255,255,255,0.55)&scrollbarColor=rgba(255,255,255,0.30)&imageStyle=9&resultSubtextFont=Helvetica&background=rgba(62,128,163,0.00)&shortcutFontSize=4&searchFontSize=4&resultSubtextColor=rgba(255,255,255,0.60)&searchBackgroundColor=rgba(140,155,153,0.00)&name=Giba%20Light%20Blue&resultTextFontSize=4&resultSelectedSubtextColor=rgba(255,255,255,0.88)&shortcutSelectedColor=rgba(255,255,255,0.85)&widthSize=4&border=rgba(62,128,163,0.95)&resultTextFont=Helvetica&resultTextColor=rgba(255,255,255,0.70)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=4&credits=Gilberto%20Olimpio&searchSelectionBackgroundColor=rgba(12,46,61,0.20)&resultSelectedTextColor=rgba(255,255,255,0.85)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Giba Light Blue Theme</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(72,90,87,0.90)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(72,90,87,1.00)&separatorColor=rgba(62,128,163,0.00)&resultSelectedBackgroundColor=rgba(88,77,76,1.00)&shortcutColor=rgba(72,90,87,0.60)&scrollbarColor=rgba(255,255,255,0.30)&imageStyle=4&resultSubtextFont=Helvetica&background=rgba(62,128,163,0.00)&shortcutFontSize=4&searchFontSize=4&resultSubtextColor=rgba(72,90,87,0.90)&searchBackgroundColor=rgba(136,160,155,0.00)&name=Retro.f&resultTextFontSize=4&resultSelectedSubtextColor=rgba(183,183,183,1.00)&shortcutSelectedColor=rgba(255,255,255,0.85)&widthSize=4&border=rgba(142,165,161,1.00)&resultTextFont=Helvetica&resultTextColor=rgba(72,90,87,1.00)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=4&credits=Gilberto%20Olimpio&searchSelectionBackgroundColor=rgba(44,55,53,0.20)&resultSelectedTextColor=rgba(183,183,183,0.90)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Retro.f</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&separatorColor=rgba(255,255,255,0.00)&resultSelectedBackgroundColor=rgba(10,10,10,0.80)&shortcutColor=rgba(255,255,255,1.00)&scrollbarColor=rgba(0,250,0,1.00)&imageStyle=4&resultSubtextFont=Lucida%20Grande&background=rgba(25,29,46,0.91)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(255,255,255,0.24)&searchBackgroundColor=rgba(86,85,87,0.00)&name=Terminal%20by%20Design&resultTextFontSize=2&resultSelectedSubtextColor=rgba(85,250,76,1.00)&shortcutSelectedColor=rgba(170,170,170,1.00)&widthSize=2&border=rgba(25,25,25,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(155,155,155,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=0&credits=AleXander&shortcutFont=Lucida%20Grande&resultSelectedTextColor=rgba(194,194,194,1.00)&resultPaddingSize=4' class='theme-option'>Terminal By Design</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(173,170,159,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(112,111,107,1.00)&resultSelectedBackgroundColor=rgba(86,84,80,1.00)&shortcutColor=rgba(166,165,158,1.00)&scrollbarColor=rgba(178,185,182,1.00)&imageStyle=9&resultSubtextFont=Courier&background=rgba(102,99,94,0.95)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(138,137,130,1.00)&searchBackgroundColor=rgba(73,72,67,1.00)&name=Vintage%20Term&resultTextFontSize=2&resultSelectedSubtextColor=rgba(15,220,45,1.00)&shortcutSelectedColor=rgba(209,207,199,1.00)&widthSize=3&border=rgba(214,214,214,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(176,174,166,1.00)&cornerRoundness=0&searchFont=Geneva&searchPaddingSize=2&credits=AleXander%20%28%40Alex-Cory%29&searchSelectionBackgroundColor=rgba(102,122,140,1.00)&resultSelectedTextColor=rgba(209,207,198,1.00)&resultPaddingSize=3&shortcutFont=Lucida%20Grande' class='theme-option'>Vintage Term</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(249,39,89,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(249,38,114,1.00)&separatorColor=rgba(117,113,94,1.00)&resultSelectedBackgroundColor=rgba(56,56,48,1.00)&shortcutColor=rgba(100,217,239,1.00)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=8&resultSubtextFont=Helvetica&background=rgba(39,40,34,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(98,111,94,1.00)&searchBackgroundColor=rgba(39,40,34,1.00)&name=Monokai&resultTextFontSize=2&resultSelectedSubtextColor=rgba(115,113,94,1.00)&shortcutSelectedColor=rgba(166,226,74,1.00)&widthSize=4&border=rgba(73,72,63,0.59)&resultTextFont=Helvetica&resultTextColor=rgba(248,248,242,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=0&credits=Fabio%20Niephaus&searchSelectionBackgroundColor=rgba(56,56,48,1.00)&resultSelectedTextColor=rgba(240,248,242,1.00)&resultPaddingSize=4&shortcutFont=Helvetica' class='theme-option'>Monokai</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(230,232,226,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(33,33,33,1.00)&separatorColor=rgba(255,241,104,0.18)&resultSelectedBackgroundColor=rgba(255,241,104,1.00)&shortcutColor=rgba(193,196,94,0.93)&scrollbarColor=rgba(81,81,81,1.00)&imageStyle=4&resultSubtextFont=Courier&background=rgba(33,33,33,1.00)&shortcutFontSize=0&searchFontSize=2&resultSubtextColor=rgba(193,196,94,1.00)&searchBackgroundColor=rgba(33,33,33,1.00)&name=Bananas&resultTextFontSize=1&resultSelectedSubtextColor=rgba(0,0,0,1.00)&shortcutSelectedColor=rgba(33,33,33,1.00)&widthSize=4&border=rgba(0,0,0,0.00)&resultTextFont=Futura&resultTextColor=rgba(230,232,226,0.78)&cornerRoundness=0&searchFont=Futura&searchPaddingSize=1&credits=CarlosNZ&searchSelectionBackgroundColor=rgba(255,255,255,0.67)&resultSelectedTextColor=rgba(33,33,33,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Bananas</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(51,51,51,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(191,191,191,0.00)&resultSelectedBackgroundColor=rgba(73,109,201,1.00)&shortcutColor=rgba(166,166,166,1.00)&scrollbarColor=rgba(191,191,191,1.00)&imageStyle=4&resultSubtextFont=Futura&background=rgba(239,239,239,1.00)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(167,167,167,1.00)&searchBackgroundColor=rgba(235,235,235,0.00)&name=Spruceup&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=2&border=rgba(255,255,255,0.00)&resultTextFont=Futura&resultTextColor=rgba(76,76,76,1.00)&cornerRoundness=0&searchFont=Futura&searchPaddingSize=0&credits=Milan%20van%20Zanten&searchSelectionBackgroundColor=rgba(90,131,211,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=2&shortcutFont=Futura' class='theme-option'>Spruceup</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(126,238,109,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(51,51,51,1.00)&resultSelectedBackgroundColor=rgba(116,115,147,0.47)&shortcutColor=rgba(227,64,48,1.00)&scrollbarColor=rgba(51,51,51,1.00)&imageStyle=8&resultSubtextFont=Helvetica&background=rgba(0,0,0,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(143,146,138,1.00)&searchBackgroundColor=rgba(55,56,82,1.00)&name=MidnightPastel&resultTextFontSize=2&resultSelectedSubtextColor=rgba(182,191,177,1.00)&shortcutSelectedColor=rgba(149,230,171,1.00)&widthSize=3&border=rgba(148,190,206,1.00)&resultTextFont=Helvetica&resultTextColor=rgba(102,190,118,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=3&credits=Brian%20Fleming&searchSelectionBackgroundColor=rgba(95,114,139,1.00)&resultSelectedTextColor=rgba(137,243,111,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>MidnightPastel</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,0.85)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(38,38,38,1.00)&resultSelectedBackgroundColor=rgba(50,50,50,1.00)&shortcutColor=rgba(118,196,255,0.00)&scrollbarColor=rgba(94,94,94,0.00)&imageStyle=4&resultSubtextFont=Helvetica&background=rgba(38,38,38,1.00)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(255,255,255,0.10)&searchBackgroundColor=rgba(38,38,38,1.00)&name=Dull%20Light&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,0.85)&shortcutSelectedColor=rgba(255,255,255,0.00)&widthSize=2&border=rgba(66,66,66,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(123,123,123,1.00)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=0&credits=Ritashugisha&searchSelectionBackgroundColor=rgba(0,150,255,1.00)&resultSelectedTextColor=rgba(0,253,255,1.00)&resultPaddingSize=0&shortcutFont=Helvetica' class='theme-option'>Dull Light</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(147,161,161,1.00)&resultSubtextFontSize=1&separatorColor=rgba(7,54,66,1.00)&resultSelectedBackgroundColor=rgba(7,54,66,1.00)&shortcutColor=rgba(38,139,210,1.00)&scrollbarColor=rgba(7,54,66,1.00)&imageStyle=9&resultSubtextFont=Menlo&background=rgba(1,43,54,1.00)&shortcutFontSize=3&searchFontSize=4&resultSubtextColor=rgba(88,110,117,1.00)&searchBackgroundColor=rgba(7,54,66,1.00)&name=Solarized%20Dark&resultTextFontSize=3&resultSelectedSubtextColor=rgba(134,147,149,1.00)&shortcutSelectedColor=rgba(211,54,130,1.00)&widthSize=4&border=rgba(7,54,66,0.40)&resultTextFont=Menlo&resultTextColor=rgba(131,148,150,1.00)&cornerRoundness=0&searchFont=Menlo&searchPaddingSize=4&credits=Andrew%20Schwartzmeyer&shortcutFont=Menlo&resultSelectedTextColor=rgba(181,137,0,1.00)&resultPaddingSize=2' class='theme-option'>Programmer's Solarized Dark</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&separatorColor=rgba(255,255,255,0.00)&resultSelectedBackgroundColor=rgba(66,66,66,1.00)&shortcutColor=rgba(255,255,255,0.00)&scrollbarColor=rgba(115,254,255,0.00)&imageStyle=4&resultSubtextFont=Lucida%20Grande&background=rgba(0,0,0,0.85)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(255,255,255,0.00)&searchBackgroundColor=rgba(86,85,87,0.00)&name=SmokeHUDv2&resultTextFontSize=1&resultSelectedSubtextColor=rgba(255,255,255,0.59)&shortcutSelectedColor=rgba(170,170,170,0.00)&widthSize=2&border=rgba(25,25,25,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(231,231,231,1.00)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=0&credits=Ritashugisha&shortcutFont=Lucida%20Grande&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=0' class='theme-option'>SmokeHUDv2</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(214,65,45,0.20)&resultSelectedBackgroundColor=rgba(27,76,147,1.00)&shortcutColor=rgba(163,34,41,1.00)&scrollbarColor=rgba(196,43,49,1.00)&imageStyle=3&resultSubtextFont=Helvetica&background=rgba(255,255,255,0.98)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(169,168,170,1.00)&searchBackgroundColor=rgba(239,239,239,1.00)&name=Navy&resultTextFontSize=2&resultSelectedSubtextColor=rgba(249,248,250,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=3&border=rgba(27,76,147,0.25)&resultTextFont=Helvetica&resultTextColor=rgba(56,56,56,1.00)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=3&credits=Mr%20Woo&searchSelectionBackgroundColor=rgba(184,202,117,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Navy</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(213,119,29,0.44)&resultSelectedBackgroundColor=rgba(214,229,172,1.00)&shortcutColor=rgba(129,88,94,1.00)&scrollbarColor=rgba(191,130,25,1.00)&imageStyle=3&resultSubtextFont=Helvetica&background=rgba(255,255,247,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(180,179,181,1.00)&searchBackgroundColor=rgba(203,189,158,0.64)&name=Subtle%20Earth%20Tones&resultTextFontSize=3&resultSelectedSubtextColor=rgba(115,115,116,1.00)&shortcutSelectedColor=rgba(129,88,94,1.00)&widthSize=3&border=rgba(58,58,58,0.06)&resultTextFont=Helvetica&resultTextColor=rgba(56,56,56,1.00)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=3&credits=Mr%20Woo&searchSelectionBackgroundColor=rgba(184,202,117,1.00)&resultSelectedTextColor=rgba(0,0,0,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Subtle Earth Tones</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(117,120,112,0.20)&resultSelectedBackgroundColor=rgba(94,152,204,0.25)&shortcutColor=rgba(255,255,255,0.50)&scrollbarColor=rgba(255,255,255,0.50)&imageStyle=3&resultSubtextFont=Helvetica&background=rgba(236,237,216,0.00)&shortcutFontSize=0&searchFontSize=2&resultSubtextColor=rgba(255,255,255,0.75)&searchBackgroundColor=rgba(255,255,255,0.00)&name=Glass&resultTextFontSize=1&resultSelectedSubtextColor=rgba(255,255,255,0.75)&shortcutSelectedColor=rgba(255,255,255,0.50)&widthSize=4&border=rgba(166,185,215,0.30)&resultTextFont=Helvetica&resultTextColor=rgba(255,255,255,0.75)&cornerRoundness=1&searchFont=Helvetica&searchPaddingSize=1&credits=Shawn%20Patrick%20Rice&searchSelectionBackgroundColor=rgba(184,202,117,1.00)&resultSelectedTextColor=rgba(251,253,255,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Glass</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(191,191,191,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(112,111,107,1.00)&resultSelectedBackgroundColor=rgba(0,12,22,0.39)&shortcutColor=rgba(166,165,158,1.00)&scrollbarColor=rgba(229,97,0,0.38)&imageStyle=6&resultSubtextFont=Courier&background=rgba(74,76,71,0.95)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(138,137,130,1.00)&searchBackgroundColor=rgba(0,13,22,0.39)&name=Ubuntu%20Ambience%20Theme&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,105,0,1.00)&shortcutSelectedColor=rgba(255,82,0,1.00)&widthSize=3&border=rgba(214,214,214,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(176,174,166,1.00)&cornerRoundness=3&searchFont=Geneva&searchPaddingSize=0&credits=AleXander&searchSelectionBackgroundColor=rgba(102,122,140,1.00)&resultSelectedTextColor=rgba(209,207,198,1.00)&resultPaddingSize=0&shortcutFont=Lucida%20Grande' class='theme-option'>Ubuntu Ambiance Theme</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(137,100,61,1.00)&resultSelectedBackgroundColor=rgba(111,168,26,0.57)&shortcutColor=rgba(137,100,61,1.00)&scrollbarColor=rgba(128,179,33,1.00)&imageStyle=9&resultSubtextFont=Courier&background=rgba(239,216,181,0.72)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(137,100,61,0.94)&searchBackgroundColor=rgba(188,169,143,0.72)&name=Natural%20Wood&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(137,100,61,1.00)&widthSize=3&border=rgba(214,214,214,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(0,0,0,1.00)&cornerRoundness=3&searchFont=Geneva&searchPaddingSize=2&credits=AleXander&searchSelectionBackgroundColor=rgba(111,168,26,0.57)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=3&shortcutFont=Lucida%20Grande' class='theme-option'>Natural Wood</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(51,51,51,0.00)&resultSelectedBackgroundColor=rgba(58,58,58,0.00)&shortcutColor=rgba(218,217,208,0.00)&scrollbarColor=rgba(51,51,51,1.00)&imageStyle=4&resultSubtextFont=Helvetica&background=rgba(0,0,0,0.80)&shortcutFontSize=2&searchFontSize=2&resultSubtextColor=rgba(198,198,198,0.64)&searchBackgroundColor=rgba(58,58,58,0.00)&name=Clean%20Dark%20Theme&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(35,12,53,0.00)&widthSize=1&border=rgba(255,255,255,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(185,185,185,1.00)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=0&credits=k9ordon&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=1&shortcutFont=Helvetica' class='theme-option'>Clean Dark Theme</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(33,33,33,0.82)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(182,182,182,1.00)&separatorColor=rgba(237,237,237,0.00)&resultSelectedBackgroundColor=rgba(247,247,247,0.72)&shortcutColor=rgba(177,177,177,0.00)&scrollbarColor=rgba(255,255,255,0.20)&imageStyle=9&resultSubtextFont=Lucida%20Grande&background=rgba(243,245,255,0.50)&shortcutFontSize=1&searchFontSize=2&resultSubtextColor=rgba(109,109,109,1.00)&searchBackgroundColor=rgba(25,25,25,0.00)&name=ModernGlassware&resultTextFontSize=2&resultSelectedSubtextColor=rgba(109,109,109,1.00)&shortcutSelectedColor=rgba(129,129,129,1.00)&widthSize=0&border=rgba(229,229,229,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(28,28,28,0.50)&cornerRoundness=2&searchFont=Lucida%20Grande&searchPaddingSize=0&credits=viztor&searchSelectionBackgroundColor=rgba(81,81,81,1.00)&resultSelectedTextColor=rgba(28,28,28,0.79)&resultPaddingSize=1&shortcutFont=Lucida%20Grande' class='theme-option'>Modern Glassware</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(236,236,236,0.00)&resultSelectedBackgroundColor=rgba(0,0,0,1.00)&shortcutColor=rgba(0,0,0,1.00)&scrollbarColor=rgba(111,111,111,1.00)&imageStyle=6&resultSubtextFont=Helvetica&background=rgba(255,255,255,1.00)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(69,96,93,1.00)&searchBackgroundColor=rgba(0,250,120,0.00)&name=Clockwork&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(245,245,245,1.00)&widthSize=2&border=rgba(0,0,0,1.00)&resultTextFont=Geneva&resultTextColor=rgba(0,0,0,1.00)&cornerRoundness=2&searchFont=Helvetica&searchPaddingSize=0&credits=Kit%20Langton&searchSelectionBackgroundColor=rgba(40,171,221,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=0&shortcutFont=Helvetica' class='theme-option'>Clockwork</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=2&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(204,216,204,0.00)&resultSelectedBackgroundColor=rgba(255,255,255,0.00)&shortcutColor=rgba(248,248,248,0.00)&scrollbarColor=rgba(157,162,162,0.00)&imageStyle=4&resultSubtextFont=Helvetica&background=rgba(0,0,0,0.85)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(255,255,255,0.14)&searchBackgroundColor=rgba(255,255,255,0.00)&name=OS%20X%20Dock%20Black&resultTextFontSize=3&resultSelectedSubtextColor=rgba(255,255,255,0.45)&shortcutSelectedColor=rgba(255,255,255,0.15)&widthSize=2&border=rgba(0,0,0,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(255,255,255,0.18)&cornerRoundness=1&searchFont=Helvetica&searchPaddingSize=0&credits=Ddyracer&searchSelectionBackgroundColor=rgba(209,204,153,1.00)&resultSelectedTextColor=rgba(255,255,255,0.88)&resultPaddingSize=4&shortcutFont=Helvetica' class='theme-option'>Philadelphia Phillies</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(253,229,51,0.19)&resultSelectedBackgroundColor=rgba(202,28,31,1.00)&shortcutColor=rgba(253,227,51,0.50)&scrollbarColor=rgba(255,255,255,0.50)&imageStyle=3&resultSubtextFont=Helvetica&background=rgba(214,10,31,1.00)&shortcutFontSize=0&searchFontSize=2&resultSubtextColor=rgba(254,230,51,0.50)&searchBackgroundColor=rgba(255,255,255,0.00)&name=Manchester%20United&resultTextFontSize=2&resultSelectedSubtextColor=rgba(254,230,51,0.50)&shortcutSelectedColor=rgba(255,255,255,0.50)&widthSize=4&border=rgba(0,0,0,1.00)&resultTextFont=Helvetica&resultTextColor=rgba(0,0,0,1.00)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=0&credits=%40joeydurham&searchSelectionBackgroundColor=rgba(184,202,117,1.00)&resultSelectedTextColor=rgba(250,253,255,1.00)&resultPaddingSize=0&shortcutFont=Helvetica' class='theme-option'>Manchester United</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,197,67,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(22,52,71,1.00)&resultSelectedBackgroundColor=rgba(26,70,96,1.00)&shortcutColor=rgba(144,144,144,1.00)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=9&resultSubtextFont=Helvetica&background=rgba(23,51,70,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(194,194,194,1.00)&searchBackgroundColor=rgba(29,69,95,1.00)&name=Cobalt2&resultTextFontSize=4&resultSelectedSubtextColor=rgba(255,197,67,1.00)&shortcutSelectedColor=rgba(255,197,67,1.00)&widthSize=4&border=rgba(23,51,70,0.62)&resultTextFont=Helvetica&resultTextColor=rgba(166,166,166,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=3&credits=Wes%20Bos&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=4&shortcutFont=Helvetica' class='theme-option'>Cobalt2</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(16,16,16,0.79)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(245,245,245,0.00)&resultSelectedBackgroundColor=rgba(20,81,222,1.00)&shortcutColor=rgba(11,62,175,0.62)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=9&resultSubtextFont=Lucida%20Grande&background=rgba(222,222,222,0.90)&shortcutFontSize=1&searchFontSize=2&resultSubtextColor=rgba(145,145,145,0.61)&searchBackgroundColor=rgba(245,245,245,0.00)&name=Better%20Yosemite&resultTextFontSize=1&resultSelectedSubtextColor=rgba(126,177,218,0.94)&shortcutSelectedColor=rgba(232,235,241,1.00)&widthSize=4&border=rgba(176,176,176,0.00)&resultTextFont=Geneva&resultTextColor=rgba(59,77,88,1.00)&cornerRoundness=3&searchFont=Geneva&searchPaddingSize=1&credits=design4artists&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(255,255,255,0.86)&resultPaddingSize=4&shortcutFont=Lucida%20Grande' class='theme-option'>Better Yosemite Spotlight</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(82,228,255,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(64,183,207,1.00)&separatorColor=rgba(120,173,255,0.00)&resultSelectedBackgroundColor=rgba(82,228,255,0.00)&shortcutColor=rgba(181,227,255,1.00)&scrollbarColor=rgba(82,228,255,0.00)&imageStyle=9&resultSubtextFont=Helvetica&background=rgba(26,26,26,1.00)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(146,203,249,0.00)&searchBackgroundColor=rgba(164,177,182,0.00)&name=Dark%20Minimalism&resultTextFontSize=2&resultSelectedSubtextColor=rgba(128,212,248,0.69)&shortcutSelectedColor=rgba(82,228,255,1.00)&widthSize=1&border=rgba(180,225,255,0.00)&resultTextFont=Futura&resultTextColor=rgba(141,141,141,1.00)&cornerRoundness=1&searchFont=Futura&searchPaddingSize=4&credits=design4artists&searchSelectionBackgroundColor=rgba(205,205,205,1.00)&resultSelectedTextColor=rgba(128,212,248,1.00)&resultPaddingSize=4&shortcutFont=Futura' class='theme-option'>Dark Minimalism</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(206,29,10,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(93,96,90,0.27)&resultSelectedBackgroundColor=rgba(55,152,173,1.00)&shortcutColor=rgba(48,143,189,1.00)&scrollbarColor=rgba(60,152,172,1.00)&imageStyle=3&resultSubtextFont=Helvetica&background=rgba(127,210,55,1.00)&shortcutFontSize=0&searchFontSize=4&resultSubtextColor=rgba(47,143,189,1.00)&searchBackgroundColor=rgba(4,73,255,0.00)&name=The%20Mystery%20Machine%20%28Scooby-Doo%29&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,0.33)&shortcutSelectedColor=rgba(255,255,255,0.76)&widthSize=4&border=rgba(42,159,185,1.00)&resultTextFont=Marker%20Felt&resultTextColor=rgba(205,48,30,1.00)&cornerRoundness=3&searchFont=Marker%20Felt&searchPaddingSize=0&credits=%40joeydurham&searchSelectionBackgroundColor=rgba(184,202,117,1.00)&resultSelectedTextColor=rgba(255,255,255,0.61)&resultPaddingSize=0&shortcutFont=Helvetica' class='theme-option'>The Mystery Machine (Scooby-doo)</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,0.00)&resultSubtextFontSize=1&separatorColor=rgba(229,229,229,1.00)&resultSelectedBackgroundColor=rgba(250,123,63,1.00)&shortcutColor=rgba(123,135,145,1.00)&scrollbarColor=rgba(123,135,145,1.00)&imageStyle=3&resultSubtextFont=Helvetica&background=rgba(255,255,255,0.00)&shortcutFontSize=2&searchFontSize=0&resultSubtextColor=rgba(124,135,144,0.77)&searchBackgroundColor=rgba(83,194,234,0.00)&name=Alfred%20Expert&resultTextFontSize=1&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=1&border=rgba(122,135,145,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(123,135,145,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=0&credits=Jack%20James&shortcutFont=Helvetica&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=0' class='theme-option'>Alfred Expert</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(83,194,234,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(246,241,237,1.00)&resultSelectedBackgroundColor=rgba(249,122,63,1.00)&shortcutColor=rgba(141,128,112,1.00)&scrollbarColor=rgba(246,241,237,1.00)&imageStyle=3&resultSubtextFont=Helvetica&background=rgba(255,255,255,1.00)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(223,222,221,1.00)&searchBackgroundColor=rgba(255,255,255,1.00)&name=Control%20Command%20Escape&resultTextFontSize=1&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=3&border=rgba(122,135,145,0.20)&resultTextFont=Helvetica&resultTextColor=rgba(89,195,232,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=0&credits=Jack%20James&searchSelectionBackgroundColor=rgba(246,122,71,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=1&shortcutFont=Helvetica' class='theme-option'>Control Command Escape</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(78,78,78,1.00)&resultSubtextFontSize=1&separatorColor=rgba(229,229,229,1.00)&resultSelectedBackgroundColor=rgba(73,186,225,1.00)&shortcutColor=rgba(121,121,121,1.00)&scrollbarColor=rgba(74,144,159,1.00)&imageStyle=3&resultSubtextFont=Helvetica&background=rgba(241,241,241,1.00)&shortcutFontSize=2&searchFontSize=2&resultSubtextColor=rgba(201,201,201,1.00)&searchBackgroundColor=rgba(254,254,254,1.00)&name=Heavenly&resultTextFontSize=1&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=3&border=rgba(74,144,159,1.00)&resultTextFont=Futura&resultTextColor=rgba(199,199,199,1.00)&cornerRoundness=3&searchFont=Futura&searchPaddingSize=0&credits=Jack%20James&shortcutFont=Helvetica&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=1' class='theme-option'>Heavenly</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(51,51,51,1.00)&resultSubtextFontSize=1&separatorColor=rgba(228,227,231,0.00)&resultSelectedBackgroundColor=rgba(110,26,144,0.95)&shortcutColor=rgba(166,166,166,1.00)&scrollbarColor=rgba(130,10,151,1.00)&imageStyle=0&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(238,238,238,0.95)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(166,166,166,1.00)&searchBackgroundColor=rgba(237,237,237,0.00)&name=Modern%20Alfred&resultTextFontSize=2&resultSelectedSubtextColor=rgba(217,217,217,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=3&border=rgba(237,237,237,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(25,25,25,1.00)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=0&credits=Sayz%20Lim&shortcutFont=Helvetica&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=0' class='theme-option'>Modern Alfred</button>
+
+<button value='alfred://theme/separatorColor=rgba(255,255,255,0.00)&searchForegroundColor=rgba(251,144,161,0.50)&resultSubtextFontSize=1&resultSelectedBackgroundColor=rgba(7,1,4,0.05)&shortcutColor=rgba(109,198,200,1.00)&scrollbarColor=rgba(254,254,215,0.30)&imageStyle=4&resultSubtextFont=Helvetica&background=rgba(254,253,253,0.55)&shortcutFontSize=2&searchFontSize=2&resultSubtextColor=rgba(121,121,121,0.42)&searchBackgroundColor=rgba(8,1,2,0.05)&name=vintagesque&resultTextFontSize=2&resultSelectedSubtextColor=rgba(31,25,66,0.30)&shortcutSelectedColor=rgba(107,195,196,0.75)&widthSize=2&border=rgba(0,0,0,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(66,66,66,0.53)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=0&credits=angeluh&shortcutFont=Helvetica&resultSelectedTextColor=rgba(109,198,200,0.85)&resultPaddingSize=1' class='theme-option'>vintagesque</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&separatorColor=rgba(51,51,51,1.00)&resultSelectedBackgroundColor=rgba(34,34,34,1.00)&shortcutColor=rgba(102,102,102,1.00)&scrollbarColor=rgba(51,51,51,1.00)&imageStyle=0&resultSubtextFont=Helvetica&background=rgba(51,51,51,1.00)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(187,187,187,1.00)&searchBackgroundColor=rgba(51,51,51,1.00)&name=Obscure&resultTextFontSize=2&resultSelectedSubtextColor=rgba(217,217,217,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=1&border=rgba(0,0,0,0.10)&resultTextFont=Helvetica&resultTextColor=rgba(221,221,221,1.00)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=4&credits=Edgar%20Suarez&shortcutFont=Helvetica&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=0' class='theme-option'>Obscure</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=2&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(254,253,255,0.00)&resultSelectedBackgroundColor=rgba(247,246,248,0.00)&shortcutColor=rgba(33,33,33,0.00)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=3&resultSubtextFont=Futura&background=rgba(244,244,244,0.95)&shortcutFontSize=3&searchFontSize=4&resultSubtextColor=rgba(169,169,169,1.00)&searchBackgroundColor=rgba(244,244,244,0.00)&name=Light%20and%20Smooth%202.0%20%28resamsel%29&resultTextFontSize=4&resultSelectedSubtextColor=rgba(100,101,185,1.00)&shortcutSelectedColor=rgba(62,79,249,1.00)&widthSize=4&border=rgba(145,144,146,0.00)&resultTextFont=Futura&resultTextColor=rgba(128,128,128,1.00)&cornerRoundness=3&searchFont=Futura&searchPaddingSize=4&credits=Ren%E9%20Samselnig&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(43,44,229,1.00)&resultPaddingSize=4&shortcutFont=Futura' class='theme-option'>Light and Smooth 2.0</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(74,83,87,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(87,98,102,1.00)&separatorColor=rgba(232,232,232,1.00)&resultSelectedBackgroundColor=rgba(248,251,253,0.60)&shortcutColor=rgba(204,204,204,1.00)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=4&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(243,243,243,1.00)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(167,173,182,1.00)&searchBackgroundColor=rgba(243,243,243,1.00)&name=Simple&resultTextFontSize=4&resultSelectedSubtextColor=rgba(140,153,158,1.00)&shortcutSelectedColor=rgba(87,98,102,1.00)&widthSize=3&border=rgba(255,255,255,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(140,146,154,1.00)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=2&credits=Sindre%20Sorhus&searchSelectionBackgroundColor=rgba(203,203,203,1.00)&resultSelectedTextColor=rgba(87,98,102,1.00)&resultPaddingSize=4&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>Simple</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(38,38,38,1.00)&resultSubtextFontSize=2&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(255,255,255,0.00)&shortcutColor=rgba(0,0,0,0.28)&scrollbarColor=rgba(0,0,0,0.28)&imageStyle=4&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(255,255,255,0.90)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(0,0,0,0.28)&searchBackgroundColor=rgba(255,255,255,0.00)&name=8&resultTextFontSize=4&resultSelectedSubtextColor=rgba(0,0,0,0.28)&shortcutSelectedColor=rgba(66,66,66,1.00)&widthSize=4&border=rgba(27,27,27,0.00)&resultTextFont=Helvetica%20Neue&resultTextColor=rgba(0,0,0,0.28)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=4&credits=Josh%20Helfferich&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(66,66,66,1.00)&resultPaddingSize=1&shortcutFont=Helvetica' class='theme-option'>8</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(227,227,227,1.00)&resultSubtextFontSize=2&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(255,255,255,0.00)&shortcutColor=rgba(255,255,255,0.28)&scrollbarColor=rgba(255,255,255,0.28)&imageStyle=4&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(12,12,12,0.85)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(255,255,255,0.28)&searchBackgroundColor=rgba(255,255,255,0.00)&name=8%20%28Dark%29&resultTextFontSize=4&resultSelectedSubtextColor=rgba(255,255,255,0.28)&shortcutSelectedColor=rgba(227,227,227,1.00)&widthSize=2&border=rgba(27,27,27,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(255,255,255,0.28)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=4&credits=Josh%20Helfferich&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(227,227,227,1.00)&resultPaddingSize=1&shortcutFont=Helvetica' class='theme-option'>8 (Dark)</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(19,90,242,1.00)&shortcutColor=rgba(255,255,255,0.30)&scrollbarColor=rgba(255,255,255,0.30)&imageStyle=8&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(0,0,0,0.25)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(255,255,255,0.50)&searchBackgroundColor=rgba(0,0,0,0.00)&name=OS%20X%20Yosemite%20Dark%20Transparent&resultTextFontSize=3&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(255,255,255,0.30)&widthSize=2&border=rgba(0,0,0,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(255,255,255,1.00)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=2&credits=Kristof%20Verbeken&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=3&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>OS X Yosemite Dark Transparent</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(214,214,214,1.00)&resultSelectedBackgroundColor=rgba(0,150,255,1.00)&shortcutColor=rgba(0,150,255,1.00)&scrollbarColor=rgba(193,193,193,1.00)&imageStyle=3&resultSubtextFont=Helvetica%20Neue&background=rgba(235,235,235,1.00)&shortcutFontSize=3&searchFontSize=3&resultSubtextColor=rgba(166,166,166,1.00)&searchBackgroundColor=rgba(255,255,255,1.00)&name=Dave&resultTextFontSize=3&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=4&border=rgba(66,66,66,0.50)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(25,25,25,1.00)&cornerRoundness=2&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=4&credits=Dave&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=2&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>Dave</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(249,39,114,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(249,39,114,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(0,0,0,0.20)&shortcutColor=rgba(76,76,76,1.00)&scrollbarColor=rgba(38,38,38,1.00)&imageStyle=8&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(39,40,34,0.98)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(127,127,127,1.00)&searchBackgroundColor=rgba(39,40,34,0.00)&name=Monokai%20Reloaded&resultTextFontSize=2&resultSelectedSubtextColor=rgba(186,186,186,1.00)&shortcutSelectedColor=rgba(127,127,127,1.00)&widthSize=4&border=rgba(0,0,0,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(255,255,255,1.00)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=0&credits=Fabio%20Niephaus&searchSelectionBackgroundColor=rgba(0,0,0,0.20)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=2&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>Monokai Reloaded</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(51,51,51,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(244,244,244,1.00)&resultSelectedBackgroundColor=rgba(245,245,245,1.00)&shortcutColor=rgba(222,222,222,1.00)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=4&resultSubtextFont=Monaco&background=rgba(244,244,244,1.00)&shortcutFontSize=3&searchFontSize=3&resultSubtextColor=rgba(160,163,168,1.00)&searchBackgroundColor=rgba(245,245,245,1.00)&name=Code&resultTextFontSize=1&resultSelectedSubtextColor=rgba(160,163,168,1.00)&shortcutSelectedColor=rgba(25,25,25,1.00)&widthSize=1&border=rgba(231,231,231,0.00)&resultTextFont=Menlo&resultTextColor=rgba(160,163,168,1.00)&cornerRoundness=2&searchFont=Menlo&searchPaddingSize=3&credits=Zander%20Martineau&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(51,51,51,1.00)&resultPaddingSize=4&shortcutFont=Menlo' class='theme-option'>Code theme</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(0,0,0,0.33)&resultSelectedBackgroundColor=rgba(0,0,0,0.33)&shortcutColor=rgba(255,255,255,0.64)&scrollbarColor=rgba(255,255,255,0.43)&imageStyle=4&resultSubtextFont=Menlo&background=rgba(0,0,0,0.34)&shortcutFontSize=3&searchFontSize=3&resultSubtextColor=rgba(243,248,255,0.55)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Code%20neue&resultTextFontSize=1&resultSelectedSubtextColor=rgba(243,248,255,0.73)&shortcutSelectedColor=rgba(255,255,255,0.67)&widthSize=1&border=rgba(231,231,231,0.00)&resultTextFont=Menlo&resultTextColor=rgba(222,222,222,1.00)&cornerRoundness=2&searchFont=Menlo&searchPaddingSize=3&credits=Zander%20Martineau&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(255,255,255,0.87)&resultPaddingSize=4&shortcutFont=Menlo' class='theme-option'>Code Neue</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,0.94)&resultSubtextFontSize=0&separatorColor=rgba(0,0,0,0.08)&resultSelectedBackgroundColor=rgba(0,0,0,0.04)&shortcutColor=rgba(0,0,0,0.24)&scrollbarColor=rgba(0,0,0,0.04)&imageStyle=4&resultSubtextFont=Lucida%20Grande&background=rgba(255,255,255,0.00)&shortcutFontSize=1&searchFontSize=2&resultSubtextColor=rgba(0,0,0,0.34)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Windowpane&resultTextFontSize=2&resultSelectedSubtextColor=rgba(0,0,0,0.54)&shortcutSelectedColor=rgba(117,117,117,0.81)&widthSize=2&border=rgba(255,255,255,0.90)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(0,0,0,0.54)&cornerRoundness=2&searchFont=Lucida%20Grande&searchPaddingSize=4&credits=Andrew%20Gallagher&shortcutFont=Lucida%20Grande&resultSelectedTextColor=rgba(0,0,0,0.94)&resultPaddingSize=2' class='theme-option'>Windowpane</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(219,219,221,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(249,38,114,1.00)&separatorColor=rgba(63,62,62,1.00)&resultSelectedBackgroundColor=rgba(65,65,47,1.00)&shortcutColor=rgba(204,28,0,1.00)&scrollbarColor=rgba(241,130,96,1.00)&imageStyle=8&resultSubtextFont=Lucida%20Grande&background=rgba(42,45,51,1.00)&shortcutFontSize=3&searchFontSize=4&resultSubtextColor=rgba(90,90,90,1.00)&searchBackgroundColor=rgba(46,54,67,1.00)&name=Predawn&resultTextFontSize=4&resultSelectedSubtextColor=rgba(241,130,96,0.60)&shortcutSelectedColor=rgba(38,194,106,1.00)&widthSize=4&border=rgba(0,0,0,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(255,255,255,0.50)&cornerRoundness=2&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=0&credits=Ryne%20Okimoto&searchSelectionBackgroundColor=rgba(56,56,48,1.00)&resultSelectedTextColor=rgba(82,147,216,0.80)&resultPaddingSize=2&shortcutFont=Lucida%20Grande' class='theme-option'>Predawn</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(102,102,102,1.00)&resultSubtextFontSize=2&searchSelectionForegroundColor=rgba(209,106,71,1.00)&separatorColor=rgba(63,62,62,0.00)&resultSelectedBackgroundColor=rgba(209,106,71,1.00)&shortcutColor=rgba(100,100,100,1.00)&scrollbarColor=rgba(209,106,71,1.00)&imageStyle=9&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(40,40,40,1.00)&shortcutFontSize=1&searchFontSize=3&resultSubtextColor=rgba(68,68,68,1.00)&searchBackgroundColor=rgba(40,40,40,0.00)&name=Twilight%20Predawn&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,0.60)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=4&border=rgba(51,51,51,1.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(85,85,85,1.00)&cornerRoundness=2&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=0&credits=Ryan%20Morton&searchSelectionBackgroundColor=rgba(51,51,51,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=3&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>Predawn Twilight</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(66,120,245,1.00)&shortcutColor=rgba(0,105,217,1.00)&scrollbarColor=rgba(170,170,170,1.00)&imageStyle=3&resultSubtextFont=Helvetica%20Neue&background=rgba(255,255,255,0.77)&shortcutFontSize=1&searchFontSize=3&resultSubtextColor=rgba(0,0,0,0.50)&searchBackgroundColor=rgba(0,0,0,0.00)&name=OS%20X%20Yosemite%20%28Light%20%26%20Blue%29&resultTextFontSize=2&resultSelectedSubtextColor=rgba(212,212,212,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=4&border=rgba(194,77,89,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(53,53,53,1.00)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=4&credits=Florian%20Pellet&searchSelectionBackgroundColor=rgba(66,120,245,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=2&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>Standard Yosemite</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(38,38,38,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(0,0,0,0.06)&shortcutColor=rgba(0,0,0,0.28)&scrollbarColor=rgba(0,0,0,0.28)&imageStyle=4&resultSubtextFont=Helvetica%20Neue&background=rgba(255,255,255,0.90)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(0,0,0,0.28)&searchBackgroundColor=rgba(255,255,255,0.00)&name=Yosemite%20i-NOVATiON&resultTextFontSize=2&resultSelectedSubtextColor=rgba(0,0,0,0.28)&shortcutSelectedColor=rgba(66,66,66,1.00)&widthSize=3&border=rgba(27,27,27,0.00)&resultTextFont=Helvetica%20Neue&resultTextColor=rgba(0,0,0,0.64)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=0&credits=i-novation.de&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(0,0,0,0.94)&resultPaddingSize=0&shortcutFont=Helvetica' class='theme-option'>YOSEMITE - best design theme for MacOS 10.10 by i-NOVATiON</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,0.80)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(0,0,0,0.06)&shortcutColor=rgba(0,0,0,0.30)&scrollbarColor=rgba(255,255,255,0.43)&imageStyle=8&resultSubtextFont=Menlo&background=rgba(255,255,255,0.90)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(0,0,0,0.41)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Horse&resultTextFontSize=3&resultSelectedSubtextColor=rgba(0,0,0,0.42)&shortcutSelectedColor=rgba(0,0,0,0.80)&widthSize=4&border=rgba(0,0,0,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(0,0,0,0.80)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=2&credits=Zander%20Martineau&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(0,0,0,0.80)&resultPaddingSize=4&shortcutFont=Menlo' class='theme-option'>Horse</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(174,122,247,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(68,71,90,1.00)&shortcutColor=rgba(139,233,253,1.00)&scrollbarColor=rgba(174,122,247,1.00)&imageStyle=8&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(30,31,41,0.95)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(98,114,164,1.00)&searchBackgroundColor=rgba(38,40,55,0.00)&name=Dracula&resultTextFontSize=2&resultSelectedSubtextColor=rgba(189,151,251,1.00)&shortcutSelectedColor=rgba(80,250,123,1.00)&widthSize=2&border=rgba(248,248,248,0.19)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(255,255,255,0.42)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=0&credits=Clifford%20Fajardo&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(248,248,242,0.40)&resultPaddingSize=2&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>Dracula Theme</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(86,151,24,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(56,54,47,1.00)&shortcutColor=rgba(255,255,255,0.64)&scrollbarColor=rgba(136,199,95,0.42)&imageStyle=8&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(48,48,48,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(151,155,134,0.50)&searchBackgroundColor=rgba(56,54,47,0.00)&name=NodeJs&resultTextFontSize=3&resultSelectedSubtextColor=rgba(255,255,255,0.69)&shortcutSelectedColor=rgba(98,192,59,1.00)&widthSize=2&border=rgba(86,151,24,0.69)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(86,151,24,0.67)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=2&credits=Clifford%20Fajardo&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(86,151,24,1.00)&resultPaddingSize=3&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>Node JS Theme</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(255,255,255,1.00)&resultSelectedBackgroundColor=rgba(255,255,255,1.00)&shortcutColor=rgba(199,199,199,1.00)&scrollbarColor=rgba(199,199,199,1.00)&imageStyle=4&resultSubtextFont=Helvetica&background=rgba(255,255,255,1.00)&shortcutFontSize=2&searchFontSize=2&resultSubtextColor=rgba(105,105,105,1.00)&searchBackgroundColor=rgba(255,255,255,1.00)&name=Pale&resultTextFontSize=2&resultSelectedSubtextColor=rgba(11,196,255,0.74)&shortcutSelectedColor=rgba(11,196,255,1.00)&widthSize=2&border=rgba(9,54,66,0.00)&resultTextFont=Helvetica%20Neue&resultTextColor=rgba(114,117,118,1.00)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=3&credits=Dean%20Jackson&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(8,195,255,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Pale</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(42,161,152,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(6,43,54,1.00)&resultSelectedBackgroundColor=rgba(6,43,54,0.95)&shortcutColor=rgba(147,161,161,1.00)&scrollbarColor=rgba(88,110,117,1.00)&imageStyle=4&resultSubtextFont=Geneva&background=rgba(9,54,66,0.98)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(101,123,131,1.00)&searchBackgroundColor=rgba(6,43,54,0.95)&name=Solarized%20Dark&resultTextFontSize=3&resultSelectedSubtextColor=rgba(133,153,12,1.00)&shortcutSelectedColor=rgba(203,75,21,1.00)&widthSize=2&border=rgba(9,54,66,0.00)&resultTextFont=Geneva&resultTextColor=rgba(147,161,161,1.00)&cornerRoundness=2&searchFont=Geneva&searchPaddingSize=3&credits=Dean%20Jackson&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(255,116,247,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Solarized Dark</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(42,161,152,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(6,43,54,1.00)&resultSelectedBackgroundColor=rgba(6,43,54,0.95)&shortcutColor=rgba(147,161,161,1.00)&scrollbarColor=rgba(88,110,117,1.00)&imageStyle=5&resultSubtextFont=Helvetica&background=rgba(9,54,66,0.98)&shortcutFontSize=2&searchFontSize=2&resultSubtextColor=rgba(101,123,131,1.00)&searchBackgroundColor=rgba(6,43,54,0.95)&name=Solarized%20Dark%20Small&resultTextFontSize=2&resultSelectedSubtextColor=rgba(133,153,12,1.00)&shortcutSelectedColor=rgba(203,75,21,1.00)&widthSize=2&border=rgba(9,54,66,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(147,161,161,1.00)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=3&credits=Dean%20Jackson&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(255,116,247,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Solarized Dark Small</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(211,54,130,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(253,246,227,1.00)&resultSelectedBackgroundColor=rgba(253,246,227,0.97)&shortcutColor=rgba(131,148,150,1.00)&scrollbarColor=rgba(147,161,161,1.00)&imageStyle=4&resultSubtextFont=Geneva&background=rgba(238,232,213,0.97)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(101,123,131,1.00)&searchBackgroundColor=rgba(253,246,227,0.97)&name=Solarized%20Light&resultTextFontSize=3&resultSelectedSubtextColor=rgba(42,161,152,1.00)&shortcutSelectedColor=rgba(220,50,46,1.00)&widthSize=2&border=rgba(9,54,66,0.00)&resultTextFont=Geneva&resultTextColor=rgba(88,110,117,1.00)&cornerRoundness=2&searchFont=Geneva&searchPaddingSize=3&credits=Dean%20Jackson&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(211,54,130,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Solarized Light</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(211,54,130,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(253,246,227,1.00)&resultSelectedBackgroundColor=rgba(253,246,227,0.97)&shortcutColor=rgba(131,148,150,1.00)&scrollbarColor=rgba(147,161,161,1.00)&imageStyle=9&resultSubtextFont=Helvetica&background=rgba(238,232,213,0.97)&shortcutFontSize=2&searchFontSize=2&resultSubtextColor=rgba(101,123,131,1.00)&searchBackgroundColor=rgba(253,246,227,0.97)&name=Solarized%20Light%20Small&resultTextFontSize=2&resultSelectedSubtextColor=rgba(42,161,152,1.00)&shortcutSelectedColor=rgba(220,50,46,1.00)&widthSize=2&border=rgba(9,54,66,0.00)&resultTextFont=Helvetica&resultTextColor=rgba(88,110,117,1.00)&cornerRoundness=3&searchFont=Helvetica&searchPaddingSize=3&credits=Dean%20Jackson&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(211,54,130,1.00)&resultPaddingSize=2&shortcutFont=Helvetica' class='theme-option'>Solarized Light Small</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(229,229,229,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(0,0,0,0.64)&shortcutColor=rgba(255,255,255,0.40)&scrollbarColor=rgba(0,0,0,0.10)&imageStyle=8&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(0,0,0,0.50)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(148,254,247,0.50)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Boilerplate&resultTextFontSize=2&resultSelectedSubtextColor=rgba(34,253,240,0.95)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=2&border=rgba(255,255,255,0.12)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(255,255,255,0.50)&cornerRoundness=3&searchFont=Helvetica%20Neue&searchPaddingSize=3&credits=Alex%20Calara&searchSelectionBackgroundColor=rgba(255,43,114,0.90)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=4&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>Boilerplate</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(213,213,213,1.00)&resultSelectedBackgroundColor=rgba(209,209,209,1.00)&shortcutColor=rgba(93,0,125,1.00)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=3&resultSubtextFont=Futura&background=rgba(235,235,235,1.00)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(166,166,166,1.00)&searchBackgroundColor=rgba(248,248,248,1.00)&name=Pedram&resultTextFontSize=2&resultSelectedSubtextColor=rgba(127,127,127,1.00)&shortcutSelectedColor=rgba(93,0,125,1.00)&widthSize=4&border=rgba(25,25,25,0.50)&resultTextFont=Futura&resultTextColor=rgba(25,25,25,1.00)&cornerRoundness=0&searchFont=Futura&searchPaddingSize=4&credits=Pedram&searchSelectionBackgroundColor=rgba(255,64,255,1.00)&resultSelectedTextColor=rgba(25,25,25,1.00)&resultPaddingSize=3&shortcutFont=Futura' class='theme-option'>Pedram Simple</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(146,146,146,1.00)&resultSelectedBackgroundColor=rgba(0,84,147,1.00)&shortcutColor=rgba(170,170,170,1.00)&scrollbarColor=rgba(38,38,38,1.00)&imageStyle=7&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(33,33,33,0.85)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(193,193,193,0.00)&searchBackgroundColor=rgba(66,66,66,1.00)&name=DarkSimplistic&resultTextFontSize=2&resultSelectedSubtextColor=rgba(186,186,186,0.00)&shortcutSelectedColor=rgba(127,127,127,1.00)&widthSize=2&border=rgba(0,0,0,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(255,255,255,1.00)&cornerRoundness=0&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=2&credits=costica1234&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=2&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>DarkSimplistic</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(146,146,146,0.00)&resultSelectedBackgroundColor=rgba(255,255,255,1.00)&shortcutColor=rgba(198,10,38,1.00)&scrollbarColor=rgba(220,54,57,1.00)&imageStyle=4&resultSubtextFont=Geneva&background=rgba(190,190,190,1.00)&shortcutFontSize=0&searchFontSize=1&resultSubtextColor=rgba(198,10,38,1.00)&searchBackgroundColor=rgba(198,10,38,1.00)&name=%23GoReds&resultTextFontSize=0&resultSelectedSubtextColor=rgba(190,190,190,1.00)&shortcutSelectedColor=rgba(0,0,0,1.00)&widthSize=0&border=rgba(190,190,190,0.21)&resultTextFont=Geneva&resultTextColor=rgba(0,0,0,1.00)&cornerRoundness=1&searchFont=Geneva&searchPaddingSize=0&credits=%40McDev&searchSelectionBackgroundColor=rgba(184,202,117,1.00)&resultSelectedTextColor=rgba(198,10,38,1.00)&resultPaddingSize=4&shortcutFont=Geneva' class='theme-option'>Cincinnati Reds</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(255,255,255,1.00)&resultSelectedBackgroundColor=rgba(115,253,214,1.00)&shortcutColor=rgba(4,50,255,1.00)&scrollbarColor=rgba(255,255,239,1.00)&imageStyle=3&resultSubtextFont=Courier&background=rgba(0,180,179,0.49)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(115,254,255,1.00)&searchBackgroundColor=rgba(36,101,113,1.00)&name=Seafoam%20Blue&resultTextFontSize=3&resultSelectedSubtextColor=rgba(4,50,255,1.00)&shortcutSelectedColor=rgba(4,50,255,1.00)&widthSize=0&border=rgba(186,199,193,0.08)&resultTextFont=Courier&resultTextColor=rgba(203,208,200,1.00)&cornerRoundness=0&searchFont=Courier&searchPaddingSize=0&credits=Don%20Garey&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(0,0,0,1.00)&resultPaddingSize=1&shortcutFont=Courier' class='theme-option'>Seafoam Blue</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(123,234,26,1.00)&resultSelectedBackgroundColor=rgba(0,21,60,1.00)&shortcutColor=rgba(126,230,24,1.00)&scrollbarColor=rgba(4,50,255,1.00)&imageStyle=3&resultSubtextFont=Lucida%20Grande&background=rgba(144,144,146,0.25)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(205,205,205,1.00)&searchBackgroundColor=rgba(0,22,60,1.00)&name=Seahawks&resultTextFontSize=3&resultSelectedSubtextColor=rgba(153,153,153,1.00)&shortcutSelectedColor=rgba(126,230,24,1.00)&widthSize=0&border=rgba(139,145,139,0.25)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(0,22,60,1.00)&cornerRoundness=0&searchFont=Lucida%20Grande&searchPaddingSize=0&credits=Don%20Garey&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(0,250,0,1.00)&resultPaddingSize=1&shortcutFont=Lucida%20Grande' class='theme-option'>Seahawks</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(173,216,255,1.00)&searchSelectionForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&separatorColor=rgba(163,163,163,1.00)&resultSelectedBackgroundColor=rgba(19,33,71,1.00)&shortcutColor=rgba(2,14,54,1.00)&resultSubtextFont=Helvetica%20Neue&scrollbarColor=rgba(2,16,50,1.00)&imageStyle=0&background=rgba(195,195,195,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(125,125,125,1.00)&name=Nickel%20Cobalt&searchBackgroundColor=rgba(19,33,71,1.00)&resultTextFontSize=2&resultSelectedSubtextColor=rgba(89,121,161,1.00)&shortcutSelectedColor=rgba(144,191,245,1.00)&widthSize=3&border=rgba(108,86,152,0.00)&resultTextFont=Helvetica%20Neue&resultTextColor=rgba(1,15,53,1.00)&cornerRoundness=0&searchFont=Helvetica%20Neue&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&credits=Malik%20Trey&searchPaddingSize=3&resultSelectedTextColor=rgba(173,216,255,1.00)&resultPaddingSize=1&shortcutFont=Helvetica%20Neue' class='theme-option'>Nickel Cobalt</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(83,66,80,1.00)&shortcutColor=rgba(252,171,23,1.00)&scrollbarColor=rgba(83,66,80,1.00)&imageStyle=8&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(62,41,60,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(98,84,94,1.00)&searchBackgroundColor=rgba(98,84,94,1.00)&name=Paraiso%20Dark&resultTextFontSize=3&resultSelectedSubtextColor=rgba(255,255,255,1.00)&shortcutSelectedColor=rgba(245,120,103,1.00)&widthSize=1&border=rgba(83,66,80,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(138,129,132,1.00)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=0&credits=Angelo%20Simeoni&searchSelectionBackgroundColor=rgba(140,122,137,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=0&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>Paraiso Dark</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(96,80,110,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(87,98,102,1.00)&separatorColor=rgba(255,255,255,0.00)&resultSelectedBackgroundColor=rgba(177,177,240,1.00)&shortcutColor=rgba(147,160,161,1.00)&scrollbarColor=rgba(147,160,161,1.00)&imageStyle=9&resultSubtextFont=Papyrus&background=rgba(210,178,246,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(101,83,118,1.00)&searchBackgroundColor=rgba(223,190,255,1.00)&name=Wild-Cherry%20Light&resultTextFontSize=3&resultSelectedSubtextColor=rgba(87,98,102,1.00)&shortcutSelectedColor=rgba(8,53,66,1.00)&widthSize=3&border=rgba(210,178,247,0.05)&resultTextFont=Papyrus&resultTextColor=rgba(102,86,118,1.00)&cornerRoundness=1&searchFont=Papyrus&searchPaddingSize=4&credits=Richard%20Guay&searchSelectionBackgroundColor=rgba(173,144,193,1.00)&resultSelectedTextColor=rgba(153,129,177,1.00)&resultPaddingSize=2&shortcutFont=Courier' class='theme-option'>Wild-Cherry Light Theme</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(158,132,178,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(87,98,102,1.00)&separatorColor=rgba(255,255,255,0.00)&resultSelectedBackgroundColor=rgba(92,54,131,1.00)&shortcutColor=rgba(147,160,161,1.00)&scrollbarColor=rgba(147,160,161,1.00)&imageStyle=9&resultSubtextFont=Papyrus&background=rgba(40,32,49,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(101,83,118,1.00)&searchBackgroundColor=rgba(59,49,70,1.00)&name=Wild-Cherry%20Dark&resultTextFontSize=3&resultSelectedSubtextColor=rgba(87,98,102,1.00)&shortcutSelectedColor=rgba(8,53,66,1.00)&widthSize=3&border=rgba(49,40,59,0.05)&resultTextFont=Papyrus&resultTextColor=rgba(83,69,97,1.00)&cornerRoundness=1&searchFont=Papyrus&searchPaddingSize=0&credits=Richard%20Guay&searchSelectionBackgroundColor=rgba(203,203,203,1.00)&resultSelectedTextColor=rgba(171,144,197,1.00)&resultPaddingSize=2&shortcutFont=Courier' class='theme-option'>Wild-Cherry Dark Theme</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(147,161,161,1.00)&searchSelectionForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(7,54,66,1.00)&shortcutColor=rgba(220,50,47,1.00)&resultSubtextFont=Menlo&scrollbarColor=rgba(0,0,0,0.10)&imageStyle=3&background=rgba(1,43,54,1.00)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(88,110,117,1.00)&name=Solarized&searchBackgroundColor=rgba(1,43,54,1.00)&resultTextFontSize=2&resultSelectedSubtextColor=rgba(110,110,110,1.00)&shortcutSelectedColor=rgba(181,137,0,1.00)&widthSize=2&border=rgba(0,0,0,0.00)&resultTextFont=Menlo&resultTextColor=rgba(131,148,150,1.00)&cornerRoundness=3&searchFont=Menlo&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&credits=jolux&searchPaddingSize=0&resultSelectedTextColor=rgba(133,153,1,1.00)&resultPaddingSize=2&shortcutFont=Menlo' class='theme-option'>Solarized Compliant Dark Theme</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(254,255,253,1.00)&separatorColor=rgba(213,213,213,1.00)&resultSelectedBackgroundColor=rgba(67,145,255,0.90)&shortcutColor=rgba(32,72,150,0.90)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=9&resultSubtextFont=Helvetica%20Neue&background=rgba(251,255,255,0.85)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(125,125,125,1.00)&searchBackgroundColor=rgba(133,244,0,0.00)&name=Yosemite&resultTextFontSize=2&resultSelectedSubtextColor=rgba(223,223,223,1.00)&shortcutSelectedColor=rgba(255,255,255,1.00)&widthSize=4&border=rgba(255,255,255,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(25,25,25,1.00)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=0&credits=Jovotrox&searchSelectionBackgroundColor=rgba(85,154,244,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=0&shortcutFont=Helvetica' class='theme-option'>Elegant v4</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(51,51,51,1.00)&resultSubtextFontSize=1&separatorColor=rgba(255,255,255,0.00)&resultSelectedBackgroundColor=rgba(0,0,0,0.30)&shortcutColor=rgba(146,146,146,1.00)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=4&resultSubtextFont=Lucida%20Grande&background=rgba(255,255,255,0.80)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(146,146,146,1.00)&searchBackgroundColor=rgba(255,255,255,0.00)&name=tiny&resultTextFontSize=1&resultSelectedSubtextColor=rgba(235,235,235,1.00)&shortcutSelectedColor=rgba(235,235,235,1.00)&widthSize=3&border=rgba(25,25,25,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(95,95,95,1.00)&cornerRoundness=2&searchFont=Lucida%20Grande&searchPaddingSize=0&credits=Maciej%20Skrzypczak&shortcutFont=Lucida%20Grande&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=1' class='theme-option'>Tiny theme</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&searchSelectionForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&separatorColor=rgba(51,51,51,1.00)&resultSelectedBackgroundColor=rgba(43,43,43,0.86)&shortcutColor=rgba(86,103,128,0.82)&resultSubtextFont=Helvetica%20Neue&scrollbarColor=rgba(50,49,54,0.00)&imageStyle=3&background=rgba(49,49,49,0.46)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(80,109,132,1.00)&name=Darkflow&searchBackgroundColor=rgba(41,41,43,0.95)&resultTextFontSize=2&resultSelectedSubtextColor=rgba(153,153,153,1.00)&shortcutSelectedColor=rgba(35,12,53,1.00)&widthSize=3&border=rgba(210,210,210,0.00)&resultTextFont=Helvetica%20Neue&resultTextColor=rgba(185,185,185,1.00)&cornerRoundness=0&searchFont=Helvetica%20Neue&searchSelectionBackgroundColor=rgba(20,166,220,1.00)&credits=Malik%20Trey&searchPaddingSize=3&resultSelectedTextColor=rgba(243,243,243,1.00)&resultPaddingSize=1&shortcutFont=Helvetica%20Neue' class='theme-option'>Darkflow</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(136,156,68,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(229,199,163,1.00)&shortcutColor=rgba(251,156,0,1.00)&scrollbarColor=rgba(170,170,170,1.00)&imageStyle=3&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(252,236,209,1.00)&shortcutFontSize=1&searchFontSize=4&resultSubtextColor=rgba(198,157,138,1.00)&searchBackgroundColor=rgba(252,236,209,1.00)&name=Kimbie&resultTextFontSize=3&resultSelectedSubtextColor=rgba(198,157,138,1.00)&shortcutSelectedColor=rgba(227,47,79,1.00)&widthSize=4&border=rgba(194,77,89,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(251,156,0,1.00)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=1&credits=Thibault%20Maekelbergh&searchSelectionBackgroundColor=rgba(66,120,245,1.00)&resultSelectedTextColor=rgba(227,47,79,1.00)&resultPaddingSize=1&shortcutFont=Helvetica%20Neue%20Light' class='theme-option'>Kimbie Light</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(229,225,210,1.00)&resultSubtextFontSize=2&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(52,50,47,1.00)&resultSelectedBackgroundColor=rgba(52,50,47,1.00)&shortcutColor=rgba(102,99,94,1.00)&scrollbarColor=rgba(170,170,170,0.00)&imageStyle=9&resultSubtextFont=Lucida%20Grande&background=rgba(52,50,47,1.00)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(136,134,128,1.00)&searchBackgroundColor=rgba(52,50,47,1.00)&name=Pro%20Dark&resultTextFontSize=3&resultSelectedSubtextColor=rgba(249,208,14,1.00)&shortcutSelectedColor=rgba(102,99,94,1.00)&widthSize=3&border=rgba(214,214,214,0.00)&resultTextFont=Lucida%20Grande&resultTextColor=rgba(136,134,128,1.00)&cornerRoundness=1&searchFont=Lucida%20Grande&searchPaddingSize=2&credits=Yorgos&searchSelectionBackgroundColor=rgba(102,122,140,1.00)&resultSelectedTextColor=rgba(249,208,14,1.00)&resultPaddingSize=4&shortcutFont=Lucida%20Grande' class='theme-option'>Pro Dark</button>
+
+<button value='alfred://theme/searchForegroundColor=rgba(255,65,69,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(0,0,0,0.00)&resultSelectedBackgroundColor=rgba(255,65,69,1.00)&shortcutColor=rgba(76,76,76,1.00)&scrollbarColor=rgba(38,38,38,1.00)&imageStyle=7&resultSubtextFont=Geneva&background=rgba(19,36,53,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(111,213,235,1.00)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Panic%20Theme&resultTextFontSize=3&resultSelectedSubtextColor=rgba(111,213,235,1.00)&shortcutSelectedColor=rgba(127,127,127,1.00)&widthSize=4&border=rgba(19,36,53,1.00)&resultTextFont=Geneva&resultTextColor=rgba(248,250,241,1.00)&cornerRoundness=2&searchFont=Geneva&searchPaddingSize=1&credits=Thibault%20Maekelberg&searchSelectionBackgroundColor=rgba(145,110,225,1.00)&resultSelectedTextColor=rgba(255,205,76,1.00)&resultPaddingSize=0&shortcutFont=Geneva' class='theme-option'>Panic Theme</button>
+
+</div>
+<div id='canvas'>
+	<div class='baselayer'>
+	<div id='alfred-window'>
+		<div class='cog'>
+				<!-- The SVG for the cog icon -->
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="12px" version="1.1" viewBox="0 0 32 32" width="12px" xml:space="preserve" class="style0">
+				  <style>
+					.style0{
+						enable-background:	new 0 0 12 12;
+					}
+					.cog-color{
+						fill:	#4E4E50;
+					}
+				</style>
+				  <g id="Layer_1"/>
+				  <g id="cog">
+				    <path d="M32 17.969v-4l-4.781-1.992c-0.133-0.375-0.273-0.738-0.445-1.094l1.93-4.805L25.875 3.2 l-4.762 1.961c-0.363-0.176-0.734-0.324-1.117-0.461L17.969 0h-4l-1.977 4.734c-0.398 0.141-0.781 0.289-1.16 0.469l-4.754-1.91 L3.25 6.121l1.938 4.711C5 11.2 4.8 11.6 4.7 12.02L0 14.031v4l4.707 1.961c0.145 0.4 0.3 0.8 0.5 1.2 l-1.902 4.742l2.828 2.828l4.723-1.945c0.379 0.2 0.8 0.3 1.2 0.461L14.031 32h4l1.98-4.758 c0.379-0.141 0.754-0.289 1.113-0.461l4.797 1.922l2.828-2.828l-1.969-4.773c0.168-0.359 0.305-0.723 0.438-1.094L32 17.969z M15.969 22c-3.312 0-6-2.688-6-6s2.688-6 6-6s6 2.7 6 6S19.281 22 16 22z" class="style1"/>
+				  </g>
+				</svg>
+			</div>
+		<div class='search'>
+			<div class='search-text'>
+				Sa
+			</div>
+		</div>
+
+		<div class='result result-selected'>
+			<div class='icon'>
+				<img src='images/Safari.png' class='icon-image'>
+			</div>
+			<div class='title-and-subtitle'>
+				<div class='result-text selected-text'>
+					Safari
+				</div>
+				<div class='result-subtext selected-subtext'>
+					/Applications/Safari.app
+				</div>
+			</div>
+			<div class='shortcut shortcut-selected'>
+				↵
+			</div>
+
+		</div>
+		<div class='result'>
+			<div class='icon'>
+				<img src='images/DesktopScreenEffectsPref.png' class='icon-image'>
+			</div>
+			<div class='title-and-subtitle'>
+				<div class='result-text'>
+					Desktop and Screensaver
+				</div>
+				<div class='result-subtext'>
+				/System/Library/PreferencePanes/DesktopScreenEffectsPref.prefPane
+				</div>
+			</div>
+			<div class='shortcut'>
+				⌘2
+			</div>
+		</div>
+		<div class='result'>
+			<div class='icon'>
+				<img src='images/EnergySaver.png' class='icon-image'>
+			</div>
+			<div class='title-and-subtitle'>
+				<div class='result-text'>
+					Energy Saver
+				</div>
+				<div class='result-subtext'>
+				/System/Library/PreferencePanes/EnergySaver.prefPane
+				</div>
+			</div>
+			<div class='shortcut'>
+				⌘3
+			</div>
+		</div>
+		<div class='result selected'>
+			<div class='icon'>
+				<img src='images/GenericFolderIcon.png' class='icon-image'>
+			</div>
+			<div class='title-and-subtitle'>
+				<div class='result-text'>
+					San Fransisco
+				</div>
+				<div class='result-subtext'>
+				/Users/preppeller/Music/iTunes/iTunes Media/Bobby Hutcherson/San Fransisco
+				</div>
+			</div>
+			<div class='shortcut'>
+				⌘4
+			</div>
+		</div>
+		<div class='result'>
+			<div class='icon'>
+				<img src='images/GenericDocumentIcon.png' class='icon-image'>
+			</div>
+			<div class='title-and-subtitle'>
+				<div class='result-text'>
+					Savoury Snacks
+				</div>
+				<div class='result-subtext'>
+				/Users/preppeller/Documents/Savoury Snacks.txt
+				</div>
+			</div>
+			<div class='shortcut'>
+				⌘5
+			</div>
+		</div>
+		<div class='result result-last'>
+			<div class='icon'>
+				<img src='images/webbookmark.png' class='icon-image'>
+			</div>
+			<div class='title-and-subtitle'>
+				<div class='result-text'>
+					Samba
+				</div>
+				<div class='result-subtext'>
+				Bookmark — http://en.wikipedia.org/wiki/Samba_(Brazillian_dance)
+				</div>
+			</div>
+			<div class='shortcut'>
+				⌘6
+			</div>
+		</div>
+<!-- 		<div class='scrollbar'>
+				&nbsp;
+		</div> -->
+				</div>
+	</div>
+
+</div>
+<div id='theme-parsed'>
+</div>
+
+
+<svg height="0" xmlns="http://www.w3.org/2000/svg">
+  <filter id="drop-shadow">
+  <feGaussianBlur in="SourceAlpha" stdDeviation="2.2"/>
+  <feOffset dx="12" dy="12" result="offsetblur"/>
+  <feFlood flood-color="rgba(0,0,0,0.5)"/>
+  <feComposite in2="offsetblur" operator="in"/>
+  <feMerge>
+  <feMergeNode/>
+  <feMergeNode in="SourceGraphic"/>
+  </feMerge>
+</filter>
+</svg>
+
+
+<script src="jquery.min.js"></script>
+<script>
+function changeCss(className, classValue) {
+    // we need invisible container to store additional css definitions
+    var cssMainContainer = $('#css-modifier-container');
+    if (cssMainContainer.length == 0) {
+        var cssMainContainer = $('<div id="css-modifier-container"></div>');
+        cssMainContainer.hide();
+        cssMainContainer.appendTo($('body'));
+    }
+
+    // and we need one div for each class
+    classContainer = cssMainContainer.find('div[data-class="' + className + '"]');
+    if (classContainer.length == 0) {
+        classContainer = $('<div data-class="' + className + '"></div>');
+        classContainer.appendTo(cssMainContainer);
+    }
+
+    // append additional style
+    classContainer.html( classContainer.html() + '<style>' + className + ' {' + classValue + '}</style>');
+}
+function parseURL(url) {
+    // Let the browser do the work
+    var searchObject = {},
+        queries, split, i;
+    // Convert query string to object
+    url = url.replace('alfred://theme/','');
+	  queries = url.split('&');
+
+    for( i = 0; i < queries.length; i++ ) {
+        split = queries[i].split('=');
+        // So, all the theme urls seem to be working, except it can't decode 'Vítor Galvão', which it considers
+        // 'V%EDtor%20Galv%E3o', so it's getting caught up on the diacritics. Strange. This might be an Alfred
+        // error when it encodes it to begin with...
+        try {
+          searchObject[split[0]] = decodeURIComponent(split[1]);// decodeURIComponent();
+        } catch( error ) {
+        	searchObject[split[0]] = split[1].replace('%20', ' ').replace('%ED', 'í').replace('%E3', 'ã');
+        }
+    }
+    return searchObject;
+}
+
+function applyTheme( selector ) {
+
+		// Remove any previously added CSS
+  	$('#css-modifier-container').remove();
+  	// Grab the contents of the text area
+  	var contents = $( selector ).val();
+  	// Grab the individual variables
+    var data = parseURL(contents);
+
+   	// This will just put the author and the name of the theme above
+    $( "#themeauthor" ).text( data['credits'] );
+    $( "#themename" ).text( data['name'] );
+    // This is a hash that will map the name of the alfred url element to
+    // the correct css selector and property.
+    // Currently, the scrollbar is not covered, and the cog hasn't been mapped
+    myMap = {
+			background: [ '#alfred-window', 'background-color' ],
+			border: [ '#alfred-window', 'border-color' ],
+			cornerRoundness: [ '#alfred-window', 'border-radius' ],
+			resultPaddingSize:  [ '.result-text', 'padding-bottom' ],
+			resultSelectedBackgroundColor: [ '.result-selected', 'background-color' ],
+			resultSelectedSubtextColor: [ '.result-selected-subtext', 'color' ],
+			resultSelectedTextColor: [ '.result-selected', 'color' ],
+			resultSubtextColor: [ '.result-subtext', 'color' ],
+			resultSubtextFont: [ '.result-subtext', 'font-family' ],
+			resultSubtextFontSize: [ '.result-subtext', 'font-size'],
+			resultTextColor: [ '.result-text', 'color' ],
+			resultTextFont: [ '.result-text', 'font-family' ],
+			resultTextFontSize: [ '.result-text', 'font-size' ],
+			searchBackgroundColor: [ '.search', 'background-color' ],
+			searchFont: [ '.search-text', 'font-family' ],
+			searchFontSize: [ '.search-text', 'font-size' ],
+			searchForegroundColor: [ '.search', 'color' ],
+			searchPaddingSize: [ '.search-text', 'padding-bottom' ],
+			shortcutColor: [ '.shortcut', 'color' ],
+			shortcutFont: [ '.shortcut', 'font-family' ],
+			shortcutFontSize: [ '.shortcut', 'font-size' ],
+			shortcutSelectedColor: [ '.shortcut-selected', 'color' ],
+			widthSize: [ '#alfred-window', 'width' ],
+			separatorColor: [ '.result', 'border-color' ],
+			imageStyle: [ '#cog', 'fill' ],
+			// We are missing the following two because our view just doesn't display it
+			// searchSelectionBackgroundColor
+			// searchSelectionForegroundColor
+		};
+		for (var key in data) {
+			var value = data[key];
+			if (key in myMap) {
+				if ( 0 === myMap[key][1].search('font-family') ) {
+					if ( -1 != value.search(' Light' ) ) {
+						// Helvetice Neue Light needs to be Helvetica Neue; and we'll set
+						// the font-weight on the css instead to simulate it.
+						// I need to test this against more of the fonts
+						value = value.replace(' Light', '');
+						changeCss( myMap[key][0], 'font-weight: 300;');
+					}
+					changeCss( myMap[key][0], myMap[key][1] + ': "' + value + '";');
+				} else if ( 0 === myMap[key][1].search('width') ) {
+					// Change the width of the window
+					changeCss( myMap[key][0], myMap[key][1] + ': ' + ( 400 + ( value * 75 ) ) + 'px;');
+					// Move the cog appropriately
+					changeCss( '.cog', 'left: ' + ( 382 + ( value * 75 ) ) + 'px;');
+					// Change the max-width of the subtext so that we don't get weird line-breaks
+					changeCss( '.result-subtext', 'max-width: ' + ( 300 + ( value * 75 ) ) + 'px;');
+					// Change the width of the base-layer (to simulate a blur effect)
+					changeCss( '.baselayer', 'width: ' + ( 448 + ( value * 75 ) ) + ';');
+					// Move the scrollbar
+					// changeCss( '.scrollbar', 'left: ' + ( ( value * 75 ) ) + ';');
+					console.log(value);
+				} else if ( 0 === myMap[key][1].search('padding-bottom') ) {
+					// The assumption is the padding-bottom is value * 2
+					changeCss( myMap[key][0], myMap[key][1] + ': ' + ( 2 * Number( value ) ) + 'px;');
+				} else if ( 0 === myMap[key][1].search('font-size') ) {
+					// I think each has a different base size, so we'll set those, and then step up.
+					if ( 'resultSubtextFontSize' == key ) {
+						base = 10;
+					} else if ( 'searchFontSize' == key ) {
+						base = 20;
+					} else {
+						base = 12;
+					}
+					changeCss( myMap[key][0], myMap[key][1] + ': ' + ( base + ( 2 * Number(value) ) ) + 'px;');
+					changeCss( '.icon-image', 'width: ' + ( 36 + ( 2 * Number(value) ) ) + 'px;');
+				} else if ( 'cornerRoundness' == key ) {
+					// The cornerRoundness does not step up evenly, so we will use an array to match index value
+					var cornerRoundess = [ 25, 50, 0, 5 ];
+					changeCss( myMap[key][0], myMap[key][1] + ': ' + cornerRoundess[Number(value)] + 'px;');
+					changeCss( '.baselayer', myMap[key][1] + ': ' + cornerRoundess[Number(value)] + 'px;');
+				} else if ( 'background' == key ) {
+					changeCss( myMap[key][0], myMap[key][1] + ': ' + value + ';');
+					// We change the cog background to match as well, but if they're partially transparent, then
+					// it becomes like a double-opacity, or half-as-transparent.
+					var temp = value.replace('rgba(', '').replace(')','').split(',');
+					if ( Number( temp[3] ) > 0 && ( Number( temp[3] < 1 ) ) ) {
+						temp[3] = 0;
+						value = 'rgba(' + temp.join() + ')';
+					}
+					console.log(temp);
+					changeCss( '.cog', myMap[key][1] + ': ' + value + ';');
+				} else if ( 'border' == key ) {
+					changeCss( '.baselayer', 'background-color: ' + value + ';');
+					changeCss( myMap[key][0], myMap[key][1] + ': ' + value + ';');
+				} else if ( 'imageStyle' == key ) {
+					// The imagestyle changes the preferences cog colors. There are 10 possibilities (I think), but
+					// I haven't mapped them yet, so this is a placeholder
+					var imageStyle = [
+						'rgba(25,25,25,.05)', // 0
+						'rgba(0,0,0,1)', 			// black, solid
+						'rgba(25,25,25,.05)',
+						'rgba(25,25,25,.05)',
+						'rgba(25,25,25,.05)',
+						'rgba(25,25,25,.05)', // 5
+						'rgba(25,25,25,.05)',
+						'rgba(25,25,25,.05)',
+						'rgba(25,25,25,.05)',
+						'rgba(0,0,0,.5)' 			// 9
+					];
+					changeCss( '#cog', 'fill: ' + imageStyle[value] + ';');
+					console.log(value);
+				} else {
+					// Just apply the mapping... this was originally the only value, but getting this to behave correctly
+					// required everything above.
+					changeCss( myMap[key][0], myMap[key][1] + ': ' + value + ';');
+				}
+			} else {
+				// These are things that we missed... (or didn't need?)
+				console.log(key);
+			}
+		}
+}
+
+$( "#applyTheme" ).bind({
+  click: function() {
+  	applyTheme("textarea#themeurltextarea");
+  }
+});
+$( "#applyTheme1" ).bind({
+  click: function() {
+  	$( "textarea#themeurltextarea" ).val('alfred://theme/searchForegroundColor=rgba(206,29,10,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(93,96,90,0.27)&resultSelectedBackgroundColor=rgba(55,152,173,1.00)&shortcutColor=rgba(48,143,189,1.00)&scrollbarColor=rgba(60,152,172,1.00)&imageStyle=3&resultSubtextFont=Helvetica&background=rgba(127,210,55,1.00)&shortcutFontSize=0&searchFontSize=4&resultSubtextColor=rgba(47,143,189,1.00)&searchBackgroundColor=rgba(4,73,255,0.00)&name=The%20Mystery%20Machine%20%28Scooby-Doo%29&resultTextFontSize=2&resultSelectedSubtextColor=rgba(255,255,255,0.33)&shortcutSelectedColor=rgba(255,255,255,0.76)&widthSize=4&border=rgba(42,159,185,1.00)&resultTextFont=Marker%20Felt&resultTextColor=rgba(205,48,30,1.00)&cornerRoundness=3&searchFont=Marker%20Felt&searchPaddingSize=0&credits=%40joeydurham&searchSelectionBackgroundColor=rgba(184,202,117,1.00)&resultSelectedTextColor=rgba(255,255,255,0.61)&resultPaddingSize=0&shortcutFont=Helvetica');
+  	setTimeout(function() { applyTheme("textarea#themeurltextarea"); }, 100);
+  }
+});
+$( "#applyTheme2" ).bind({
+  click: function() {
+		$( "textarea#themeurltextarea" ).val('alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&searchSelectionForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=1&separatorColor=rgba(117,120,112,0.00)&resultSelectedBackgroundColor=rgba(184,202,117,1.00)&shortcutColor=rgba(197,202,117,1.00)&resultSubtextFont=Helvetica%20Neue&scrollbarColor=rgba(51,51,51,1.00)&imageStyle=2&background=rgba(238,238,230,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(56,56,56,1.00)&name=aa&searchBackgroundColor=rgba(97,89,74,1.00)&resultTextFontSize=2&resultSelectedSubtextColor=rgba(102,102,102,1.00)&shortcutSelectedColor=rgba(35,12,53,1.00)&widthSize=3&border=rgba(58,58,58,0.56)&resultTextFont=Helvetica%20Neue&resultTextColor=rgba(56,56,56,1.00)&cornerRoundness=0&searchFont=Helvetica%20Neue&searchSelectionBackgroundColor=rgba(184,202,117,1.00)&credits=aa&searchPaddingSize=3&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=1&shortcutFont=Helvetica%20Neue');
+  	setTimeout(function() { applyTheme("textarea#themeurltextarea"); }, 100);
+  }
+});
+$( "#applyTheme3" ).bind({
+  click: function() {
+  	$( "textarea#themeurltextarea" ).val('alfred://theme/searchForegroundColor=rgba(255,197,67,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(22,52,71,1.00)&resultSelectedBackgroundColor=rgba(26,70,96,1.00)&shortcutColor=rgba(144,144,144,1.00)&scrollbarColor=rgba(213,213,213,1.00)&imageStyle=9&resultSubtextFont=Helvetica&background=rgba(23,51,70,1.00)&shortcutFontSize=2&searchFontSize=4&resultSubtextColor=rgba(194,194,194,1.00)&searchBackgroundColor=rgba(29,69,95,1.00)&name=Cobalt2&resultTextFontSize=4&resultSelectedSubtextColor=rgba(255,197,67,1.00)&shortcutSelectedColor=rgba(255,197,67,1.00)&widthSize=4&border=rgba(23,51,70,0.62)&resultTextFont=Helvetica&resultTextColor=rgba(166,166,166,1.00)&cornerRoundness=0&searchFont=Helvetica&searchPaddingSize=3&credits=Wes%20Bos&searchSelectionBackgroundColor=rgba(181,213,255,1.00)&resultSelectedTextColor=rgba(255,255,255,1.00)&resultPaddingSize=4&shortcutFont=Helvetica');
+  	setTimeout(function() { applyTheme("textarea#themeurltextarea"); }, 100);
+  }
+});
+$( "#applyTheme4" ).bind({
+  click: function() {
+  	$( "textarea#themeurltextarea" ).val('alfred://theme/searchForegroundColor=rgba(0,0,0,1.00)&resultSubtextFontSize=1&searchSelectionForegroundColor=rgba(0,0,0,1.00)&separatorColor=rgba(87,60,70,0.49)&resultSelectedBackgroundColor=rgba(0,0,0,0.06)&shortcutColor=rgba(179,179,179,1.00)&scrollbarColor=rgba(0,0,0,0.10)&imageStyle=3&resultSubtextFont=Helvetica%20Neue%20Light&background=rgba(255,255,255,0.98)&shortcutFontSize=2&searchFontSize=3&resultSubtextColor=rgba(153,153,153,1.00)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Yosemite%20v2&resultTextFontSize=3&resultSelectedSubtextColor=rgba(110,110,110,1.00)&shortcutSelectedColor=rgba(166,166,166,1.00)&widthSize=0&border=rgba(0,0,0,0.00)&resultTextFont=Helvetica%20Neue%20Light&resultTextColor=rgba(53,53,53,1.00)&cornerRoundness=3&searchFont=Helvetica%20Neue%20Light&searchPaddingSize=4&credits=Shawn%20Patrick%20Rice&searchSelectionBackgroundColor=rgba(178,215,255,1.00)&resultSelectedTextColor=rgba(0,0,0,1.00)&resultPaddingSize=2&shortcutFont=Helvetica%20Neue%20Light');
+  	setTimeout(function() { applyTheme("textarea#themeurltextarea"); }, 100);
+  }
+});
+$( "#applyTheme5" ).bind({
+  click: function() {
+  	$( "textarea#themeurltextarea" ).val('alfred://theme/searchForegroundColor=rgba(255,255,255,1.00)&resultSubtextFontSize=0&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(117,120,112,0.20)&resultSelectedBackgroundColor=rgba(94,152,204,0.25)&shortcutColor=rgba(255,255,255,0.50)&scrollbarColor=rgba(255,255,255,0.50)&imageStyle=4&resultSubtextFont=Helvetica&background=rgba(0,0,0,0.00)&shortcutFontSize=0&searchFontSize=2&resultSubtextColor=rgba(255,255,255,0.75)&searchBackgroundColor=rgba(0,0,0,0.00)&name=Glass&resultTextFontSize=1&resultSelectedSubtextColor=rgba(255,255,255,0.75)&shortcutSelectedColor=rgba(255,255,255,0.50)&widthSize=4&border=rgba(169,189,222,0.30)&resultTextFont=Helvetica&resultTextColor=rgba(255,255,255,1.00)&cornerRoundness=1&searchFont=Helvetica&searchPaddingSize=1&credits=Shawn%20Patrick%20Rice&searchSelectionBackgroundColor=rgba(184,202,117,1.00)&resultSelectedTextColor=rgba(251,253,255,1.00)&resultPaddingSize=2&shortcutFont=Helvetica');
+  	setTimeout(function() { applyTheme("textarea#themeurltextarea"); }, 100);
+  }
+});
+
+$( 'button.theme-option' ).bind({
+	click: function() {
+		$( "textarea#themeurltextarea" ).val( $( this ).val() );
+		(applyTheme("textarea#themeurltextarea"));
+	}
+})
+
+$('document').ready(
+	function() { applyTheme("textarea#themeurltextarea"); }
+);
+
+
+</script>
