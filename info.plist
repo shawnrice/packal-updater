@@ -124,6 +124,25 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
+				<string>php search-result-action.php "{query}"</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>1DF6B24D-DEF2-4628-A54D-E416E6A71262</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
 				<string>php notifications.php "{query}"</string>
 				<key>type</key>
 				<integer>0</integer>
@@ -167,25 +186,6 @@
 			<string>alfred.workflow.input.scriptfilter</string>
 			<key>uid</key>
 			<string>5C87F438-BD85-4F90-84AC-04056F1CEC23</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>script</key>
-				<string>php search-result-action.php "{query}"</string>
-				<key>type</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>1DF6B24D-DEF2-4628-A54D-E416E6A71262</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>

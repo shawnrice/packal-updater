@@ -1,6 +1,7 @@
 <?php
 
 require_once( __DIR__ . '/includes.php' );
+require_once( __DIR__ . '/vendor/autoload.php' );
 
 class Submit {
 
@@ -12,11 +13,13 @@ class Submit {
 		$this->params = $params;
 		// Standard setup
 		$this->ch = curl_init();
-		// PACKAL_BASE_API_URL
-		curl_setopt( $this->ch, CURLOPT_URL, 'http://localhost:3000/' . $type . '/submit' );
+
+		curl_setopt( $this->ch, CURLOPT_URL, PACKAL_BASE_API_URL . 'alfred2/' . $type . '/submit' );
 		curl_setopt( $this->ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $this->ch, CURLOPT_POST, true );
-		curl_setopt( $this->ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' ) );
+		curl_setopt( $this->ch, CURLOPT_HTTPHEADER, array('Content-Type: multipart/form-data' ) );
+		curl_setopt( $this->ch, CURLOPT_SAFE_UPLOAD, true );
+
 
 		// Call the submit method
 		if ( ! call_user_func_array( [ $this, $type ], [ $params ] ) ) {
@@ -34,8 +37,10 @@ class Submit {
 		if ( ! $this->ensure_keys([ 'file', 'version' ], $params ) ) {
 			return false;
 		}
-		$params['file'] = '@' . realpath( $params['file'] );
-		$this->postData = [ 'workflow_revision' => $params, 'alfred_version' => 2 ];
+		$alphred = new Alphred;
+		$params['file'] = getCurlValue( $params['file'], 'application/zip', 'workflow.alfredworkflow' ) ;
+		$alphred->console( print_r( $params, true ), 4 );
+		$this->postData = [ 'workflow_revision' => $params ];
 		return true;
 	}
 
@@ -43,7 +48,7 @@ class Submit {
 		if ( ! $this->ensure_keys([ 'name', 'description', 'tags', 'uri' ], $params ) ) {
 			return false;
 		}
-		$params['alfred2'] = true;
+		$params['tags'] = implode( ',', $params['tags'] );
 		$this->postData = [ 'theme' => $params ];
 		return true;
 	}
@@ -59,7 +64,8 @@ class Submit {
 	private function standard() {
 		return [
 			'username' => $this->get_username(),
-			'password' => $this->get_password()
+			'password' => $this->get_password(),
+			'alfred_version' => 'alfred2',
 		];
 	}
 
@@ -75,13 +81,16 @@ class Submit {
 
 	public function execute() {
 		// I should add some error handling in this
-		$result = curl_exec($this->ch);
-		curl_close($this->ch);
+		print_r( var_dump($this->ch), true );
+		$result = curl_exec( $this->ch );
+		curl_close( $this->ch );
 		return $result;
 	}
 
 	private function build_data( ) {
-		curl_setopt( $this->ch, CURLOPT_POSTFIELDS, json_encode( $this->postData ) );
+		$alphred = new Alphred;
+
+		curl_setopt( $this->ch, CURLOPT_POSTFIELDS,  http_build_query($this->postData) );
 	}
 
 	private function ensure_keys( $keys, $params ) {
@@ -109,23 +118,21 @@ function submit_report( $params ) {
 	return $submission->execute();
 }
 
-// $workflow = submit_workflow([
-// 	'file' => '/Users/Sven/Desktop/Packal/data/pro.elms.paul.speedtest/speedtest.alfredworkflow'
-// ]);
-// print_r( json_decode( $workflow ), true );
 
-// $report = submit_report([ 'workflow_revision_id' => 3,
-//               	'report_type' => 'Malicious Code',
-//               	'message' => 'This is not good.'
-//               ]);
+// Helper function courtesy of https://github.com/guzzle/guzzle/blob/3a0787217e6c0246b457e637ddd33332efea1d2a/src/Guzzle/Http/Message/PostFile.php#L90
+function getCurlValue($filename, $contentType, $postname)
+{
+    // PHP 5.5 introduced a CurlFile object that deprecates the old @filename syntax
+    // See: https://wiki.php.net/rfc/curl-file-upload
+    // if (function_exists('curl_file_create')) {
+    //     return curl_file_create($filename);
+    // }
 
-// print_r( json_decode( $report ), true );
+    // Use the old style if using an older version of PHP
+    $value = $filename; //;filename=" . $postname;
+    // if ($contentType) {
+    //     $value .= ';type=' . $contentType;
+    // }
 
-// $theme = submit_theme([
-// 	'name' => 'Glass',
-// 	'description' => 'A beautiful, nearly transparent theme.',
-// 	'tags' => implode(',', [ 'transparent', 'minimal', 'glass' ]),
-// 	'uri' => 'alfred://theme/background=rgba(0,0,0,0.00)&border=rgba(169,189,222,0.30)&cornerRoundness=1&credits=Shawn%20Patrick%20Rice&imageStyle=4&name=Glass&resultPaddingSize=2&resultSelectedBackgroundColor=rgba(94,151,204,0.25)&resultSelectedSubtextColor=rgba(255,255,255,0.75)&resultSelectedTextColor=rgba(250,253,255,1.00)&resultSubtextColor=rgba(255,255,255,0.75)&resultSubtextFont=Helvetica&resultSubtextFontSize=0&resultTextColor=rgba(255,255,255,1.00)&resultTextFont=Helvetica&resultTextFontSize=1&scrollbarColor=rgba(255,255,255,0.50)&searchBackgroundColor=rgba(0,0,0,0.00)&searchFont=Helvetica&searchFontSize=2&searchForegroundColor=rgba(255,255,255,1.00)&searchPaddingSize=1&searchSelectionBackgroundColor=rgba(184,201,117,1.00)&searchSelectionForegroundColor=rgba(255,255,255,1.00)&separatorColor=rgba(117,120,112,0.20)&shortcutColor=rgba(255,255,255,0.50)&shortcutFont=Helvetica&shortcutFontSize=0&shortcutSelectedColor=rgba(255,255,255,0.50)&widthSize=4'
-//          ]);
-
-// print_r( json_decode( $theme ), true );
+    return $value;
+}

@@ -36,7 +36,7 @@ function check_connection() {
 }
 
 function main( $argv ) {
-	global $alphred, $separator, $icon_suffix, $api_available, $endpoints;
+	global $alphred, $separator, $icon_suffix, $api_available, $endpoints, $original_query;
 
 	$api_available = true;
 	// COMMENTED FOR TESTING
@@ -70,6 +70,7 @@ function main( $argv ) {
 
 	// Trim the spaces
 	array_walk( $parts, create_function( '&$val', '$val = strtolower(trim($val));' ) );
+	$original_query = $query;
 	foreach ( $parts as $key => $part ) :
 		if ( empty( $part ) ) {
 			unset( $parts[ $key ] );

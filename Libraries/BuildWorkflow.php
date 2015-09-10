@@ -153,11 +153,11 @@ class BuildWorkflow {
 
 	private function create_archive() {
 		$zip = new ZipArchive();
-		if ( true !== $zip->open( "{$this->tmp}/workflow.alfredworkflow", ZipArchive::CREATE ) ) {
+		if ( true !== $zip->open( $this->archive_name(), ZipArchive::CREATE ) ) {
 	    return false;
 		}
 		foreach( $this->files as $file ) :
-			$zip->addFile( $file, str_replace( $this->tmp, '', $file ) );
+			$zip->addFile( $file, str_replace( $this->tmp . '/', '', $file ) );
 		endforeach;
 		$zip->close();
 	}
@@ -192,9 +192,9 @@ class BuildWorkflow {
 		if ( ! file_exists( "{$this->directory}/info.plist" ) ) {
 			return false;
 		}
-		// if ( ! file_exists( "{$this->directory}/workflow.ini" ) ) {
-		// 	return false;
-		// }
+		if ( ! file_exists( "{$this->directory}/workflow.ini" ) ) {
+			return false;
+		}
 		return true;
 	}
 
@@ -251,6 +251,6 @@ class BuildWorkflow {
 
 }
 
-$dir = '/Users/Sven/Dropbox/app syncing/alfred2/Alfred.alfredpreferences/workflows/user.workflow.67A4F4B2-CAD7-41E5-8EC9-322620012FFF';
-$archive = new BuildWorkflow( $dir );
-echo $archive->archive_name();
+// $dir = '/Users/Sven/Dropbox/app syncing/alfred2/Alfred.alfredpreferences/workflows/user.workflow.67A4F4B2-CAD7-41E5-8EC9-322620012FFF';
+// $archive = new BuildWorkflow( $dir );
+// echo $archive->archive_name();

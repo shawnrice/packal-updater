@@ -1,18 +1,25 @@
 <?php
 
 require_once( __DIR__ . '/includes.php' );
+require_once( __DIR__ . '/generate-workflow-ini.php' );
+require_once( __DIR__ . '/Libraries/BuildWorkflow.php' );
+require_once( __DIR__ . '/submit.php' );
+use Alphred\Ini as Ini;
 
 class Action {
 
 	public function __construct( $args ) {
 		$args = json_decode( $args, true );
 		$this->alphred = new Alphred;
-		print_r( $args );
+		// print_r( $args );
 		$this->action   = $args['action'];
-		$this->target   = isset( $args['target'] ) ? $args['target'] : false;
-		$this->workflow = isset( $args['workflow'] ) ? $args['workflow'] : false;
 		$this->base_url = PACKAL_BASE_API_URL;
-		$this->path     = isset( $args['path'] ) ? $args['path'] : false;
+
+		foreach( [ 'target', 'workflow', 'path', 'theme', 'value' ] as $key ) :
+			$this->$key = isset( $args[ $key ] ) ? $args[ $key ] : false;
+		endforeach;
+
+		/* @todo I NEED TO FIX THESE MESSAGES */
 		$this->messages = [
 			'status' => 'pass',
 			'action' => ( $this->target ) ? $this->action . ' ' . $this->target : $this->action
@@ -27,31 +34,77 @@ class Action {
 				break;
 			case 'open':
 				$this->open( $this->target );
+				if ( false !== strpos( $this->target, 'alfred://' ) ) {
+					$this->post_download( 'theme', [ 'theme' => $this->theme['id'], 'name' => $this->theme['name'] ] );
+				}
 				break;
 			case 'download':
+				if ( $this->workflow ) {
+					$this->post_download( 'workflow',
+					                     [
+					                     	'workflow' => $this->workflow['id'],
+					                     	'revision' => $this->workflow['revision_id'],
+
+					                     ]
+					);
+				}
 				$this->download( $this->target );
 				break;
 			case 'install':
+				if ( $this->workflow ) {
+					$this->post_download( 'workflow',
+					                     [
+					                     	'workflow' => $this->workflow['id'],
+					                     	'revision' => $this->workflow['revision_id'],
+
+					                     ]
+					);
+				}
 				$this->install( $this->target );
 				break;
-			case 'submit':
+			case 'submit_theme':
 				// @todo finish writing this
-				$this->submit( 'theme', false );
+				$this->submit( 'theme', $this->theme );
+				break;
+			case 'submit_workflow':
+				// @todo finish writing this
+				$this->submit( 'workflow', $this->path );
 				break;
 			case 'generate_ini':
 				$this->generate_ini( $this->path );
+				break;
+			case 'configure':
+				$this->configure( $this->target, $this->value );
 				break;
 		endswitch;
 		if ( ! isset( $this->messages[ 'messages' ] ) ) {
 			$this->messages['messages'] = [ 'Success!' ];
 		}
 		// Output the messages for the notifier.
+		// print_r( json_encode( $this->messages ) );
 		return json_encode( $this->messages );
 	}
 
+	private function configure( $key, $value = false ) {
+		if ( 'password' == $key ) {
+			$password = $this->alphred->get_password_dialog(
+				'Please enter your Packal.org password. If you do not have one, then please make an account on Packal.org and then set this.',
+				'Packal Workflow'
+			);
+			if ( 'canceled' !== $password ) {
+				$this->alphred->save_password( 'packal.org', $password );
+				$this->alphred->console( 'Set Packal.org password in the keychain', 1 );
+				$this->messages['messages'] = [ 'Successfully set Packal.org password.' ];
+			} else {
+				$this->alphred->console( 'Canceled `set password` operation.', 1 );
+			}
+			return;
+		}
+		$this->alphred->config_set( $key, $value );
+	}
+
 	private function generate_ini( $path ) {
-		// Shawn, seriously? Like, fix this shit.
-		exec( "php '" . __DIR__ . "/generate-workflow-ini.php' '{$path}'" );
+		generate_ini( $path );
 	}
 
 	private function get_filename( $url ) {
@@ -80,29 +133,129 @@ class Action {
 
 	private function submit( $type, $resource ) {
 		if ( 'theme' == $type ) {
-			echo "IN SUBMIT";
 			$this->submit_theme( $resource );
+		} else if ( 'workflow' == $type ) {
+			$this->submit_workflow( $resource );
 		}
+	}
+
+	/**
+	 * [post_download description]
+	 *
+	 * Sends a POST request to track downloads / installs on workflows and themes.
+	 *
+	 * @param  [type] $type       [description]
+	 * @param  [type] $properties [description]
+	 * @return [type]             [description]
+	 */
+	private function post_download( $type, $properties ) {
+		$id = ( 'theme' == $type ) ? $properties['theme'] : $properties['workflow'];
+		$json = [
+				'id' => self::uuid(),
+				'visit_id' => self::uuid(),
+				'user_id' => null,
+				'name' => "{$type}-{$id}",
+				'properties' => $properties,
+				'time' =>	date_format( date_create('now', new DateTimeZone( 'Etc/UTC' ) ), 'Y-m-d H:i:s' ),
+				'theme_id' => ($type == 'theme') ? $id : null,
+				'workflow_revision_id' => ($type == 'workflow') ? (int)$properties['revision'] : null,
+				'workflow_id' => ($type == 'workflow') ? $id : null,
+		];
+		// I wanted to use $alphred->post, but it doesn't encode the query fields correctly.
+		$c = curl_init('http://localhost:3000/ahoy/events');
+		curl_setopt( $c, CURLOPT_POST, true );
+		curl_setopt( $c, CURLOPT_POSTFIELDS, json_encode( $json ) );
+		curl_setopt( $c, CURLOPT_HTTPHEADER, [ 'Content-Type: application/json' ]);
+		curl_setopt( $c, CURLOPT_RETURNTRANSFER, true );
+		curl_exec( $c );
+		curl_close( $c );
+	}
+
+	private function uuid() {
+		return self::random(8) . '-' . self::random(4) . '-' . self::random(4) . '-' . self::random(4). '-' . self::random(12);
+	}
+
+	private function random( $length ) {
+		$string = 'abcdef0123456789';
+		$value = '';
+		for ( $i = 0; $i < $length; $i++ ) :
+			$value .= substr( $string, rand( 0, 15 ), 1 );
+		endfor;
+		return $value;
 	}
 
 	private function submit_theme( $theme ) {
-		$this->submit_build_theme_info( ['name' => 'Glass' ] );
+		$metadata = $this->submit_build_theme_info( $theme );
+		$uri = $theme['uri'];
+		// print_r( $metadata );
+		submit_theme([
+		  'uri' => $theme['uri'],
+		  'description' => $metadata['theme_description'],
+		  'tags' => $metadata['theme_tags'],
+		  'name' => $theme['name'],
+		]);
+
 	}
 
-	private function submit_workflow( $workflow ) {
+	private function submit_workflow( $workflow_path ) {
+		$alphred = new Alphred;
+		if ( ! $username = $alphred->config_read( 'username' ) ) {
+			$alphred->console( 'Could not read username in the config file.', 4 );
+			$dialog = new \Alphred\Dialog([
+				'title' => 'Packal Error: No Username Set',
+				'text' => 'Please set your username with the `config` option to submit a workflow',
+				'button' => 'Okay',
+				'icon' => 'stop',
+			]);
+			$dialog->execute();
+			return;
+		}
+		if ( ! $password = $alphred->get_password( 'packal.org' ) ) {
+			$dialog = new \Alphred\Dialog([
+				'title' => 'Packal Error: No Password Set',
+				'text' => 'Please set your password with the `config` option to submit a workflow',
+				'icon' => 'stop',
+			]);
+			$dialog->execute();
+			return;
+		}
+		$ini = Ini::read_ini( "{$workflow_path}/workflow.ini" );
+		$version = $ini['workflow']['version'];
+		if ( file_exists( "{$workflow_path}/screenshots" ) ) {
+			$workflow = new BuildWorkflow( $workflow_path, "{$workflow_path}/screenshots" );
+		} else {
+			$workflow = new BuildWorkflow( $workflow_path );
+		}
+		// Let's actually do some submitting here
+		$json = json_encode( [
+      'file' => $workflow->archive_name(),
+      'username' => $username,
+      'password' => $password,
+      'version' => $version,
+		]);
+		// Okay, I have no idea how to fix this, but PHP's cURL keeps sending the file simply as
+		// the string that is the filename. That should not be happening because of the '@' in
+		// front of it, but it isn't working no matter what I do. The problem comes from the fact
+		// that the file is in a subarray, and cURL just won't recognize the file as a file while
+		// in the subarray. So, poo, poo.
+		// submit_workflow([ 'file' => '@' . $workflow->archive_name(), 'version' => $version ]);
 
+		// This is a hack, and it might not be sustainable. But, this is at least my temporary
+		// solution in order to get around the above problem.
+		exec("ruby '" . __DIR__ . "/workflow_upload.rb' '" . $json . "'", $output );
+		$alphred->console( print_r( $output, true ), 4 );
 	}
 
 	private function submit_build_theme_info( $theme ) {
-		$file = $this->slugify( $theme['name'] );
-		$file = "{$_SERVER['alfred_workflow_data']}/data/themes/submit-{$file}.json";
+		$file = "{$_SERVER['alfred_workflow_data']}/data/themes/submit-" . $this->slugify( $theme['name'] ) . "json";
 		if ( file_exists( $file ) ) {
 			$data = json_decode( file_get_contents( $file ), true );
 		} else {
-			$data = ['theme_name' => $theme['name'], 'theme_description' => '', 'theme_tags' => [] ];
+			$data = [ 'theme_description' => '', 'theme_tags' => [] ];
 		}
+		$data['theme_name'] = $theme['name'];
 		$metadata = $this->create_build_theme_info_dialog( $data );
-		if ( '0' == $metadata['cb'] ) {
+		if ( $metadata ) {
 			unset( $metadata['cb'] );
 			$this->alphred->console( "Saving theme information for `{$theme['name']}`.", 1 );
 			file_put_contents( $file, json_encode( $metadata, JSON_PRETTY_PRINT ) );
@@ -112,8 +265,7 @@ class Action {
 			// $alphred->notify('Should we put some notification here.')
 			exit(1);
 		}
-
-
+		return $metadata;
 	}
 
 	private function create_build_theme_info_dialog( $data ) {
@@ -121,6 +273,10 @@ class Action {
 		$conf = file_get_contents( __DIR__ . '/Resources/pashau-theme-config.ini' );
 		$data['theme_tags'] = implode( '[return]', $data['theme_tags'] );
 		foreach ( $data as $key => $val ) :
+			$conf = str_replace( '%%' . $key . '%%', $val, $conf );
+		endforeach;
+		$values = [ 'theme_name' => $data['theme_name'] ];
+		foreach ( $values as $key => $val ) :
 			$conf = str_replace( '%%' . $key . '%%', $val, $conf );
 		endforeach;
 		$config = tempnam( '/tmp', 'Pashua_' );
@@ -141,6 +297,9 @@ class Action {
 		        continue;
 		    }
 		    $parsed[ $matches[1] ] = $matches[2];
+		}
+		if ( 1 == $parsed['cb'] ) {
+			return false;
 		}
 		$parsed['theme_tags'] = explode( '[return]', $parsed['theme_tags'] );
 		if ( empty( $parsed['theme_tags'][0] ) ) {

@@ -51,7 +51,7 @@ function submit_theme_menu( $query = false ) {
 		$alphred->add_result([
 		  'title' => "Submit {$theme['name']} to Packal.org",
 		  'valid' => true,
-		  'arg'  => json_encode( [ 'action' => 'submit' ] ),
+		  'arg'  => json_encode( [ 'action' => 'submit_theme', 'theme' => $theme ] ),
 		]);
 	endforeach;
 }
@@ -60,7 +60,6 @@ function submit_theme_menu( $query = false ) {
 function submit_workflow_menu( $query = false ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
 	$packal_workflows = get_packal_workflows();
-
 	$me = 'Shawn Patrick Rice';
 	$ttl = $alphred->config_read( 'workflow_map_cache' );
 	$workflows = json_decode( file_get_contents( MapWorkflows::my_workflows_path() ), true );
@@ -70,6 +69,7 @@ function submit_workflow_menu( $query = false ) {
 		$generate = true;
 		$valid = true;
 		$arg = false;
+
 		if ( $workflow_ini ) {
 			if ( true === ( $subtitle = validate_workflow_ini_file( $workflow, $packal_workflows ) ) ) {
 				$subtitle = 'Ready to submit.';
@@ -78,23 +78,22 @@ function submit_workflow_menu( $query = false ) {
 					'action' => 'submit_workflow',
 					'path' => $workflow['path'],
 				]);
+			} else {
+				$subtitle = "Edit workflow.ini: {$subtitle}";
 			}
 		} else {
 			$subtitle = 'Generate workflow.ini file';
 		}
 		if ( true === $generate ) {
-			$valid = true;
 			$arg = json_encode([ 'action' => 'generate_ini', 'path' => $workflow['path'] ]);
 		} else {
 			// We should be here if there are errors in the workflow.ini file, but, currently,
 			// we are not.
-			echo $subtitle;
-			$valid = false;
 		}
 
 		$alphred->add_result([
 			'title' => "Submit a {$workflow['name']}",
-			'icon' => $workflow['path'] . '/icon.png',
+			'icon' => "{$workflow['path']}/icon.png",
 			'subtitle' => $subtitle,
 			'valid' => $valid,
 			'arg' => $arg,
@@ -108,6 +107,7 @@ function get_packal_workflows() {
 }
 
 function validate_workflow_ini_file( $workflow, $packal_workflows ) {
+	global $alphred;
 	$ini = $workflow['path'] . '/workflow.ini';
 	foreach( json_decode( $packal_workflows, true )['workflows'] as $w ) :
 		if ( ! isset( $w['bundle'] ) ) {
@@ -116,6 +116,7 @@ function validate_workflow_ini_file( $workflow, $packal_workflows ) {
 		if ( $workflow['bundle'] != $w['bundle'] ) {
 			continue;
 		} else {
+			$alphred->console( "VERSION: {$w['version']}", 4 );
 			$packal_version = $w['version'];
 			break;
 		}
@@ -142,7 +143,8 @@ function validate_workflow_ini_file( $workflow, $packal_workflows ) {
 		if ( version::gt( $packal_version, $ini['workflow']['version'] ) ) {
 			return true;
 		} else {
-			return 'A version the same or greater has already been submitted on Packal. Please update the workflow.ini file';
+			// return 'A version the same or greater has already been submitted on Packal. Please update the workflow.ini file';
+			return true;
 		}
 	} else {
 		return true;

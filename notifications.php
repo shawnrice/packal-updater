@@ -8,7 +8,9 @@ if ( ! isset( $argv[1] ) || ! ( $messages = json_decode( $argv[1], true ) ) ) {
 }
 
 $alphred  = new Alphred;
-$messages = json_decode( $argv[1], true );
+
+print_r( $messages );
+
 $alphred->send_notification([
   'title' 	 => 'Packal',
   'subtitle' => ( 'pass' == $messages[ 'status' ] ) ?

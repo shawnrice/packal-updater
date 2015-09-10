@@ -2,17 +2,23 @@
 
 function create_configure_menu( $query = false) {
 	global $alphred, $separator, $icon_suffix;
+
+	$username = ( $alphred->config_read( 'username' ) ) ? $alphred->config_read( 'username' ) : 'not set';
+	$password =	( $alphred->get_password( 'packal.org' ) ) ? 'Password is set.' : 'Password is not set.';
+
 	$alphred->add_result([
 		'title' => 'Set Username',
 		'uid' => 'packal-configure-username',
 		'arg' => 'packal-configure-username',
+		'subtitle' => "Current: {$username}.",
 		'autocomplete' => "configure{$separator}username{$separator}",
 		'valid' => false,
 	]);
 	$alphred->add_result([
 		'title' => 'Set Password',
 		'uid' => 'packal-configure-password',
-		'arg' => 'packal-configure-password',
+		'subtitle' => $password,
+		'arg' => json_encode([ 'action' => 'configure', 'target' => 'password' ]),
 		'valid' => true,
 	]);
 	$alphred->add_result([
@@ -25,24 +31,29 @@ function create_configure_menu( $query = false) {
 }
 
 function config_set_username_menu( $query = false ) {
-	global $alphred, $separator, $icon_suffix;
+	global $alphred, $separator, $icon_suffix, $original_query;
+	$subtitle = 'Current: ' . $alphred->config_read( 'username' ) . '. ';
+
+	// We need to do this below to get the case correct for the name
+	$name = end( explode( $separator, $original_query ) );
 	$title = 'Set Packal username to: ';
 	if ( $query ) {
-		$title = "{$title}`{$query}`";
+		$title = "{$title}`{$name}`";
 	}
 	$valid = false;
 	if ( strlen( $query ) > 3 ) {
 		$valid = true;
 	}
 	if ( ! $valid ) {
-		$subtitle = "Keep typing for a valid username.";
+		$subtitle .= "Keep typing for a valid username.";
 	} else {
-		$subtitle = '';
+		$subtitle .= '';
 	}
 	$alphred->add_result([
   	'title' => $title,
   	'subtitle' => $subtitle,
   	'valid' => $valid,
+  	'arg' => json_encode([ 'action' => 'configure', 'target' => 'username', 'value' => $name ]),
 	]);
 }
 
@@ -69,16 +80,23 @@ function create_blacklist_menu( $query = false ) {
 	$query = str_replace( ' - false', '', $query );
 	$query = str_replace( ' - true', '', $query );
 	$workflows = json_decode(
-	                file_get_contents(
-	                  "{$_SERVER['alfred_workflow_data']}/data/workflows/workflow_map.json"
-	                ), true
-	              );
+    file_get_contents(
+      "{$_SERVER['alfred_workflow_data']}/data/workflows/workflow_map.json"
+    ),
+    true
+	);
 
 	if ( file_exists( "{$_SERVER['alfred_workflow_data']}/data/workflows/blacklist.json" ) ) {
-		$blacklist = json_decode( file_get_contents( "{$_SERVER['alfred_workflow_data']}/data/workflows/blacklist.json" ), true );
+		$blacklist = json_decode(
+		  file_get_contents( "{$_SERVER['alfred_workflow_data']}/data/workflows/blacklist.json" ),
+		  true
+		);
 	} else {
 		$blacklist = [];
-		file_put_contents( "{$_SERVER['alfred_workflow_data']}/data/workflows/blacklist.json", json_encode( $blacklist, JSON_PRETTY_PRINT ) );
+		file_put_contents(
+		  "{$_SERVER['alfred_workflow_data']}/data/workflows/blacklist.json",
+		  json_encode( $blacklist, JSON_PRETTY_PRINT )
+		);
 	}
 	if ( $query ) {
 		foreach ( $workflows as $workflow ) :
@@ -88,7 +106,10 @@ function create_blacklist_menu( $query = false ) {
 				} else if ( isset( $action ) && 'whitelist' == $action ) {
 				 $blacklist[ $query ] = false;
 				}
-				file_put_contents( "{$_SERVER['alfred_workflow_data']}/data/workflows/blacklist.json", json_encode( $blacklist, JSON_PRETTY_PRINT ) );
+				file_put_contents(
+				  "{$_SERVER['alfred_workflow_data']}/data/workflows/blacklist.json",
+				  json_encode( $blacklist, JSON_PRETTY_PRINT )
+				);
 				break;
 			}
 		endforeach;
