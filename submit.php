@@ -5,6 +5,7 @@ require_once( __DIR__ . '/includes.php' );
 class Submit {
 
 	public function __construct( $type, $params ) {
+		$this->alphred = new Alphred;
 		$types = [ 'workflow', 'theme', 'report' ];
 		if ( ! in_array( $type, $types ) ) {
 			die( "$type is not a valid type. Valid types are: " . implode( ', ', $types ) );
@@ -63,13 +64,11 @@ class Submit {
 	}
 
 	private function get_username() {
-		// This is obviously temporary
-		return 'Shawn Patrick Rice';
+		return $this->alphred->config_read( 'username' );
 	}
 
 	private function get_password() {
-		// This is obviously temporary
-		return '12345678';
+		return $this->alphred->get_password( 'packal.org' );
 	}
 
 	public function execute() {

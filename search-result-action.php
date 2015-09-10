@@ -76,13 +76,59 @@ class Action {
 			case 'configure':
 				$this->configure( $this->target, $this->value );
 				break;
+			case 'report':
+				$this->report();
+				break;
 		endswitch;
 		if ( ! isset( $this->messages[ 'messages' ] ) ) {
 			$this->messages['messages'] = [ 'Success!' ];
 		}
 		// Output the messages for the notifier.
-		// print_r( json_encode( $this->messages ) );
 		return json_encode( $this->messages );
+	}
+
+	private function report() {
+		$path = __DIR__ . '/Pashua.app/Contents/MacOS/Pashua';
+		$conf = file_get_contents( __DIR__ . '/Resources/pashau-report-config.ini' );
+		$values = [ 'workflow_name' => $this->workflow['name'],
+								'version' => $this->workflow['version'],
+								'revision' => $this->workflow['revision_id'],
+								'workflow' => $this->workflow['id'],
+		];
+		foreach ( $values as $key => $val ) :
+			$conf = str_replace( '%%' . $key . '%%', $val, $conf );
+		endforeach;
+
+
+		$config = tempnam( '/tmp', 'Pashua_' );
+		if ( false === $fp = @fopen( $config, 'w' ) ) {
+		    throw new \RuntimeException( "Error trying to open {$config}" );
+		}
+		fwrite( $fp, $conf );
+		fclose( $fp );
+
+		// Call pashua binary with config file as argument and read result
+		$result = shell_exec( escapeshellarg( $path ) . ' ' . escapeshellarg( $config ) );
+		@unlink( $config );
+	  // Parse result
+		$parsed = array();
+		foreach ( explode( "\n", $result ) as $line ) {
+	    preg_match( '/^(\w+)=(.*)$/', $line, $matches );
+	    if ( empty( $matches ) or empty( $matches[1] ) ) {
+	        continue;
+	    }
+	    $parsed[ $matches[1] ] = $matches[2];
+		}
+		if ( 1 == $parsed['cb'] ) {
+			return false;
+		}
+		print_r( $parsed );
+		$params = [
+			'workflow_revision_id' => $parsed['revision'],
+			'report_type' => $parsed['type'],
+			'message' => $parsed['message']
+		];
+		return submit_report( $params );
 	}
 
 	private function configure( $key, $value = false ) {
@@ -198,9 +244,8 @@ class Action {
 	}
 
 	private function submit_workflow( $workflow_path ) {
-		$alphred = new Alphred;
-		if ( ! $username = $alphred->config_read( 'username' ) ) {
-			$alphred->console( 'Could not read username in the config file.', 4 );
+		if ( ! $username = $this->alphred->config_read( 'username' ) ) {
+			$this->alphred->console( 'Could not read username in the config file.', 4 );
 			$dialog = new \Alphred\Dialog([
 				'title' => 'Packal Error: No Username Set',
 				'text' => 'Please set your username with the `config` option to submit a workflow',
@@ -210,7 +255,7 @@ class Action {
 			$dialog->execute();
 			return;
 		}
-		if ( ! $password = $alphred->get_password( 'packal.org' ) ) {
+		if ( ! $password = $this->alphred->get_password( 'packal.org' ) ) {
 			$dialog = new \Alphred\Dialog([
 				'title' => 'Packal Error: No Password Set',
 				'text' => 'Please set your password with the `config` option to submit a workflow',
@@ -234,7 +279,7 @@ class Action {
       'version' => $version,
 		]);
 		$output = submit_workflow([ 'file' => $workflow->archive_name(), 'version' => $version ]);
-		$alphred->console( print_r( $output, true ), 4 );
+		$this->alphred->console( print_r( $output, true ), 4 );
 	}
 
 	private function submit_build_theme_info( $theme ) {

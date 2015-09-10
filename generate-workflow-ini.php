@@ -91,7 +91,7 @@ function pashua_dialog( $directory, $workflow ) {
 	$conf = str_replace( '##CATEGORIES##', $temp, $conf );
 	$config = tempnam( '/tmp', 'Pashua_' );
 	if ( false === $fp = @fopen( $config, 'w' ) ) {
-	    throw new \RuntimeException( "Error trying to open {$configfile}" );
+	    throw new \RuntimeException( "Error trying to open {$config}" );
 	}
 	fwrite( $fp, $conf );
 	fclose( $fp );
