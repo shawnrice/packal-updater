@@ -233,16 +233,7 @@ class Action {
       'password' => $password,
       'version' => $version,
 		]);
-		// Okay, I have no idea how to fix this, but PHP's cURL keeps sending the file simply as
-		// the string that is the filename. That should not be happening because of the '@' in
-		// front of it, but it isn't working no matter what I do. The problem comes from the fact
-		// that the file is in a subarray, and cURL just won't recognize the file as a file while
-		// in the subarray. So, poo, poo.
-		// submit_workflow([ 'file' => '@' . $workflow->archive_name(), 'version' => $version ]);
-
-		// This is a hack, and it might not be sustainable. But, this is at least my temporary
-		// solution in order to get around the above problem.
-		exec("ruby '" . __DIR__ . "/workflow_upload.rb' '" . $json . "'", $output );
+		$output = submit_workflow([ 'file' => $workflow->archive_name(), 'version' => $version ]);
 		$alphred->console( print_r( $output, true ), 4 );
 	}
 

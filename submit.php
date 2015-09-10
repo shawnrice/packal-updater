@@ -1,7 +1,6 @@
 <?php
 
 require_once( __DIR__ . '/includes.php' );
-require_once( __DIR__ . '/vendor/autoload.php' );
 
 class Submit {
 
@@ -13,13 +12,10 @@ class Submit {
 		$this->params = $params;
 		// Standard setup
 		$this->ch = curl_init();
-
 		curl_setopt( $this->ch, CURLOPT_URL, PACKAL_BASE_API_URL . 'alfred2/' . $type . '/submit' );
 		curl_setopt( $this->ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $this->ch, CURLOPT_POST, true );
-		curl_setopt( $this->ch, CURLOPT_HTTPHEADER, array('Content-Type: multipart/form-data' ) );
 		curl_setopt( $this->ch, CURLOPT_SAFE_UPLOAD, true );
-
 
 		// Call the submit method
 		if ( ! call_user_func_array( [ $this, $type ], [ $params ] ) ) {
@@ -37,9 +33,6 @@ class Submit {
 		if ( ! $this->ensure_keys([ 'file', 'version' ], $params ) ) {
 			return false;
 		}
-		$alphred = new Alphred;
-		$params['file'] = getCurlValue( $params['file'], 'application/zip', 'workflow.alfredworkflow' ) ;
-		$alphred->console( print_r( $params, true ), 4 );
 		$this->postData = [ 'workflow_revision' => $params ];
 		return true;
 	}
@@ -81,16 +74,20 @@ class Submit {
 
 	public function execute() {
 		// I should add some error handling in this
-		print_r( var_dump($this->ch), true );
 		$result = curl_exec( $this->ch );
 		curl_close( $this->ch );
 		return $result;
 	}
 
 	private function build_data( ) {
-		$alphred = new Alphred;
-
-		curl_setopt( $this->ch, CURLOPT_POSTFIELDS,  http_build_query($this->postData) );
+		if ( isset( $this->postData['workflow_revision'] ) ) {
+			$this->postData['workflow_revision[version]'] = $this->postData['workflow_revision']['version'];
+			unset( $this->postData['workflow_revision'] );
+			// Pass to a weird function that I did not write but that seems to work
+			curl_custom_postfields( $this->ch, $this->postData, [ $this->params['file'] ] );
+		} else {
+			curl_setopt( $this->ch, CURLOPT_POSTFIELDS,  http_build_query( $this->postData ) );
+		}
 	}
 
 	private function ensure_keys( $keys, $params ) {
@@ -118,21 +115,77 @@ function submit_report( $params ) {
 	return $submission->execute();
 }
 
+// FROM PHP.NET, this is kind of a hacky way to get it to work, but it works!
+/**
+ * For safe multipart POST request for PHP5.3 ~ PHP 5.4.
+ *
+ * @param resource $ch cURL resource
+ * @param array $assoc "name => value"
+ * @param array $files "name => path"
+ * @return bool
+ */
+function curl_custom_postfields($ch, array $assoc = array(), array $files = array()) {
 
-// Helper function courtesy of https://github.com/guzzle/guzzle/blob/3a0787217e6c0246b457e637ddd33332efea1d2a/src/Guzzle/Http/Message/PostFile.php#L90
-function getCurlValue($filename, $contentType, $postname)
-{
-    // PHP 5.5 introduced a CurlFile object that deprecates the old @filename syntax
-    // See: https://wiki.php.net/rfc/curl-file-upload
-    // if (function_exists('curl_file_create')) {
-    //     return curl_file_create($filename);
-    // }
+    // invalid characters for "name" and "filename"
+    static $disallow = array("\0", "\"", "\r", "\n");
 
-    // Use the old style if using an older version of PHP
-    $value = $filename; //;filename=" . $postname;
-    // if ($contentType) {
-    //     $value .= ';type=' . $contentType;
-    // }
+    // initialize body
+    $body = array();
 
-    return $value;
+    // build normal parameters
+    foreach ($assoc as $k => $v) {
+        $k = str_replace($disallow, "_", $k);
+        $body[] = implode("\r\n", array(
+            "Content-Disposition: form-data; name=\"{$k}\"",
+            "",
+            filter_var($v),
+        ));
+    }
+
+    // build file parameters
+    foreach ($files as $k => $v) {
+        switch (true) {
+            case false === $v = realpath(filter_var($v)):
+            case !is_file($v):
+            case !is_readable($v):
+                continue; // or return false, throw new InvalidArgumentException
+        }
+        $data = file_get_contents($v);
+        $v = call_user_func("end", explode(DIRECTORY_SEPARATOR, $v));
+
+        // THIS IS A TERRIBLE HACK
+        $k = 'workflow_revision[file]';
+        list($k, $v) = str_replace($disallow, "_", array($k, $v));
+        $body[] = implode("\r\n", array(
+            "Content-Disposition: form-data; name=\"{$k}\"; filename=\"{$v}\"",
+            "Content-Type: application/octet-stream",
+            "",
+            $data,
+        ));
+    }
+
+    // generate safe boundary
+    do {
+        $boundary = "---------------------" . md5(mt_rand() . microtime());
+    } while (preg_grep("/{$boundary}/", $body));
+
+    // add boundary for each parameters
+    array_walk($body, function (&$part) use ($boundary) {
+        $part = "--{$boundary}\r\n{$part}";
+    });
+
+    // add final boundary
+    $body[] = "--{$boundary}--";
+    $body[] = "";
+
+    // set options
+    return curl_setopt_array($ch, array(
+        CURLOPT_POST       => true,
+        CURLOPT_POSTFIELDS => implode("\r\n", $body),
+        CURLOPT_HTTPHEADER => array(
+            "Expect: 100-continue",
+            "Content-Type: multipart/form-data; boundary={$boundary}", // change Content-Type
+        ),
+    ));
+
 }
