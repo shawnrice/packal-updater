@@ -250,7 +250,3 @@ class BuildWorkflow {
 	}
 
 }
-
-// $dir = '/Users/Sven/Dropbox/app syncing/alfred2/Alfred.alfredpreferences/workflows/user.workflow.67A4F4B2-CAD7-41E5-8EC9-322620012FFF';
-// $archive = new BuildWorkflow( $dir );
-// echo $archive->archive_name();

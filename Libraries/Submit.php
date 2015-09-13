@@ -1,7 +1,5 @@
 <?php
 
-require_once( __DIR__ . '/includes.php' );
-
 class Submit {
 
 	public function __construct( $type, $params ) {

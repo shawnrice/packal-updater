@@ -13,17 +13,12 @@ function create_search_menu( $possible ) {
   	'uid' => 'packal-search-workflow',
   	'autocomplete' => "search{$separator}workflow{$separator}",
   	'valid' => false,
-
 	]);
 }
 
-
 function render_workflows( $workflows, $query ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
-	// print_r( $workflows );
-	$workflows = json_decode( $workflows, true );
-	$workflows = $workflows['workflows'];
-
+	$workflows = json_decode( $workflows, true )['workflows'];
 	if ( ! empty( $query ) ) {
 		$singular = false;
 		foreach( $workflows as $workflow ) :
@@ -35,19 +30,15 @@ function render_workflows( $workflows, $query ) {
 			}
 		endforeach;
 		if ( ! $singular ) {
-			$workflows = $alphred->filter(
-			  $workflows,
-			  $query,
-			  'name',
-			  [ 'match_type' => MATCH_SUBSTRING | MATCH_ALLCHARS | MATCH_STARTSWITH | MATCH_ATOM ]
-			);
+			$workflows = $alphred->filter( $workflows, $query, 'name', [ 'match_type' => DEFAULT_FILTER_PARAMS ] );
 		}
 	}
 	if ( isset( $singular ) && $singular ) {
 		if ( $api_available ) {
 			$alphred->add_result([
 				'title'    => "{$workflow['name']} (v{$workflow['version']}) by {$workflow['author']}",
-				'icon' 		 => get( $workflow['icon'], 604800 + rand(100000, 200000) )[1],
+				// Download the icon and put a cache expiry from eight to seventeen days
+				'icon' 		 => get( $workflow['icon'], false, 604800 + rand(100000, 900000), PRIMARY_CACHE_BIN . '-icons' )[1],
 				'subtitle' => $workflow['description'],
 				'valid'    => false,
 			]);
@@ -115,7 +106,7 @@ function render_workflows( $workflows, $query ) {
 		} else {
 			$alphred->add_result([
 				'title'    => "{$workflow['name']} (v{$workflow['version']}) by {$workflow['author']}",
-				'icon' 		 => get( $workflow['icon'], 604800 + rand(100000, 200000) )[1],
+				'icon' 		 => get( $workflow['icon'], false, 604800 + rand(100000, 900000), PRIMARY_CACHE_BIN . '-icons' )[1],
 				'subtitle' => $workflow['description'],
 				'valid'    => false,
 			]);
@@ -164,9 +155,8 @@ function render_workflows( $workflows, $query ) {
 			'valid' => false,
 		]);
 		foreach ( $workflows as $workflow ) :
-			$request = get( $workflow['icon'], 86400 );
 			$alphred->add_result([
-		    'icon' => $request[1],
+		    'icon' => get( $workflow['icon'], false, 604800 + rand(100000, 900000), PRIMARY_CACHE_BIN . '-icons' )[1],
 		    'title' => "{$workflow['name']} (v{$workflow['version']})",
 		    'subtitle' => substr( "{$workflow['description']}", 0, 120 )
 		    				. ' (last updated: ' . $alphred->fuzzy_time_diff( strtotime( $workflow['updated'] ) ) . ')',
@@ -182,13 +172,7 @@ function render_themes( $themes, $query ) {
 	$themes = json_decode( $themes, true );
 	$themes = $themes['themes'];
 	if ( ! empty( $query ) ) {
-		$themes = $alphred->filter(
-		  $themes,
-		  $query,
-		  'name',
-		  //  && MATCH_ATOM && MATCH_INITIALS  &&
-		  [ 'match_type' => MATCH_SUBSTRING | MATCH_ALLCHARS | MATCH_STARTSWITH | MATCH_ATOM ]
-		);
+		$themes = $alphred->filter( $themes, $query, 'name', [ 'match_type' => DEFAULT_FILTER_PARAMS ] );
 	}
 
 	$singular = false;
@@ -210,7 +194,7 @@ function render_themes( $themes, $query ) {
 		foreach ( $themes as $theme ) :
 			// I need to do something to get the filepath instead
 			// $icon = md5( json_encode( $alphred->get( $workflow['icon'], 3600 ) ) );
-			$subtitle = scrub(urldecode($theme['description']));
+			$subtitle = scrub( urldecode( $theme['description'] ) );
 			if ( strlen( $subtitle ) > 120 ) {
 				$subtitle = substr( $subtitle, 0, 120) . '...';
 			} else {

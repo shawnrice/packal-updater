@@ -3,8 +3,6 @@
 // This script works ONLY from, well, nothing at this point. Make sure that it works from the
 // workflow, and abstract it into functions, please.
 
-require_once __DIR__ . '/Libraries/Alphred.phar';
-require_once( __DIR__ . '/Libraries/CFPropertyList/classes/CFPropertyList/CFPropertyList.php' );
 use Alphred\Ini as Ini;
 use CFPropertyList\CFPropertyList as CFPropertyList;
 
@@ -34,7 +32,15 @@ function generate_ini( $path ) {
 }
 
 
-
+/**
+ * [pashua_dialog description]
+ *
+ * @todo replace this with the newer Pashua class
+ *
+ * @param  [type] $directory [description]
+ * @param  [type] $workflow  [description]
+ * @return [type]            [description]
+ */
 function pashua_dialog( $directory, $workflow ) {
 	$alphred = new Alphred;
 	$plist = new CFPropertyList( "{$directory}/info.plist", CFPropertyList::FORMAT_XML);
@@ -46,7 +52,7 @@ function pashua_dialog( $directory, $workflow ) {
 			return false;
 		}
 	endforeach;
-	$path = __DIR__ . '/Pashua.app/Contents/MacOS/Pashua';
+	$path = __DIR__ . '/Resources/Pashua.app/Contents/MacOS/Pashua';
 	$conf = file_get_contents( __DIR__ . '/Resources/pashau-workflow-config.ini' );
 	$values = [ 'name' => $plist['name'],
 							'bundle' => $plist['bundleid'],

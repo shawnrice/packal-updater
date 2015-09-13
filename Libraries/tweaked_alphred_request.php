@@ -1,5 +1,4 @@
 <?php
-
 // These two functions recreate the Alphred wrapper's request, but I do this,
 // so that I can get the cache file path out of it in order to get the damn
 // icons to show. That's also why I need to use the damn globals.

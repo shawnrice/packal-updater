@@ -1,7 +1,5 @@
 <?php
-require_once( __DIR__ . '/../test_vars.php' );
-require_once( __DIR__ . '/Alphred.phar' );
-require_once( __DIR__ . '/CFPropertyList/classes/CFPropertyList/CFPropertyList.php' );
+require_once( __DIR__ . '/../includes.php' );
 
 use CFPropertyList\CFPropertyList as CFPropertyList;
 use Alphred\Ini as Ini;

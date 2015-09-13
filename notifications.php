@@ -7,13 +7,27 @@ if ( ! isset( $argv[1] ) || ! ( $messages = json_decode( $argv[1], true ) ) ) {
 	die( 'We need some damn json, yo.' );
 }
 
+if ( 0 === count( $messages ) ) {
+	exit(0);
+}
+
 $alphred  = new Alphred;
 
-print_r( $messages );
+if ( isset( $messages['subtitle'] ) ) {
+	$subtitle = $messages['subtitle'];
+} else {
+	$subtitle = ( 'pass' == $messages[ 'status' ] ) ?
+		$messages['action'] . ' Completed' : $messages['action'] . ' Failed';
+}
+
+if ( isset( $messages['text'] ) ) {
+	$text = $messages['text'];
+} else {
+	$text = implode( "\n", $messages['messages'] );
+}
 
 $alphred->send_notification([
   'title' 	 => 'Packal',
-  'subtitle' => ( 'pass' == $messages[ 'status' ] ) ?
-  	$messages['action'] . ' Completed' : $messages['action'] . ' Failed',
-  'text' 		 => implode( "\n", $messages['messages'] ),
+  'subtitle' => $subtitle,
+  'text' 		 => $text,
 ]);

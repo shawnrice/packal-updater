@@ -1,12 +1,8 @@
 <?php
-require_once( __DIR__ . '/../Libraries/php-semver/src/vierbergenlars/SemVer/expression.php' );
-require_once( __DIR__ . '/../Libraries/php-semver/src/vierbergenlars/SemVer/version.php' );
-require_once( __DIR__ . '/../Libraries/php-semver/src/vierbergenlars/SemVer/SemVerException.php' );
 
 use vierbergenlars\SemVer\version;
 use vierbergenlars\SemVer\expression;
 use vierbergenlars\SemVer\SemVerException;
-
 
 function create_submit_menu( $possible ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
@@ -45,7 +41,7 @@ function create_submit_menu( $possible ) {
 
 function submit_theme_menu( $query = false ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
-	$me = 'Shawn Patrick Rice';
+	$me = $alphred->config_read( 'username' );
 	$themes = array_values( encode_themes( get_themes(), $me ) );
 	foreach( $themes as $theme ) :
 		$alphred->add_result([
@@ -60,20 +56,24 @@ function submit_theme_menu( $query = false ) {
 function submit_workflow_menu( $query = false ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
 	$packal_workflows = get_packal_workflows();
-	$me = 'Shawn Patrick Rice';
+	$me = $alphred->config_read( 'username' );
 	$ttl = $alphred->config_read( 'workflow_map_cache' );
+
+	// I should look to make sure that this is called somewhere earlier.
+	MapWorkflows::map( true, $ttl );
 	$workflows = json_decode( file_get_contents( MapWorkflows::my_workflows_path() ), true );
 
+	// Filter down the workflows
+	$workflows = $alphred->filter( $workflows, $query, 'name', [ 'match_type' => DEFAULT_FILTER_PARAMS ] );
+
 	foreach( $workflows as $workflow ) :
-		$workflow_ini = ( file_exists( $workflow['path'] . '/workflow.ini') ) ? true : false;
-		$generate = true;
 		$valid = true;
 		$arg = false;
 
-		if ( $workflow_ini ) {
+		// Make sure the workflow.ini file exists
+		if ( file_exists( $workflow['path'] . '/workflow.ini') ) {
 			if ( true === ( $subtitle = validate_workflow_ini_file( $workflow, $packal_workflows ) ) ) {
 				$subtitle = 'Ready to submit.';
-				$generate = false;
 				$arg = json_encode([
 					'action' => 'submit_workflow',
 					'path' => $workflow['path'],
@@ -82,17 +82,13 @@ function submit_workflow_menu( $query = false ) {
 				$subtitle = "Edit workflow.ini: {$subtitle}";
 			}
 		} else {
+			// There is no workflow.ini file, so we will generate one.
 			$subtitle = 'Generate workflow.ini file';
-		}
-		if ( true === $generate ) {
 			$arg = json_encode([ 'action' => 'generate_ini', 'path' => $workflow['path'] ]);
-		} else {
-			// We should be here if there are errors in the workflow.ini file, but, currently,
-			// we are not.
 		}
 
 		$alphred->add_result([
-			'title' => "Submit a {$workflow['name']}",
+			'title' => "Submit `{$workflow['name']}` to Packal.org",
 			'icon' => "{$workflow['path']}/icon.png",
 			'subtitle' => $subtitle,
 			'valid' => $valid,

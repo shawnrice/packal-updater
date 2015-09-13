@@ -3,20 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>com.push.workflow.update.packal</string>
+	<string>com.packal2</string>
 	<key>connections</key>
 	<dict>
-		<key>1C0B5FDE-A442-4116-BCEC-CABE27F73393</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>1DF6B24D-DEF2-4628-A54D-E416E6A71262</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-			</dict>
-		</array>
 		<key>1DF6B24D-DEF2-4628-A54D-E416E6A71262</key>
 		<array>
 			<dict>
@@ -43,79 +32,13 @@
 	<key>createdby</key>
 	<string>Shawn Patrick Rice</string>
 	<key>description</key>
-	<string>This pushes an update of a workflow to Packal</string>
+	<string>Download, Install, and Update workflows and themes from Packal</string>
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>Push Packal Update</string>
+	<string>Packal</string>
 	<key>objects</key>
 	<array>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>argumenttype</key>
-				<integer>1</integer>
-				<key>escaping</key>
-				<integer>38</integer>
-				<key>keyword</key>
-				<string>push</string>
-				<key>queuedelaycustom</key>
-				<integer>1</integer>
-				<key>queuedelayimmediatelyinitially</key>
-				<false/>
-				<key>queuedelaymode</key>
-				<integer>0</integer>
-				<key>queuemode</key>
-				<integer>1</integer>
-				<key>script</key>
-				<string>php filter.php "{query}"</string>
-				<key>title</key>
-				<string>Push Updates to Server</string>
-				<key>type</key>
-				<integer>0</integer>
-				<key>withspace</key>
-				<true/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.scriptfilter</string>
-			<key>uid</key>
-			<string>7DE0FC35-5559-424A-9E75-CED89B479617</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>argumenttype</key>
-				<integer>1</integer>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>keyword</key>
-				<string>search</string>
-				<key>queuedelaycustom</key>
-				<integer>3</integer>
-				<key>queuedelayimmediatelyinitially</key>
-				<true/>
-				<key>queuedelaymode</key>
-				<integer>0</integer>
-				<key>queuemode</key>
-				<integer>1</integer>
-				<key>script</key>
-				<string>php search.php "{query}"</string>
-				<key>title</key>
-				<string>Search Packal...</string>
-				<key>type</key>
-				<integer>0</integer>
-				<key>withspace</key>
-				<true/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.scriptfilter</string>
-			<key>uid</key>
-			<string>1C0B5FDE-A442-4116-BCEC-CABE27F73393</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -194,27 +117,17 @@
 	<string>Using readme file.</string>
 	<key>uidata</key>
 	<dict>
-		<key>1C0B5FDE-A442-4116-BCEC-CABE27F73393</key>
-		<dict>
-			<key>ypos</key>
-			<real>120</real>
-		</dict>
 		<key>1DF6B24D-DEF2-4628-A54D-E416E6A71262</key>
 		<dict>
 			<key>ypos</key>
-			<real>230</real>
+			<real>10</real>
 		</dict>
 		<key>31778F3F-74B5-4D85-B792-E13AE414B6F1</key>
 		<dict>
 			<key>ypos</key>
-			<real>230</real>
+			<real>10</real>
 		</dict>
 		<key>5C87F438-BD85-4F90-84AC-04056F1CEC23</key>
-		<dict>
-			<key>ypos</key>
-			<real>230</real>
-		</dict>
-		<key>7DE0FC35-5559-424A-9E75-CED89B479617</key>
 		<dict>
 			<key>ypos</key>
 			<real>10</real>
