@@ -15,14 +15,6 @@
 require_once( __DIR__ . '/autoloader.php' );
 require_once( __DIR__ . '/Libraries/BuildWorkflowMap.php' );
 
-// Stuff for Semantic Versioning
-require_once( __DIR__ . '/Libraries/php-semver/src/vierbergenlars/SemVer/expression.php' );
-require_once( __DIR__ . '/Libraries/php-semver/src/vierbergenlars/SemVer/version.php' );
-require_once( __DIR__ . '/Libraries/php-semver/src/vierbergenlars/SemVer/SemVerException.php' );
-use vierbergenlars\SemVer\version;
-use vierbergenlars\SemVer\expression;
-use vierbergenlars\SemVer\SemVerException;
-
 // This is a dumb autoloader for all the different menu files.
 foreach ( array_diff( scandir( __DIR__ . '/Menus' ), [ '.', '..', '.DS_Store'] ) as $file ) {
 	if ( 'php' === pathinfo( $file )['extension'] ) {

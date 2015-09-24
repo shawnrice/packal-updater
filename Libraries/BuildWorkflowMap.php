@@ -185,7 +185,6 @@ class MapWorkflows {
 	}
 
 	private function check_for_mine( $plist ) {
-
 		$alphred = new Alphred;
 		$me = $alphred->config_read( 'username' );
 		if ( $me == $plist['author'] ) {
@@ -195,7 +194,7 @@ class MapWorkflows {
 	}
 
 	private function read_info_plist( $directory ) {
-		$plist = new CFPropertyList( "{$directory}/info.plist", CFPropertyList::FORMAT_XML);
+		$plist = new CFPropertyList( "{$directory}/info.plist", CFPropertyList::FORMAT_XML );
 		$plist = $plist->toArray();
 
 		if ( empty( $plist['bundleid'] ) || empty( $plist['createdby'] ) ) {
@@ -209,9 +208,9 @@ class MapWorkflows {
 			return false;
 		}
 		$ini = Ini::read_ini( "{$directory}/workflow.ini" );
-		if ( ! isset( $ini['global']['version'] ) ) {
+		if ( ! isset( $ini['workflow']['version'] ) ) {
 			return false;
 		}
-		return $ini['global']['version'];
+		return $ini['workflow']['version'];
 	}
 }

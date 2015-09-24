@@ -1,5 +1,11 @@
 <?php
 
+// These are just here for now...
+$bundle = 'com.packal2';
+$_SERVER['alfred_workflow_data'] = "{$_SERVER['HOME']}/Library/Application Support/Alfred 2/Workflow Data/{$bundle}/";
+$_SERVER['alfred_workflow_cache'] = "{$_SERVER['HOME']}/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/{$bundle}";
+$_SERVER['alfred_workflow_bundleid'] = $bundle;
+
 define( 'DEVELOPMENT_TESTING', true );
 
 // We are going to define the environments here; this means we can work with multiple servers easily
