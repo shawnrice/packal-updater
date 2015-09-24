@@ -69,6 +69,9 @@ class MapWorkflows {
 	}
 
 	private function use_cache( $no_cache, $ttl ) {
+		if ( false == $no_cache ) {
+			return false;
+		}
 		// So, first we're going try to deal with some caching in order to
 		// speed this up. If the file exists, then we'll see if we can
 		// use the cache.

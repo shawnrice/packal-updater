@@ -1,7 +1,7 @@
 <?php
 
 require_once( __DIR__ . '/autoloader.php' );
-
+use CFPropertyList\CFPropertyList as CFPropertyList;
 use Alphred\Ini as Ini;
 
 class Action {
@@ -347,7 +347,30 @@ class Action {
 		exec( "open {$location}" );
 	}
 
+	private function find_workflow_by_bundle( $bundle ) {
+		$workflows = json_decode( file_get_contents( MapWorkflows::map() ), true );
+		foreach ( $workflows as $workflow ) :
+			if ( $bundle == $workflow['bundle'] ) {
+				return true;
+			}
+		endforeach;
+		return false;
+	}
+
+	/**
+	 * Installs a workflow file
+	 *
+	 * @todo Sanitize the plist before installing.
+	 *
+	 * @param  [type] $url [description]
+	 * @return [type]      [description]
+	 */
 	private function install( $url ) {
+		if ( $this->find_workflow_by_bundle( $this->workflow['bundle'] ) ) {
+			$this->messages['subtitle'] = 'Install `' . $this->workflow['name'] . '`';
+			$this->messages['messages'] = [ 'Error: workflow already installed.' ];
+			return true;
+		}
 		if ( ! $this->valid( $url ) ) {
 			$this->log_failure( "Location {$url} is not a valid location." );
 			return false;
@@ -356,29 +379,57 @@ class Action {
 		// background.
 		if ( $file = $this->download( $url ) ) {
 			if ( $this->verify_file( $file, $this->workflow['md5'] ) ) {
-		    $front = Alphred\Applescript::get_front()['app'];
-		    // Activate Alfred Preferences to make sure that we don't suffer a delay
-		    $delay = Alphred\Applescript::activate('Alfred Preferences');
-		    // Open the .alfredworkflow file
-		    $delay = $this->open( $file );
-		    // Delay until the window animation finishes
-		    // usleep(1500000);
-		    sleep(1);
-		    // Press Enter for the User
-		    $script = "tell applications \"System Events\"\nkey code 36\nend tell";
-				exec( "osascript -e '{$script}'" );
-				// Reactivate the front window
-				Alphred\Applescript::activate( $front );
-				// Sleep for one second
-				sleep(1);
+				$directory = $this->create_unique_workflow_directory();
+				$zip = new ZipArchive;
+				if ( true === $zip->open( $file ) ) {
+				  $zip->extractTo( $directory );
+				  $zip->close();
+				  Plist::import_sanitize( "{$directory}/info.plist" );
+  				$this->messages['subtitle'] = 'Install `' . $this->workflow['name'] . '`';
+					$this->messages['messages'] = [ 'Success!' ];
+
+					// Re-map the workflows so that they aren't stale.
+					MapWorkflows::map( true, 0 );
+				} else {
+					$this->messages['subtitle'] = 'Install `' . $this->workflow['name'] . '`';
+					$this->messages['messages'] = [ 'Error unzipping file.' ];
+				  $this->log_failure( "Could not unpack ({$file})." );
+				}
 				// Delete the file from the Downloads directory
 		    unlink( $file );
 			} else {
+				$this->messages['subtitle'] = 'Install `' . $this->workflow['name'] . '`';
+				$this->messages['messages'] = [ 'Error: file hashes do not match.' ];
 				$this->log_failure( "Could not verify file ({$file}). File hashes do not match." );
 			}
 		} else {
+			$this->messages['subtitle'] = 'Install `' . $this->workflow['name'] . '`';
+			$this->messages['messages'] = [ 'Error: could not download file.' ];
 			$this->log_failure( "Could not download file ({$url})." );
 		}
+	}
+
+	private function create_unique_workflow_directory() {
+		$workflow_directory = $this->find_workflows_directory();
+		$dir = $workflow_directory . "/" . generate_uuid();
+		if ( ! file_exists( $dir ) ) {
+			mkdir( $dir, 0775 );
+			return $dir;
+		}
+		$this->create_unique_workflow_directory();
+	}
+
+	private function find_workflows_directory() {
+		$preferences = "{$_SERVER['HOME']}/Library/Preferences/com.runningwithcrayons.Alfred-Preferences.plist";
+		$preferences = new CFPropertyList( $preferences, CFPropertyList::FORMAT_BINARY );
+		$preferences = $preferences->toArray();
+
+		if ( isset( $preferences['syncfolder'] ) ) {
+			$workflows = str_replace( '~', $_SERVER['HOME'], $preferences['syncfolder'] ) . '/Alfred.alfredpreferences/workflows';
+		} else {
+			$workflows = "{$_SERVER['HOME']}/Library/Application Support/Alfred 2/Alfred.alfredpreferences/workflows";
+		}
+		return $workflows;
 	}
 
 	private function log_failure( $message ) {

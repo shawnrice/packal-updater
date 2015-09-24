@@ -1,6 +1,8 @@
 Packal
 ======
 
+__Keyword: `p›`.__
+
 This workflow is meant to interface with the new Packal.org (staging: mellifluously.org) for all things Packal. This includes submitting and downloading and installing workflows and themes as well as updating workflows. Currently this is and will remain the only official vector for submitting workflows and themes on Packal (although, you can interact with the Packal API in other ways).
 
 Currently, the `bundleid` for this workflow is `com.packal2`, but, when released, it will be `com.packal`, which is the original `bundleid` of the __Packal Updater__, and so the upgrade path will replace that workflow.

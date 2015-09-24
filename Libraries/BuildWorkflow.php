@@ -1,5 +1,6 @@
 <?php
 
+require_once( __DIR__ . '/functions.php' );
 // Usage:
 // $archive = new BuildWorkflow( '/path/to/alfredworkflow_directory' );
 // $filname = $archive->archive_name();
@@ -9,7 +10,8 @@
 // $dir = '/Users/Sven/Dropbox/app syncing/alfred2/Alfred.alfredpreferences/workflows/user.workflow.67A4F4B2-CAD7-41E5-8EC9-322620012FFF/';
 // $archive = new BuildWorkflow( $dir );
 // $filename = $archive->archive_name();
-// echo $filename;
+// echo "File: {$filename}\n";
+// echo "Tmp dir: {$archive->tmp}\n";
 
 class BuildWorkflow {
 
@@ -139,19 +141,23 @@ class BuildWorkflow {
 			// return false; // Should I raise an exception?
 		}
 
-		$this->make_random_temp_dir();
-		$this->recurse_copy( $this->directory, $this->tmp );
-		if ( ( $screenshots_directory ) && file_exists( $screenshots_directory ) && is_dir( $screenshots_directory ) ) {
+		$this->tmp = FileSystem::make_random_temp_dir();
+		FileSystem::recurse_copy( $this->directory, $this->tmp, $this->excluded_files );
+		if ( FileSystem::dir_exists( $screenshots_directory ) ) {
 			// I could always add in something here to make sure that the directory name is called 'screenshots'
-			$this->recurse_copy( $screenshots_directory, $this->tmp );
+			FileSystem::recurse_copy( $screenshots_directory, $this->tmp, $this->excluded_files );
 		}
 		$this->files = [];
-		$this->read_directory( $this->tmp );
+		FileSystem::read_directory( $this->tmp, $this->files );
 		$this->create_archive();
 	}
 
 	public function archive_name() {
 		return "{$this->tmp}/workflow.alfredworkflow";
+	}
+
+	public function remove_temp_dir( $directory ) {
+		FileSystem::recurse_unlink( $this->tmp );
 	}
 
 	private function create_archive() {
@@ -165,32 +171,6 @@ class BuildWorkflow {
 		$zip->close();
 	}
 
-	public function remove_temp_dir( $directory ) {
-		recurse_unlink( $this->tmp );
-	}
-
-	private function read_directory( $directory ) {
-		foreach( array_diff( scandir( $directory ), [ '.', '..' ] ) as $file ) :
-			if ( is_dir( "{$directory}/{$file}" ) ) {
-				$this->read_directory( "{$directory}/{$file}" );
-			} else {
-				$this->files[] = "{$directory}/{$file}";
-			}
-		endforeach;
-
-	}
-
-	private function make_random_temp_dir() {
-		$letters = 'abcdefghijklmnopqrstuvwxyz';
-		$random = '';
-		for ($i = 0; $i < 10; $i++ ) :
-			$random .= $letters[rand( 0 , strlen( $letters ) - 1 )];
-		endfor;
-
-		$this->tmp = sys_get_temp_dir() . '/' . $random;
-		mkdir( $this->tmp );
-	}
-
 	private function check_for_workflow() {
 		if ( ! file_exists( "{$this->directory}/info.plist" ) ) {
 			return false;
@@ -201,64 +181,4 @@ class BuildWorkflow {
 		return true;
 	}
 
-	private function recurse_copy( $source, $destination ) {
-
-		$excluded = [ '/\.git/', '/.*\.pyc/' ];
-
-    $directory = opendir( $source );
-    if ( ! file_exists( $destination ) ) {
-    	mkdir( $destination );
-    }
-    while( false !== ( $file = readdir( $directory ) ) ) :
-      if ( ( $file != '.' ) && ( $file != '..' ) ) {
-      	$valid = true;
-      	foreach ( $this->excluded_files as $pattern ) :
-	    		if ( preg_match( $pattern, $file ) ) {
-	    			$valid = false;
-	    			break;
-	    		}
-    		endforeach;
-    		if ( ! $valid ) {
-    			self::log( "Excluding {$file}.\n" );
-    			continue;
-    		}
-        if ( is_dir( $source . '/' . $file ) ) {
-          $this->recurse_copy( $source . '/' . $file, $destination . '/' . $file );
-        } else {
-          copy( $source . '/' . $file, $destination . '/' . $file );
-        }
-      }
-    endwhile;
-
-    closedir( $directory );
-	}
-
-	private function recurse_unlink( $directory ) {
-	  if ( ! $directory_handle = @opendir( $directory ) ) {
-	    return;
-	  }
-
-	  while ( false !== ( $file = readdir( $directory_handle ) ) ) :
-	    if( $file == '.' || $file == '..' ) {
-	      continue;
-	    }
-	    if ( is_dir( $directory . '/' . $file ) ) {
-	    	$this->recurse_unlink( $directory . '/' . $file );
-	    }
-	  endwhile;
-
-	  closedir( $directory_handle );
-	  @rmdir( $directory );
-
-	  return;
-	}
-
-	private function log( $message ) {
-		if ( class_exists( 'Alphred' ) ) {
-			$alphred = new Alphred;
-			$alphred->console( "{$message}\n", 4 );
-		} else {
-			echo "{$message}\n";
-		}
-	}
 }

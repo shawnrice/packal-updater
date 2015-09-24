@@ -26,4 +26,4 @@ define( 'WORKFLOW_ENVIRONMENT', file_get_contents( __DIR__ . '/environment.txt' 
 define( 'PRIMARY_CACHE_BIN', parse_url( PACKAL_BASE_URL, PHP_URL_HOST ) );
 
 // Just a shortcut for the default matching
-define( 'DEFAULT_FILTER_PARAMS',  MATCH_SUBSTRING | MATCH_ALLCHARS | MATCH_STARTSWITH | MATCH_ATOM );
+@define( 'DEFAULT_FILTER_PARAMS',  MATCH_SUBSTRING | MATCH_ALLCHARS | MATCH_STARTSWITH | MATCH_ATOM );
