@@ -1,0 +1,866 @@
+html {
+  font-size: 12px;
+  font-family: 'Source Sans Pro', Georgia;
+  line-height: 16px;
+  margin: none;
+  padding: none;
+}
+
+body {
+  background: rgba(233, 233, 233, .5);
+  user-select: none;
+    -webkit-user-select: none;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat';
+  color: #333;
+}
+
+.title h1 {
+  color: purple;
+}
+
+table tr:nth-child(even) {
+  background: rgba(0,0,0,0.1);
+}
+
+a {
+  position: relative;
+  margin: -.5em;
+  padding: .5em;
+  color: #08C;
+  text-decoration: none;
+  transition: all 0.3s ease-out;
+}
+a:hover { color: #0AF; }
+
+*, *:before, *:after {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+code {
+  font-family: Monaco;
+  font-size: .75em;
+  font-weight: 300;
+}
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: " ";
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+/*******************************************************************************
+General Layout
+*******************************************************************************/
+.viewport {
+  position: fixed;
+  width: 100%;
+  min-width: 600px;
+  height: 100%;
+  background: rgba(253, 253, 253, .5);
+}
+
+.header {
+  position: relative;
+  padding-bottom: 20px;
+  max-height: 100px;
+  width: inherit;
+  height: 17%;
+  min-width: 600px;
+  border-bottom: 5px #900080 solid !important;
+  padding: 0 10px 0 35px;
+}
+
+.pane {
+  overflow: scroll;
+  width: 100%;
+  height: 83%;
+  border-top: 4px solid black;
+  padding: 2em 35px 3em 35px;
+}
+
+.preloader {
+  padding: 10% 0 0 48%;
+  width: 100%;
+  height: 100%;
+}
+
+.preloader h2 {
+  margin-bottom: 28px;
+  margin-left: -32px;
+  color: black;
+}
+
+#updating-overlay {
+  position: fixed;
+  display: none;
+  margin: 0 25%;
+  z-index: 200;
+  width: 45%;
+  height: 30%;
+  min-height: 400px;
+  border: 5px solid black;
+  background-color: #efefef;
+  text-align: center;
+  opacity: .8;
+  top: 15%;
+}
+
+#updating-overlay h2 {
+  color: black;
+  margin-top: 20%;
+}
+
+.box {
+  position: relative;
+  z-index: 0;
+  float: left;
+  margin: 1em;
+  padding: 1em;
+  width: 30%;
+  height: 200px;
+  border: 1px black solid;
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.header h1 {
+  margin: 10px 0 0 0;
+  font-size: 3em;
+}
+
+.title {
+  padding: 2em 0 0 0em;
+  height: 100%;
+}
+
+.author {
+  content: 'Me.';
+}
+
+.wficon {
+  z-index: 0;
+  width: 72px;
+  height: 72px;
+}
+
+.wficon-container {
+  position: absolute;
+  bottom: 17px;
+  padding-right: 25px;
+  width: 100%;
+  text-align: right;
+}
+
+.separator {
+  margin: 0;
+  width: 100%;
+  height: 3px;
+  border: 0px;
+  background: black;
+  text-align: center;
+}
+
+.blacklisted {
+  position: absolute;
+  z-index: 1000;
+  margin: -1em 0 0 -1em;
+  width: 100%;
+  height: 100%;
+  background: #ccc;
+  opacity: .3;
+  display: block;
+  text-align: center;
+  padding: 0;
+}
+
+.disabled-x {
+  /*float: left;*/
+
+  font-size: 18em;
+  /*margin: 0 30%;*/
+}
+/*'line-height: 190px; font-size: 250px; padding-left: 20%;'*/
+
+.hide {
+  display: none;
+}
+
+.blist, .open-directory, #open-backup-dir {
+  cursor: pointer;
+}
+
+.icon {
+  margin-right: 1em;
+  margin-bottom: 1em;
+  width: 24px;
+}
+
+.nav > ul > li > div > div {
+  position: relative;
+  float: left;
+
+}
+
+.nav > ul > li > div {
+  padding: .25em;
+  min-height: 20px;
+  border-top: 1px black solid;
+}
+
+.nav ul li {
+  clear: both;
+  margin: 1em 1em;
+  list-style: none;
+  line-height: 24px;
+
+}
+
+.short {
+  float: left;
+  overflow: hidden;
+  padding: 0;
+  max-width: 100%;
+  height: 3em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.short p {
+  overflow: hidden;
+  margin: 0;
+  height: 3em;
+  text-overflow: ellipsis;
+}
+
+.backups li {
+  margin: 1em;
+  list-style: none;
+  font-size: 1.2em;
+
+}
+
+.backup-box h2 {
+  color: black;
+}
+
+.backup-box {
+  border-color: black;
+}
+
+.delete-backup {
+  cursor: pointer;
+}
+
+.open-backup-dir h3 {
+  color: black;
+  cursor: pointer;
+}
+
+.open-directory:hover {
+  color: #800080;
+  transition: color .25s;
+}
+
+.open-directory {
+  color: black;
+  margin-left: .5em;
+  transition: color .25s;
+}
+
+/**** Dialogs ****/
+.ui-dialog {
+  border: 4px solid black;
+  border-top: 5px solid black;
+  padding: 1em 3em;
+  width: auto;
+  max-width: 100%;
+  background: rgba(233, 233, 233, 1);
+}
+
+.ui-dialog-titlebar, .ui-dialog-titlebar-close, .ui-dialog-title {
+  display: none;
+}
+
+.ui-dialog-content {
+  text-align: center;
+  font-size: 2em;
+  line-height: 1em;
+  padding: .5em 0 0 0;
+  font-family: 'Source Sans Pro';
+}
+
+#delete-backup-dialog {
+  font-size: 1.5em;
+}
+
+.ui-dialog-buttonpane {
+  text-align: right;
+}
+
+.ui-dialog-buttonset {
+  outline: none;
+}
+
+.ui-dialog-buttonset button {
+ outline: none;
+ background: none;
+ font-size: 1.5em;
+ border-radius:6px;
+ border: 3px solid black;
+ padding: .15em 1em .25em 1em;
+ margin: 0 1em 0 0;
+ background: #800080;
+ color: #efefef;
+ transition: background .25s,color .25s;
+}
+
+.ui-dialog-buttonset button:hover {
+ background:  #efefef;
+ color: #800080;
+ transition: background .25s,color .25s;
+}
+
+.fa {
+  opacity: .8;
+}
+
+
+
+.delete-backup:hover {
+  color: #A60000;
+  -webkit-transition: color .25s ease-in;
+   transition: color .25s ease-in;
+}
+
+/*******************************************************************************
+ * Status 
+ *******************************************************************************/
+.updates-available {
+  cursor: pointer
+}
+.detail-accordion > h3 {
+  margin-bottom: 1em;
+  margin-left: 2em;
+  padding: 2px 0;
+  max-width: 75px;
+  border-top: 1px dashed black;
+  border-bottom: 1px dashed black;
+  color: gray;
+  text-align: center;
+  letter-spacing: 1px;
+  font-weight: normal;
+  font-size: 1em !important;
+  font-family: 'Montserrat', Georgia !important;
+  line-height: 1.2em;
+  cursor: pointer;
+}
+.detail-accordion > div > div, .detail-accordion > p {
+  position: relative;
+  float: left;
+  clear: both;
+  margin: .25em 0 1em 2.5em;
+  padding: .75em 1em;
+  width: 600px;
+  border: 1px solid black;
+  font-size: .75em;
+  line-height: 1.5em;
+}
+
+.ui-accordion .ui-accordion-content{
+  overflow: auto;
+}
+
+.url-open, .update-manifest {
+  clear: none !important;
+  width: 90px;
+  border: none !important;
+  border-bottom: 1px gray dashed !important;
+  color: gray;
+  cursor: pointer;
+}
+
+.update-manifest {
+  width: 126px !important;
+  border: none !important;
+  border-bottom: 1px gray dashed !important;
+  color: gray;
+  cursor: pointer; 
+}
+
+.status-body {
+  margin: 3em 0 0 2%;
+  min-width: 600px;
+  width: 95%;
+  font-size: 1.5em;
+}
+
+.status-body > div {
+  margin-bottom: 1em;
+}
+
+/*******************************************************************************
+ * About
+ ******************************************************************************/
+
+#about-section {
+  width: 95%;
+  font-size: 1.5em;
+  line-height: 1.5em;
+}
+
+#about-section p {
+  margin-left: 2em;
+}
+
+/*******************************************************************************
+ * Updates
+ ******************************************************************************/
+
+.updates-complete-backdrop {
+  position: absolute;
+  clear: none;
+  width: 93%;
+  height: 60%;
+  background: url( '../../assets/images/packal-man.jpg' ) no-repeat center;
+  background-size: contain;
+  opacity: .25;
+}
+
+.center-me-please {
+  float: left;
+  width: 100%;
+  padding: 15%;
+  display: table-cell;
+  text-align: center;
+  font-size: 1.5em;
+  line-height: 2em;
+  vertical-align: middle;  
+}
+
+.update-box {
+  margin: 25px 0 0 2%;
+  padding: .1em;
+  width: 90%;
+  height: 110px;
+  border: 1px solid black;
+}
+
+.update-icon {
+  position: relative;
+  display: inline-block;
+  float: left;
+  padding: 25px 0;
+  width: 125px;
+  height: 110px;
+  text-align: center;
+  opacity: .9;
+  
+}
+
+.update-icon img {
+  max-width: 48px;
+}
+
+.update-content {
+  position: relative;
+  float: left; 
+}
+
+.update-button {
+  /*border: 2px black solid;*/
+  /*font-size: 1.5em;*/
+  float: right;
+  margin: 1em 1em 0 0;
+  padding: 15px 50px 0 0;
+  /*width: 100px;*/
+  height: 110px;
+  text-align: center;
+}
+
+.update-box button:focus {
+  outline: none;
+}
+
+button.css3button {
+  padding: 10px 20px;
+  border: 3px solid black;
+  background: #800080;
+  color: #e6e6e6;
+  font-size: 1.25em;
+  transition: background .25s, color .25s, border-color .25s;
+}
+
+button.css3button:hover {
+  background: #ccc;
+  color: black;
+  border-color: black;
+  transition: background .25s, color .25s, border-color .25s;
+}
+
+/*******************************************************************************
+Backups
+*******************************************************************************/
+
+.backup-box {
+  margin: 25px 0 0 2%;
+  padding: 1em;
+  width: 90%;
+  border: 1px solid black;
+}
+
+/*******************************************************************************
+Settings
+*******************************************************************************/
+/* general style for the form */
+.settings-form {
+  margin: 0.3em auto 0 auto;
+  width: 95%;
+  font-size: 1.5em;
+  line-height: 2em;
+}
+
+.firstRun {
+  font-size: 1.5em;
+  margin: 2em 0 -1em 2em;
+  background: #ddd;
+  width: 40em;
+  padding: .25em 2em;
+  text-align: center;
+  border: 3px dashed gray;
+}
+
+/* normalize the input elements, make them look like everything else */
+.settings-form input,
+.settings-form select,
+.settings-form button {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-weight: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  -webkit-appearance: none;
+}
+
+.settings-form input:focus {
+  outline: none;
+}
+
+.settings-form input,
+.settings-form select  {
+  display: inline-block;
+  margin: 0 .25em;
+  padding: 0;
+  border-bottom: 1px dashed #b14943;
+  /*color: #b14943;*/
+  color: purple;
+  line-height: 1.2em;
+  cursor: pointer;
+}
+
+/* These are blank spans to help resize form elements. */
+#username,
+#authorName,
+#packal-username,
+#number-of-backups,
+#workflow-reporting,
+#force-packal,
+#notification-options {
+  display: none;
+}
+
+/*******************************************************************************
+Tooltips
+*******************************************************************************/
+  .ui-tooltip, .arrow:after {
+    background-color: rgba(128, 0, 128, 0.8);
+    border: 2px solid #cfcfcf;
+  }
+  .ui-tooltip {
+    padding: 10px 10px;
+    color: white;
+    border-radius: 20px;
+    max-width: 20em;
+    text-align: justify;
+    /*font: bold 14px "Helvetica Neue", Sans-Serif;*/
+    /*text-transform: uppercase;*/
+    box-shadow: 0 0 3px black;
+  }
+  .arrow {
+    width: 70px;
+    height: 16px;
+    overflow: hidden;
+    position: absolute;
+    left: 50%;
+    margin-left: -35px;
+    bottom: -16px;
+  }
+  .arrow.top {
+    top: -16px;
+    bottom: auto;
+  }
+  .arrow.left {
+    left: 20%;
+  }
+  .arrow:after {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: -20px;
+    width: 25px;
+    height: 25px;
+    box-shadow: 6px 5px 9px -9px black;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    tranform: rotate(45deg);
+  }
+  .arrow.top:after {
+    bottom: -20px;
+    top: auto;
+  }
+
+
+
+/*******************************************************************************
+  Menu
+*******************************************************************************/
+
+.bt-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-width: 600px;
+  height: 0;
+  border-width: 0px;
+  border-style: solid;
+  border-color: #333;
+  background-color: rgba(0,0,0,0);
+  -webkit-transition: border-width 0.3s, background-color 0.3s, height 0s 0.3s;
+  transition: border-width 0.3s, background-color 0.3s, height 0s 0.3s;
+  -webkit-backface-visibility: hidden;
+}
+
+.bt-menu.bt-menu-open {
+  height: 100%;
+  border-width: 90px 30px 30px 30px;
+  background-color: rgba(0,0,0,0.3);
+  -webkit-transition: border-width 0.3s, background-color 0.3s;
+  transition: border-width 0.3s, background-color 0.3s;
+}
+
+.bt-menu-open {
+  z-index: 1000;
+}
+
+.bt-overlay {
+  position: absolute;
+  width: 100%;
+  min-width: 600px;
+}
+
+.bt-menu-open .bt-overlay {
+  height: 100%;
+}
+
+.bt-menu-trigger {
+  position: fixed;
+  top: 22px;
+  left: 50%;
+  z-index: 100;
+  display: block;
+  margin-left: -25px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+
+.bt-menu-trigger span {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 8%;
+  background-color: purple;
+  font-size: 0px;
+  -webkit-transition: background-color 0.3s;
+  transition: background-color 0.3s;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.bt-menu-open .bt-menu-trigger span {
+  background-color: #fff;
+}
+
+.bt-menu-trigger span:before,
+.bt-menu-trigger span:after {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: purple;
+  content: '';
+  -webkit-transition: -webkit-transform 0.3s, background-color 0.3s;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.bt-menu-trigger span:before {
+  -webkit-transform: translateY(-250%);
+  transform: translateY(-250%);
+}
+
+.bt-menu-trigger span:after {
+  -webkit-transform: translateY(250%);
+  transform: translateY(250%);
+}
+
+.bt-menu-open .bt-menu-trigger span:before,
+.bt-menu-open .bt-menu-trigger span:after {
+  background-color: #fff;
+}
+
+.bt-menu-open .bt-menu-trigger span:before {
+  -webkit-transform: translateY(-350%);
+  transform: translateY(-350%);
+}
+
+.bt-menu-open .bt-menu-trigger span:after {
+  -webkit-transform: translateY(350%);
+  transform: translateY(350%);
+}
+
+.bt-menu ul {
+  position: fixed;
+  top: 0px;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 0;
+  list-style: none;
+  text-align: center;
+  white-space: nowrap;
+  -webkit-transition: height 0s 0.3s;
+  transition: height 0s 0.3s;
+}
+
+.bt-menu.bt-menu-open ul {
+  height: 90px;
+  -webkit-transition: none;
+  transition: none;
+}
+
+.bt-menu ul li,
+.bt-menu ul li a {
+  text-align: center;
+}
+
+.bt-menu ul li {
+  display: inline-block;
+  margin: 0 2%;
+  width: 5%;
+  height: 90px;
+  line-height: 90px;
+  opacity: 0;
+  -webkit-transition: -webkit-transform 0.3s, opacity 0.3s;
+  transition: transform 0.3s, opacity 0.3s;
+  -webkit-transform: translate3d(0,-100%,0);
+  transform: translate3d(0,-100%,0);
+}
+
+.bt-menu ul li:nth-child(3) {
+  margin-right: 70px;
+}
+
+.bt-menu ul li:nth-child(4) {
+  margin-left: 70px;
+}
+
+.bt-menu.bt-menu-open ul li {
+  opacity: 1;
+  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+}
+
+.bt-menu.bt-menu-open ul li:first-child,
+.bt-menu.bt-menu-open ul li:last-child {
+  -webkit-transition-delay: 0.15s;
+  transition-delay: 0.15s;
+}
+
+.bt-menu.bt-menu-open ul li:nth-child(2),
+.bt-menu.bt-menu-open ul li:nth-last-child(2) {
+  -webkit-transition-delay: 0.1s;
+  transition-delay: 0.1s;
+}
+
+.bt-menu.bt-menu-open ul li:nth-child(3),
+.bt-menu.bt-menu-open ul li:nth-last-child(3) {
+  -webkit-transition-delay: 0.05s;
+  transition-delay: 0.05s;
+}
+
+.bt-menu ul li a {
+  display: block;
+  outline: none;
+  color: #fff;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 1.15em;
+  -webkit-transition: color 0.2s;
+  transition: color 0.2s;
+}
+
+.bt-menu ul li a:before {
+  display: none;
+  font-size: 32px;
+}
+
+.bt-menu ul li a:hover,
+.bt-menu ul li a:focus {
+  color: #2980b9;
+}
+
+/************ /MENU *************/
+
+#fusion_ad {
+  font-size: .7em;
+  max-width: 135px;
+  position: absolute;
+  right: 5em;
+}
+.fusionentire > a {
+  clear: both;
+  display: inline-block;
+
+}
+.fusionimg {
+  margin-bottom: 5px;
+}
+.bsap {
+  margin-top: 2px;
+  margin-bottom: 1em;  
+}
