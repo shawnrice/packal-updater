@@ -1,6 +1,6 @@
 <?php
 
-require_once( __DIR__ . '/includes.php' );
+require_once( __DIR__ . '/autoloader.php' );
 
 use Alphred\Ini as Ini;
 
@@ -42,7 +42,6 @@ class Action {
 					                     [
 					                     	'workflow' => $this->workflow['id'],
 					                     	'revision' => $this->workflow['revision_id'],
-
 					                     ]
 					);
 				}
@@ -54,7 +53,6 @@ class Action {
 					                     [
 					                     	'workflow' => $this->workflow['id'],
 					                     	'revision' => $this->workflow['revision_id'],
-
 					                     ]
 					);
 				}
@@ -130,7 +128,16 @@ class Action {
 	}
 
 	private function generate_ini( $path ) {
-		generate_ini( $path );
+		$return = generate_ini( $path );
+		$this->alphred->console( print_r( $workflow, true), 4);
+		if ( $return[0] ) {
+			$this->messages['subtitle'] = [ 'Workflow Generation Success' ];
+			$this->messages['messages'] = [ 'Generated `workflow.ini` for ' . $return[1] ];
+		} else {
+			$this->messages['subtitle'] = [ 'Workflow Generation Failure' ];
+			$this->messages['messages'] = [ 'Canceled `workflow.ini` for ' . $return[1] ];
+		}
+
 	}
 
 	private function get_filename( $url ) {

@@ -1,6 +1,6 @@
 <?php
 
-require_once( __DIR__ . '/includes.php' );
+require_once( __DIR__ . '/autoloader.php' );
 
 $alphred = '';
 // $separator = '›';
@@ -32,7 +32,7 @@ function main( $argv ) {
 		endforeach;
 		// I should redo this menu system
 		$parts = array_values( $parts );
-		print_r( $parts );
+		// print_r( $parts );
 		$main  = $parts[0];
 		$sub   = $parts[1];
 		$which = $parts[0] . '-single';

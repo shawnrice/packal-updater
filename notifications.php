@@ -1,6 +1,6 @@
 <?php
 
-require_once( __DIR__ . '/includes.php' );
+require_once( __DIR__ . '/autoloader.php' );
 
 if ( ! isset( $argv[1] ) || ! ( $messages = json_decode( $argv[1], true ) ) ) {
 	// Exit early and often

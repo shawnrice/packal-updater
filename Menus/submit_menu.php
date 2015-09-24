@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @todo remove dependency on vierbergenlars\SemVer and use my SemVer class instead
+ */
+
 use vierbergenlars\SemVer\version;
 use vierbergenlars\SemVer\expression;
 use vierbergenlars\SemVer\SemVerException;
@@ -102,6 +106,14 @@ function get_packal_workflows() {
 	return $alphred->get( $endpoints['workflow'], 3600, true );
 }
 
+
+/**
+ * [validate_workflow_ini_file description]
+ *
+ * @param  [type] $workflow         [description]
+ * @param  [type] $packal_workflows [description]
+ * @return [type]                   [description]
+ */
 function validate_workflow_ini_file( $workflow, $packal_workflows ) {
 	global $alphred;
 	$ini = $workflow['path'] . '/workflow.ini';
@@ -112,7 +124,7 @@ function validate_workflow_ini_file( $workflow, $packal_workflows ) {
 		if ( $workflow['bundle'] != $w['bundle'] ) {
 			continue;
 		} else {
-			$alphred->console( "VERSION: {$w['version']}", 4 );
+			// $alphred->console( "VERSION: {$w['version']}", 4 );
 			$packal_version = $w['version'];
 			break;
 		}
@@ -124,7 +136,7 @@ function validate_workflow_ini_file( $workflow, $packal_workflows ) {
 		return 'No workflow section in workflow.ini';
 	}
 	// Check to make sure a version is set in workflow ini file
-	if ( ! isset( $ini['workflow']['version'] ) ) {
+	if ( ! isset( $ini['workflow']['version'] ) || empty( $ini['workflow']['version'] ) ) {
 		return 'No version is set in workflow.ini';
 	}
 	// Check to make sure that there is a packal section in the workflow.ini file,

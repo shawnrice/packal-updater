@@ -1,7 +1,9 @@
 <?php
-
-// This script works ONLY from, well, nothing at this point. Make sure that it works from the
-// workflow, and abstract it into functions, please.
+/**
+ * Contains functions to generate the workflow.ini files using Pashua as a
+ * nice front-end interface. Theoretically, this allows editing of Workflow.ini
+ * files as well through the interface, but I need to check that.
+ */
 
 use Alphred\Ini as Ini;
 use CFPropertyList\CFPropertyList as CFPropertyList;
@@ -25,17 +27,19 @@ function generate_ini( $path ) {
 		}
 		ksort( $workflow['packal'] );
 	}
-	$workflow = pashua_dialog( $path, $workflow );
+	$return = pashua_dialog( $path, $workflow );
+	$workflow = $return[0];
 	if ( $workflow ) {
 		Ini::write_ini( $workflow, $ini );
+		return [ true, $return[1] ];
 	}
+	return [ false, $return[1] ];
 }
-
 
 /**
  * [pashua_dialog description]
  *
- * @todo replace this with the newer Pashua class
+ * @todo this should be cleaned up
  *
  * @param  [type] $directory [description]
  * @param  [type] $workflow  [description]
@@ -52,93 +56,89 @@ function pashua_dialog( $directory, $workflow ) {
 			return false;
 		}
 	endforeach;
-	$path = __DIR__ . '/Resources/Pashua.app/Contents/MacOS/Pashua';
-	$conf = file_get_contents( __DIR__ . '/Resources/pashau-workflow-config.ini' );
-	$values = [ 'name' => $plist['name'],
-							'bundle' => $plist['bundleid'],
-							'short' => $plist['description'],
-							'tags' => implode( '[return]', $workflow['packal']['tags'] ),
-							'github' => $workflow['workflow']['github'],
-							'forum' => $workflow['workflow']['forum'],
-	];
-	foreach ( $values as $key => $val ) :
-		$conf = str_replace( '%%' . $key . '%%', $val, $conf );
-	endforeach;
-	// Do some wonky stuff to get the categories. I'm doing this so that I can
-	// keep the categories in a json file.
-	$alphabet = 'abcdefghijklmnopqrstuvwxyz';
-	$categories = json_decode( file_get_contents( __DIR__ . '/assets/categories.json' ), true );
-	if ( isset( $workflow['packal']['categories'] ) && 0 !== count( $workflow['packal']['categories'] ) ) {
-		$cats = $workflow['packal']['categories'];
-	} else {
-		$cats = [];
+
+	if ( isset( $workflow['packal'] ) ) {
+		if ( isset( $workflow['packal']['categories'] ) ) {
+			$cats = $workflow['packal']['categories'];
+		}
+		if ( isset( $workflow['packal']['tags'] ) ) {
+			$tags = implode( '[return]', $workflow['packal']['tags'] );
+		}
+	}
+	if ( isset( $workflow['workflow'] ) ) {
+		if ( isset( $workflow['workflow']['forum'] ) ) {
+			$forum = $workflow['workflow']['forum'];
+		}
+		if ( isset( $workflow['workflow']['github'] ) ) {
+			$forum = $workflow['workflow']['github'];
+		}
 	}
 
-	$end = substr( $alphabet, count( $categories ) - 1, 1 );
-	$temp = '';
+	foreach( [ 'tags', 'github', 'forum' ] as $var ) :
+		$$var = ( isset( $$var ) ) ? $$var : '';
+	endforeach;
+
+	// Do some wonky stuff to get the categories. I'm doing this so that I can keep the categories in a json file.
+	$alphabet = 'abcdefghijklmnopqrstuvwxyz';
+	$categories = json_decode( file_get_contents( __DIR__ . '/../assets/categories.json' ), true );
+	$cats = ( isset( $cats ) ) ? $cats : [];
+	$temp_categories = '';
 	$y = 300;
-	foreach ( range( 'a', $end ) as $key => $suffix ) :
+	foreach ( range( 'a', substr( $alphabet, count( $categories ) - 1, 1 ) ) as $key => $suffix ) :
 		if ( 0 === $key % 2 ) {
-			$temp .= "cat_{$suffix}.x = 600\r\n";
+			$temp_categories .= "cat_{$suffix}.x = 600\r\n";
 			$y -= 20;
 		} else {
-			$temp .= "cat_{$suffix}.x = 400\r\n";
+			$temp_categories .= "cat_{$suffix}.x = 400\r\n";
 		}
-		$temp .= "cat_{$suffix}.y = {$y}\r\n";
-		$temp .= "cat_{$suffix}.type = checkbox\r\n";
-		$temp .= "cat_{$suffix}.label = {$categories[ $key ]}\r\n";
-		if ( in_array( $categories[ $key ], $cats ) ) {
-			$temp .= "cat_{$suffix}.default = 1\r\n";
-		} else {
-			$temp .= "cat_{$suffix}.default = 0\r\n";
-		}
+		$temp_categories .= "cat_{$suffix}.y = {$y}\r\n";
+		$temp_categories .= "cat_{$suffix}.type = checkbox\r\n";
+		$temp_categories .= "cat_{$suffix}.label = {$categories[ $key ]}\r\n";
+
+		$temp_categories .= "cat_{$suffix}.default = ";
+		$temp_categories .= ( in_array( $categories[ $key ], $cats ) ) ? "1" : "0";
+		$temp_categories .= "\r\n";
+
 		$pashua_categories[ "cat_{$suffix}" ] = $categories[ $key ];
 	endforeach;
-	$conf = str_replace( '##CATEGORIES##', $temp, $conf );
-	$config = tempnam( '/tmp', 'Pashua_' );
-	if ( false === $fp = @fopen( $config, 'w' ) ) {
-	    throw new \RuntimeException( "Error trying to open {$config}" );
-	}
-	fwrite( $fp, $conf );
-	fclose( $fp );
 
-	// Call pashua binary with config file as argument and read result
-	$result = shell_exec( escapeshellarg( $path ) . ' ' . escapeshellarg( $config ) );
-	@unlink( $config );
-  // Parse result
-	$parsed = array();
-	foreach ( explode( "\n", $result ) as $line ) {
-    preg_match( '/^(\w+)=(.*)$/', $line, $matches );
-    if ( empty( $matches ) or empty( $matches[1] ) ) {
-        continue;
-    }
-    $parsed[ $matches[1] ] = $matches[2];
-	}
-
-	if ( 1 == $parsed['cb'] ) {
+	$values = [
+		'name' => $plist['name'],
+		'bundle' => $plist['bundleid'],
+		'short' => $plist['description'],
+		'tags' => $tags,
+		'github' => $github,
+		'forum' => $forum,
+		'CATEGORIES' => $temp_categories,
+	];
+	if ( ! $parsed = Pashua::go( 'pashau-workflow-config.ini', $values ) ) {
 		return false;
 	}
 
+	// Initialize some variables.
+	$workflow = [];
 	$workflow['workflow'] = [];
-	$workflow['workflow']['version'] = $parsed['version'];
-	if ( is_string( $workflow['packal']['osx'] ) ) {
-		$workflow['packal']['osx'] = [];
-	}
-	foreach ( [
+	$workflow['packal'] = [];
+	$workflow['packal']['osx'] = [];
+
+	// Fix the version as a "just-in-case"
+	$workflow['workflow']['version'] = SemVer::fix( $parsed['version'] );
+
+	$osx = [
 		'capitan' => '10.11',
 	  'yosemite' => '10.10',
 	  'mavericks' => '10.9',
 	  'mountain' => '10.8',
 	  'lion' => '10.7',
 	  'snow' => '10.6'
-	] as $name => $version ) :
-		if ( 1 == $parsed[ $name ] ) {
-			$workflow['packal']['osx'][] = $version;
-		}
+	];
+	foreach ( $osx as $name => $version ) :
+		if ( 1 == $parsed[ $name ] ) $workflow['packal']['osx'][] = $version;
 	endforeach;
+
 	$workflow['packal']['osx'] = implode( ',', array_unique( $workflow['packal']['osx'] ) );
-	$tags = array_unique( explode( '[return]', $parsed['tags'] ) );
-	$workflow['packal']['tags'] = implode( ',', $tags );
+	$workflow['packal']['tags'] = implode( ',', array_unique( explode( '[return]', $parsed['tags'] ) ) );
+
 	$categories = [];
 	foreach ( $parsed as $key => $value ) :
 		if ( false !== strpos( $key, 'cat_' ) ) {
@@ -158,12 +158,19 @@ function pashua_dialog( $directory, $workflow ) {
 		$workflow['workflow']['forum'] = $forum;
 	}
 
-	return $workflow;
+	return [ $workflow, $plist['name'] ];
 }
 
+/**
+ * Verifies (/fixes if possible) the Github repo
+ *
+ * Note: it does not verify that the repo exists on Github
+ *
+ * @param  string $repo the repo name as 'owner/repo'
+ * @return string|bool  the (fixed) repo or false
+ */
 function verify_github( $repo ) {
 	$repo = strtolower( $repo );
-
 	if ( empty( $repo ) ) {
 		return false;
 	}
@@ -176,16 +183,21 @@ function verify_github( $repo ) {
 	if ( preg_match( '/^([A-Za-z0-9_-]*)(\/)([A-Za-z0-9_-]*)$/', $repo, $match ) ) {
 		return $repo;
 	} else {
-		// Can't parse the repo
+		// can't parse the repo
 		return false;
 	}
 }
 
+/**
+ * Verifies that the string is a URL and that it has `alfredforum` in it
+ * @param  string $url an alfredforum url
+ * @return string|bool the alfred forum url or false
+ */
 function verify_forum( $url ) {
 	if ( filter_var( $url, FILTER_VALIDATE_URL && FILTER_FLAG_PATH_REQUIRED ) ) {
 		return false;
 	}
-	if ( false === strpos( $url, 'alfredforum.com/' ) ) {
+	if ( false === strpos( $url, 'http://www.alfredforum.com/topic/' ) ) {
 		return false;
 	}
 	return $url;

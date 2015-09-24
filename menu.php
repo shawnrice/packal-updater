@@ -12,7 +12,7 @@
  *
  */
 
-require_once( __DIR__ . '/includes.php' );
+require_once( __DIR__ . '/autoloader.php' );
 require_once( __DIR__ . '/Libraries/BuildWorkflowMap.php' );
 
 // Stuff for Semantic Versioning
@@ -180,13 +180,22 @@ function check_for_old_packal_workflows() {
 	// files (i.e. workflows downloaded from the old Packal). If there are, then it will present
 	// an option to update all the options.
 
-	print_r( json_decode( file_get_contents( MapWorkflows::map() ), true ) );
+	// print_r( json_decode( file_get_contents( MapWorkflows::map() ), true ) );
 
 	$workflows = [];
 	return $workflows;
 }
 
 $alphred = new Alphred;
+
+if ( DEVELOPMENT_TESTING ) {
+	$alphred->add_result([
+		'title' => "Environment: " . strtoupper( WORKFLOW_ENVIRONMENT ),
+		'subtitle' => 'URL: ' . PACKAL_BASE_API_URL,
+		'valid' => false,
+	]);
+}
+
 $icon_suffix = 'light' == $alphred->theme_background() ? '-dark.png' : '-light.png';
 // $separator = '>'; // $separator = '›'; // $separator = ':';
 $separator = '›';

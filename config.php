@@ -1,5 +1,7 @@
 <?php
 
+define( 'DEVELOPMENT_TESTING', true );
+
 // We are going to define the environments here; this means we can work with multiple servers easily
 $environments = [
 	'development' => 'http://localhost:3000', // Local Passenger Server
@@ -13,6 +15,7 @@ $environment = $environments[ file_get_contents( __DIR__ . '/environment.txt' ) 
 // Define the URLs that we will use through the workflow
 define( 'PACKAL_BASE_API_URL', "{$environment}/api/v1/" );
 define( 'PACKAL_BASE_URL', $environment );
+define( 'WORKFLOW_ENVIRONMENT', file_get_contents( __DIR__ . '/environment.txt' ) );
 
 define( 'PRIMARY_CACHE_BIN', parse_url( PACKAL_BASE_URL, PHP_URL_HOST ) );
 

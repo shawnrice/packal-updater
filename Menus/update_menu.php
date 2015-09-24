@@ -64,7 +64,7 @@ function create_migrate_menu( $query = false, $full = false ) {
 function find_updates( $workflows ) {
 	global $alphred, $separator, $icon_suffix, $api_available, $endpoints;
 	$updates = json_decode( retrieve_remote_data( $endpoints['workflow'] ), true );
-	print_r( $updates );
+	// print_r( $updates );
 	foreach ( $workflows as $key => $workflow ) :
 		if ( ! $workflow['packal'] ) {
 			unset( $workflows[$key] );

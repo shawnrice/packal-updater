@@ -1,5 +1,5 @@
 <?php
-require_once( __DIR__ . '/../includes.php' );
+require_once( __DIR__ . '/../autoloader.php' );
 
 use CFPropertyList\CFPropertyList as CFPropertyList;
 use Alphred\Ini as Ini;
@@ -186,7 +186,8 @@ class MapWorkflows {
 
 	private function check_for_mine( $plist ) {
 
-		$me = 'Shawn Patrick Rice';
+		$alphred = new Alphred;
+		$me = $alphred->config_read( 'username' );
 		if ( $me == $plist['author'] ) {
 			return true;
 		}

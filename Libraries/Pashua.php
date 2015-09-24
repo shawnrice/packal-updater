@@ -21,7 +21,6 @@
 		}
 
 		private function replace_values( $conf, $replacements ) {
-			print_r( $replacements);
 			foreach ( $replacements as $key => $val ) :
 				$conf = str_replace( '%%' . $key . '%%', $val, $conf );
 			endforeach;

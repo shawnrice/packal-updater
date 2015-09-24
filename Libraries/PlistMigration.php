@@ -1,8 +1,12 @@
 <?php
-/**
-* Require CFPropertyList
-*/
-require_once( __DIR__ . '/CFPropertyList/classes/CFPropertyList/CFPropertyList.php' );
+
+if ( ! self::is_phar() ) {
+	/**
+	* Require CFPropertyList
+	*/
+	require_once( __DIR__ . '/CFPropertyList/classes/CFPropertyList/CFPropertyList.php' );
+}
+
 use CFPropertyList\CFPropertyList as CFPropertyList;
 
 /**
@@ -209,7 +213,7 @@ function migratePlist( $current, $new ) {
 		}
 	}
 	return TRUE;
-
+}
 	/**
 	 *
 	 * Todo:
