@@ -24,7 +24,7 @@ foreach ( array_diff( scandir( __DIR__ . '/Menus' ), [ '.', '..', '.DS_Store'] )
 
 function check_connection() {
 	global $alphred;
-	return $alphred->get( PACKAL_BASE_API_URL . 'ping', false, 0, false );
+	return $alphred->get( BASE_API_URL . 'ping', false, 0, false );
 }
 
 function main( $argv ) {
@@ -45,8 +45,8 @@ function main( $argv ) {
 
 	$commands = [ 'search', 'submit', 'configure', 'update', 'clear-caches' ];
 	$endpoints = [
-		'workflow' => PACKAL_BASE_API_URL . 'workflow?all',
-		'theme'    => PACKAL_BASE_API_URL . 'theme?all'
+		'workflow' => BASE_API_URL . 'workflow?all',
+		'theme'    => BASE_API_URL . 'theme?all'
 	];
 
 	$updates = check_for_updates( $endpoints['workflow'] );
@@ -183,7 +183,7 @@ $alphred = new Alphred;
 if ( DEVELOPMENT_TESTING ) {
 	$alphred->add_result([
 		'title' => "Environment: " . strtoupper( WORKFLOW_ENVIRONMENT ),
-		'subtitle' => 'URL: ' . PACKAL_BASE_API_URL,
+		'subtitle' => 'URL: ' . BASE_API_URL,
 		'valid' => false,
 	]);
 }

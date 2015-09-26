@@ -16,8 +16,8 @@ function main( $argv ) {
 	$icon_suffix = 'light' == $alphred->theme_background() ? '-dark.png' : '-light.png';
 
 	$endpoints = [
-		'workflow' => PACKAL_BASE_API_URL . 'workflow?all',
-		'theme' => PACKAL_BASE_API_URL . 'theme?all'
+		'workflow' => BASE_API_URL . 'workflow?all',
+		'theme' => BASE_API_URL . 'theme?all'
 	];
 
 	if ( false !== strpos( $query, $separator ) ) {

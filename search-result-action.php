@@ -11,7 +11,7 @@ class Action {
 		$this->alphred = new Alphred;
 		// print_r( $args );
 		$this->action   = $args['action'];
-		$this->base_url = PACKAL_BASE_API_URL;
+		$this->base_url = BASE_API_URL;
 
 		foreach( [ 'target', 'workflow', 'path', 'theme', 'value' ] as $key ) :
 			$this->$key = isset( $args[ $key ] ) ? $args[ $key ] : false;
@@ -172,50 +172,9 @@ class Action {
 		}
 	}
 
-	/**
-	 * [post_download description]
-	 *
-	 * Sends a POST request to track downloads / installs on workflows and themes.
-	 *
-	 * @param  [type] $type       [description]
-	 * @param  [type] $properties [description]
-	 * @return [type]             [description]
-	 */
-	private function post_download( $type, $properties ) {
-		$id = ( 'theme' == $type ) ? $properties['theme'] : $properties['workflow'];
-		$json = [
-				'id' => self::uuid(),
-				'visit_id' => self::uuid(),
-				'user_id' => null,
-				'name' => "{$type}-{$id}",
-				'properties' => $properties,
-				'time' =>	date_format( date_create('now', new DateTimeZone( 'Etc/UTC' ) ), 'Y-m-d H:i:s' ),
-				'theme_id' => ($type == 'theme') ? $id : null,
-				'workflow_revision_id' => ($type == 'workflow') ? (int)$properties['revision'] : null,
-				'workflow_id' => ($type == 'workflow') ? $id : null,
-		];
-		// I wanted to use $alphred->post, but it doesn't encode the query fields correctly.
-		$c = curl_init('http://localhost:3000/ahoy/events');
-		curl_setopt( $c, CURLOPT_POST, true );
-		curl_setopt( $c, CURLOPT_POSTFIELDS, json_encode( $json ) );
-		curl_setopt( $c, CURLOPT_HTTPHEADER, [ 'Content-Type: application/json' ]);
-		curl_setopt( $c, CURLOPT_RETURNTRANSFER, true );
-		curl_exec( $c );
-		curl_close( $c );
-	}
 
-	private function uuid() {
-		return self::random(8) . '-' . self::random(4) . '-' . self::random(4) . '-' . self::random(4). '-' . self::random(12);
-	}
 
-	private function random( $length ) {
-		$string = 'abcdef0123456789';
-		$value = '';
-		for ( $i = 0; $i < $length; $i++ ) :
-			$value .= substr( $string, rand( 0, 15 ), 1 );
-		endfor;
-		return $value;
-	}
+
 
 	private function submit_theme( $theme ) {
 		$metadata = $this->submit_build_theme_info( $theme );

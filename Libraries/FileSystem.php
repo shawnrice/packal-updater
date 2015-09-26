@@ -58,9 +58,12 @@ class FileSystem {
 	    if( $file == '.' || $file == '..' ) {
 	      continue;
 	    }
-	    if ( is_dir( $directory . '/' . $file ) ) {
-	    	self::recurse_unlink( $directory . '/' . $file );
+	    if ( is_dir( "{$directory}/{$file}" ) ) {
+	    	self::recurse_unlink( "{$directory}/{$file}" );
+	    } else {
+	    	unlink( "{$directory}/{$file}" );
 	    }
+
 	  endwhile;
 
 	  closedir( $directory_handle );
@@ -83,11 +86,70 @@ class FileSystem {
 		return ( $dir ) && file_exists( $dir ) && is_dir( $dir );
 	}
 
+	public static function get_filename( $url ) {
+		return self::valid_location( $url ) ? substr( $url, strrpos( $url, '/' ) + 1 ) : false;
+	}
+
+	public static function valid_location( $location ) {
+		if ( file_exists( $location ) ) {
+			return true;
+		}
+		if ( self::verify_url( $location ) ) {
+			return true;
+		}
+		return false;
+	}
+
+	public static function verify_url( $url ) {
+		return filter_var( $url, FILTER_VALIDATE_URL );
+	}
+
+	public static function download_file( $url, $directory ) {
+		if ( ! ( $file = self::get_filename( $url ) ) ) {
+			return false;
+		}
+		if ( file_put_contents( "{$directory}/{$file}", file_get_contents( $url ) ) ) {
+			return "{$directory}/{$file}";
+		}
+		return false;
+	}
+
+	public static function verify_download( $file, $md5 ) {
+		return md5_file( $file ) == $md5;
+	}
+
+	public static function extract_archive( $archive, $destination ) {
+		$zip = new ZipArchive;
+		if ( true === $zip->open( $archive ) ) {
+		  $zip->extractTo( $destination );
+		  $zip->close();
+		 } else {
+		 	return false;
+		 }
+		 return true;
+	}
+
+
+	public static function extract_to_temp( $file ) {
+		$directory = self::make_random_temp_dir();
+		if ( ! self::extract_archive( $file, $directory ) ) {
+			self::recurse_unlink( $directory );
+			return false;
+		}
+		return $directory;
+	}
+
+	public static function clean_up( $directories ) {
+		foreach( $directories as $directory ) :
+			self::recurse_unlink( $directory );
+		endforeach;
+	}
+
 	// This method should not be in the FileSystem class
 	private function log( $message ) {
 		if ( class_exists( 'Alphred' ) ) {
 			$alphred = new Alphred;
-			$alphred->console( "{$message}\n", 4 );
+			$alphred->console( "{$message}", 4 );
 		} else {
 			echo "{$message}\n";
 		}

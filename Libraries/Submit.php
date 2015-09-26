@@ -11,7 +11,7 @@ class Submit {
 		$this->params = $params;
 		// Standard setup
 		$this->ch = curl_init();
-		curl_setopt( $this->ch, CURLOPT_URL, PACKAL_BASE_API_URL . 'alfred2/' . $type . '/submit' );
+		curl_setopt( $this->ch, CURLOPT_URL, BASE_API_URL . 'alfred2/' . $type . '/submit' );
 		curl_setopt( $this->ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $this->ch, CURLOPT_POST, true );
 		curl_setopt( $this->ch, CURLOPT_SAFE_UPLOAD, true );

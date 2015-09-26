@@ -30,7 +30,7 @@ function render_workflows( $workflows, $query ) {
 			}
 		endforeach;
 		if ( ! $singular ) {
-			$workflows = $alphred->filter( $workflows, $query, 'name', [ 'match_type' => DEFAULT_FILTER_PARAMS ] );
+			$workflows = $alphred->filter( $workflows, $query, 'name', [ 'match_type' => MATCH_SUBSTRING | MATCH_ALLCHARS | MATCH_STARTSWITH | MATCH_ATOM ] );
 		}
 	}
 	if ( isset( $singular ) && $singular ) {
@@ -172,7 +172,7 @@ function render_themes( $themes, $query ) {
 	$themes = json_decode( $themes, true );
 	$themes = $themes['themes'];
 	if ( ! empty( $query ) ) {
-		$themes = $alphred->filter( $themes, $query, 'name', [ 'match_type' => DEFAULT_FILTER_PARAMS ] );
+		$themes = $alphred->filter( $themes, $query, 'name', [ 'match_type' => MATCH_SUBSTRING | MATCH_ALLCHARS | MATCH_STARTSWITH | MATCH_ATOM ] );
 	}
 
 	$singular = false;

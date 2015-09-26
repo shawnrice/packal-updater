@@ -68,7 +68,7 @@ function submit_workflow_menu( $query = false ) {
 	$workflows = json_decode( file_get_contents( MapWorkflows::my_workflows_path() ), true );
 
 	// Filter down the workflows
-	$workflows = $alphred->filter( $workflows, $query, 'name', [ 'match_type' => DEFAULT_FILTER_PARAMS ] );
+	$workflows = $alphred->filter( $workflows, $query, 'name', [ 'match_type' => MATCH_SUBSTRING | MATCH_ALLCHARS | MATCH_STARTSWITH | MATCH_ATOM ] );
 
 	foreach( $workflows as $workflow ) :
 		$valid = true;

@@ -22,6 +22,12 @@ $other_files = [
 	'Libraries/BuildWorkflowMap.php',
 	'Libraries/BuildWorkflow.php',
 	'Libraries/Submit.php',
+	'Libraries/FileSystem.php',
+	'Libraries/Packal.php',
+	'Libraries/Themes.php',
+	'Libraries/Workflows.php',
+	'config.php',
+	'environment.txt',
 	// 'Resources/help_template.txt',
 ];
 $main_stub   = 'cli.php';

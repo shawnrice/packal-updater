@@ -43,145 +43,104 @@ if ( ! ini_get( 'date.timezone' ) ) {
 class CLI {
 	const VERSION = '0.0.1';
 	const CLI_NAME = 'packal-cli';
-	const BUNDLE = 'com.packal2';
 
 	const GREEN =  "\033[32m";
 	const RED = "\033[31m";
 	const NORMAL = "\033[0m";
 
 	public function __construct( $options = [] ) {
-		if ( isset( $_SERVER['PACKAL_ENVIRONMENT'] ) ) {
-			define( 'ENVIRONMENT', $_SERVER['PACKAL_ENVIRONMENT'] );
-		} else {
-			define( 'ENVIRONMENT', 'staging' );
-		}
 		self::autoloader();
-		self::set_api_url();
+
 		self::make_directories();
-		$this->alphred = new Alphred;
+		$this->alphred  = new Alphred;
+		$this->packal   = new Packal( ENVIRONMENT );
+		$this->workflow = new Workflows( ENVIRONMENT );
+		$this->theme    = new Themes( ENVIRONMENT );
 		$this->run();
 	}
 
-	/**
-	 * Gets the data directory path
-	 *
-	 * @return [type] [description]
-	 */
-	public function data() {
-		return "{$_SERVER['HOME']}/Library/Application Support/Alfred 2/Workflow Data/" . self::BUNDLE . '/';
-	}
-
-	/**
-	 * Gets the cache directory path
-	 *
-	 * @return [type] [description]
-	 */
-	public function cache() {
-		return "{$_SERVER['HOME']}/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/" . self::BUNDLE . '/';
-	}
-
-
-
-	function download_theme_data() {
-		$themes = $this->alphred->get( BASE_API_URL . '/theme?all' );
-		file_put_contents( self::data() . ENVIRONMENT . '/data/themes.json', $themes );
-		return json_decode( $themes, true );
-	}
-
-	function download_workflow_data() {
-		$workflows = $this->alphred->get( BASE_API_URL . '/workflow?all' );
-		file_put_contents( self::data() . ENVIRONMENT . '/data/workflow.json', $workflows );
-		return json_decode( $workflows, true );
-	}
-
-	/**
-	 * [find_one_theme description]
-	 *
-	 * There is probably a better way to do this.
-	 *
-	 * @param  [type] $slug [description]
-	 * @return [type]       [description]
-	 */
-	function find_theme_by_slug( $slug ) {
-		$themes = $this->download_theme_data();
-		$themes = $this->alphred->filter( $themes['themes'], $slug, 'url', [ 'match_type' => MATCH_SUBSTRING ] );
-		if ( 0 === count( $themes ) ) {
-			return false;
-		}
-		if ( 1 === count( $themes ) ) {
-			return $themes[0];
-		}
-		foreach( $themes as $theme ) {
-			$tmp_slug = substr( $theme['url'], strrpos( $theme['url'], '/' ) + 1 );
-			if ( $tmp_slug == $slug ) {
-				return $theme;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Pulls the slug off the URL
-	 *
-	 * @param  string $url a url
-	 * @return string      the slug
-	 */
-	function find_slug( $url ) {
-		return substr( $url, strrpos( $url, '/') + 1 );
+	private static function print_connectivity_error() {
+		$error = "\n!!! Error: Cannot connect to Packal servers. If cached data is present, you can install themes and search anything but nothing else.\n\n";
+		print self::highlight( $error, $error );
 	}
 
 	function install_theme( $slug ) {
-		if ( false === $theme = $this->find_theme_by_slug( $slug ) ) {
-			echo self::highlight( 'Error', "Error: there is no theme with the slug `{$slug}`.\n" );
+		$result = $this->theme->install( $slug );
+		if ( false == $result[0] ) {
+			print self::highlight( 'Error', "Error: there is no theme with the slug `{$result[1]['slug']}`.\n" );
 			exit(1);
+		} else {
+			print self::highlight( $result[1], "Installing {$result[1]}.\n" );
 		}
-		echo self::highlight( $theme['name'], "Installing {$theme['name']}.\n" );
-		exec("open '{$theme['uri']}'");
 		exit(0);
 	}
 
 	function install_workflow( $bundle ) {
-		echo "Let's try to install {$bundle}.\n";
-	}
-
-	function upgrade_workflow( $bundle ) {
-		echo "In upgrade_workflow\n";
-	}
-
-	function upgrade_workflows( $bundles ) {
-		echo "In upgrade_workflows\n";
+		$workflow = $this->workflow->find_workflow_by_bundle_from_packal( $bundle );
+		if ( is_string( $workflow ) ) {
+			print self::color( "!!! Error: {$workflow}\n", 'red' );
+			exit(1);
+		}
+		$result = $this->workflow->install( $workflow );
+		if ( is_string( $result ) ) {
+			$error = "!!! Error: " . $result . '.';
+			print self::highlight( $error, $error ) . "\n";
+			exit(1);
+		}
+		print self::color( "Successfully installed `{$workflow['name']}`.\n", 'green' );
+		exit(0);
 	}
 
 	/**
-	 * Abstracted Search method
+	 * [upgrade_workflows description]
 	 *
-	 * Searches for both workflows and themes depending on the input.
+	 * @todo Should I cache the results of this to a file?
 	 *
-	 * @param  string $search    search term
-	 * @param  string $key       the array sub-key to search through
-	 * @param  string $type      which type to search (workflow/theme)
-	 * @param  string $identifer name of identifier (bundle/slug)
-	 * @return string            the text of the output
+	 * @param  array  $workflows [description]
+	 * @return [type]            [description]
 	 */
-	function search( $search, $key, $type, $identifer ) {
+	function upgrade_workflows( $workflows = [] ) {
+		$this->workflow->find_upgrades();
+		if ( count( $this->workflow->upgrades ) > 0 ) {
+			$output = self::RED . "There are " . count( $this->workflow->upgrades ) . " upgrade(s)." . self::NORMAL . " available\n";
+			foreach( $this->workflow->upgrades as $upgrade ) {
+				$output .= "{$upgrade['old']['name']} -- {$upgrade['old']['bundle']} -- (" . self::RED . "{$upgrade['old']['version']}" . self::NORMAL . " -> " . self::GREEN . "{$upgrade['new']['version']}" . self::NORMAL . "), ";
+			}
+			$output = substr( $output, 0, -2 ) . "\n";
+			print $output;
+			$this->confirm( 'Continue with upgrades? (Y/n): ', 'Canceled upgrades.' );
+			foreach( $this->workflow->upgrades as $upgrade ) :
+			// 	print_r( $upgrade );
+			// exit();
+				if ( true !== $output = $this->workflow->upgrade( $upgrade ) ) {
+					print self::highlight( $output, $output );
+				} else {
+					print "Upgrade successful.";
+				}
+				print "\n";
+			endforeach;
+		} else {
+			print "All workflows are up to date.\n";
+			exit(0);
+		}
+	}
+
+
+	function print_search( $search, $key, $type, $identifer ) {
 		$red    = "\033[31m";
 		$green  = "\033[32m";
 		$normal = "\033[0m";
 
-		$items = call_user_func([ $this, "download_{$type}_data" ]);
-		$items = $this->alphred->filter(
-			$items[ "{$type}s" ],
-			$search,
-			$key,
-			[ 'match_type' => MATCH_SUBSTRING |MATCH_STARTSWITH | MATCH_ATOM ]
-		);
+		$items = $this->packal->search( $search, $key, $type, $identifer );
 
 		// Construct initial header
-		$output = "Searching {$red}" . str_replace( '/api/v1/', '', BASE_API_URL ) . "{$normal} for {$type}s.\n";
+		$output = self::print_divider();
+		$output .= "Searching {$red}" . str_replace( '/api/v1/', '', BASE_API_URL ) . "{$normal} for {$type}s.\n";
 		$output .= "Found {$red}" . count( $items ) . "{$normal} {$type}(s).\n";
 
 		// If we find nothing, then return early
 		if ( 0 === count( $items ) ) {
+			$output .= self::print_divider();
 			return $output;
 		}
 
@@ -195,7 +154,7 @@ class CLI {
 		$name_max = 0;
 
 		foreach ( $items as $item ) :
-			$id = ( 'theme' == $type ) ? self::find_slug( $item['url'] ) : $item[ $identifer ];
+			$id = ( 'theme' == $type ) ? $this->theme->find_slug( $item['url'] ) : $item[ $identifer ];
 			if ( strlen( $id ) > $id_max ) { $id_max = strlen( $id ); }
 			if ( strlen( $item['name'] ) > $name_max ) { $name_max = strlen( $item['name'] ); }
 			$out[] = [ $identifer => $id, 'name' => $item['name'], 'desc' => self::scrub( $item['description'] ) ];
@@ -223,13 +182,9 @@ class CLI {
 	 */
 	private function autoloader() {
 
-		// Set some variables here so that Alphred plays nicely, etc....
-		$_SERVER['alfred_workflow_data'] = self::data();
-		$_SERVER['alfred_workflow_cache'] = self::cache();
-		$_SERVER['alfred_workflow_bundleid'] = self::BUNDLE;
-
 		if ( self::is_phar() ) {
 			$files = [
+				'config.php',
 				'Alphred/Main.php',
 				'BuildThemeMap.php',
 				'BuildWorkflow.php',
@@ -240,9 +195,13 @@ class CLI {
 				'Submit.php',
 				'functions.php',
 				'FileSystem.php',
+				'Packal.php',
+				'Themes.php',
+				'Workflows.php',
 			];
 		} else {
 			$files = [
+				'config.php',
 				'Libraries/Alphred.phar',
 				'Libraries/BuildThemeMap.php',
 				'Libraries/BuildWorkflow.php',
@@ -253,20 +212,29 @@ class CLI {
 				'Libraries/Submit.php',
 				'Libraries/functions.php',
 				'Libraries/FileSystem.php',
+				'Libraries/Packal.php',
+				'Libraries/Themes.php',
+				'Libraries/Workflows.php',
+
 			];
 		}
 
 		foreach( $files as $file ) {
 			require_once( __DIR__ . '/' . $file );
 		}
+
+			// Set some variables here so that Alphred plays nicely, etc....
+		$_SERVER['alfred_workflow_data']     = DATA;
+		$_SERVER['alfred_workflow_cache']    = CACHE;
+		$_SERVER['alfred_workflow_bundleid'] = BUNDLE;
 	}
 
 	private function make_directories() {
 		$directories = [
-			self::data(),
-			self::cache(),
-			self::data() . ENVIRONMENT,
-			self::data() . ENVIRONMENT . '/data',
+			DATA,
+			CACHE,
+			DATA . ENVIRONMENT,
+			DATA . ENVIRONMENT . '/data',
 		];
 		foreach ( $directories as $dir ) :
 			if ( ! file_exists( $dir ) ) {
@@ -275,14 +243,7 @@ class CLI {
 		endforeach;
 	}
 
-	private function set_api_url() {
-		$urls = [
-			'development' => 'http://localhost:3000/api/v1/',
-			'staging' => 'https://mellifluously.org/api/v1/',
-			'production' => 'https://packal.org/api/v1/',
-		];
-		define( 'BASE_API_URL', $urls[ ENVIRONMENT ] );
-	}
+
 
 	/*********************************************************************
 	 * "Meta" Methods
@@ -362,7 +323,7 @@ class CLI {
 	}
 
 	function usage() {
-		echo "You need to pass things to this script for it to do anything.\n";
+		print "You need to pass things to this script for it to do anything.\n";
 	}
 
 	function version() {
@@ -373,15 +334,24 @@ class CLI {
 
 	function run() {
 		$options = $this->parse_options();
-		// So, what are we doing here? Can we do this with a switch statement?
 
+		if ( empty( $options ) ) {
+			$this->usage();
+			exit(1);
+		}
+
+		if ( ! $this->packal->ping() ) {
+			self::print_connectivity_error();
+		}
+
+		// So, what are we doing here? Can we do this with a switch statement?
 		if ( isset( $options['search-themes'] ) ) {
-			print $this->search( $options['search-themes'], 'name', 'theme', 'slug' );
+			print $this->print_search( $options['search-themes'], 'name', 'theme', 'slug' );
 			// echo $this->search_theme( $options['st'] );
 			exit(0);
 		}
 		if ( isset( $options['search-workflows'] ) ) {
-			print $this->search( $options['search-workflows'], 'name', 'workflow', 'bundle' );
+			print $this->print_search( $options['search-workflows'], 'name', 'workflow', 'bundle' );
 			exit(0);
 		}
 		if ( isset( $options['help'] ) ) {
@@ -404,7 +374,7 @@ class CLI {
 			$this->upgrade_workflows( $options['upgrade'] );
 			exit(0);
 		}
-		echo "No arguments found.\n";
+		print "No arguments found.\n";
 		print_r($options);
 	}
 
@@ -419,7 +389,7 @@ class CLI {
 	 * @return [type]          [description]
 	 */
 	private function input( $prompt = false, $hidden = false ) {
-		if ( $prompt ) { echo $prompt; }
+		if ( $prompt ) { print $prompt; }
 		if ( $hidden ) { system( 'stty -echo' ); }
 		$return = trim( fgets( STDIN ) );
 		if ( $hidden ) { system( 'stty echo' ); }
@@ -448,15 +418,17 @@ class CLI {
 	 * [confirm description]
 	 * @return [type] [description]
 	 */
-	private function confirm() {
-		$answer = strtolower( self::get_input( "Continue (Y/n): " ) );
+	private function confirm( $prompt = false, $canceled = false ) {
+		$prompt = ( $prompt ) ? $prompt : "Continue (Y/n): ";
+		$canceled = ( ( $canceled ) ? $canceled : "Canceled action." ) . "\n";
+		$answer = strtolower( self::get_input( $prompt ) );
 		if ( empty( $answer ) ) {
 			return true;
 		} else if ( in_array( $answer, [ 'y', 'ye', 'yes' ] ) ) {
 			return true;
 		}
-		echo "Canceled action.\n";
-		exit(0);
+		print $canceled;
+		exit(1);
 	}
 
 	/*********************************************************************
@@ -534,6 +506,18 @@ class CLI {
 		$normal = "\033[0m";
 		// Should this be str_replace instead? This highlights everything, but lowercases some weird stuff
 		return str_ireplace( $search, "{$red}{$search}{$normal}", $string );
+	}
+
+	private function color( $message, $color ) {
+		$colors = [
+			'red'    => "\033[31m",
+			'green'  => "\033[32m",
+			'normal' => "\033[0m",
+		];
+		if ( ! array_key_exists( $color, $colors ) ) {
+			return $message;
+		}
+		return "{$colors[$color]}{$message}{$colors['normal']}";
 	}
 
 }

@@ -14,22 +14,25 @@ class Plist {
 	 * @param string  $plist    The location of the plist file
 	 * @return void
 	 */
-	public static function strip_hotkey( $location, $plist ) {
+	public static function strip_hotkey( $location, $plist, $hotstring = false ) {
 		// I might consider adding error handling in this.
 
 		// Just the first part of the command that finds PlistBuddy
 		$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
 
-		// Reset the Hotstring (key)
-		$cmd = $PlistBuddy . "\"set $location:hotstring \" '$plist'";
-		exec( $cmd );
+		if ( $hotstring ) {
+			// Reset the Hotstring (key)
+			$cmd = $PlistBuddy . "\"set {$location}:hotstring \" '{$plist}'";
+			exec( $cmd );
+		}
+
 
 		// Reset the hotkey
-		$cmd = $PlistBuddy . "\"set $location:hotkey 0\" '$plist'";
+		$cmd = $PlistBuddy . "\"set {$location}:hotkey 0\" '{$plist}'";
 		exec( $cmd );
 
 		// Reset the modifier keys
-		$cmd = $PlistBuddy . "\"set $location:hotmod 0\" '$plist'";
+		$cmd = $PlistBuddy . "\"set {$location}:hotmod 0\" '{$plist}'";
 		exec( $cmd );
 
 	}
@@ -48,7 +51,7 @@ class Plist {
 		$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
 
 		// Set the value
-		$cmd = $PlistBuddy . "\"set $location $value\" '$plist'";
+		$cmd = $PlistBuddy . "\"set {$location} {$value}\" '{$plist}'";
 		// echo $cmd;
 		exec( $cmd );
 
@@ -73,8 +76,9 @@ class Plist {
 		foreach ( $tmp['objects'] as $key => $object ) {
 			if ( $object['type'] == 'alfred.workflow.trigger.hotkey' ) {
 				// We've found a hotkey, so let's strip it.
+				$hotstring = ( isset( $object['config']['hotstring'] ) ) ? true : false;
 				$location = ":objects:{$key}:config";
-				self::strip_hotkey( $location, $plist );
+				self::strip_hotkey( $location, $plist, $hotstring );
 			}
 		}
 
@@ -187,8 +191,6 @@ class Plist {
 			if ( in_array( $o['type'] , $objects ) ) {
 				// Check to see if the objects is one of the original objects with a uid.
 				if ( in_array( $o['uid'] , $uids ) ) {
-					echo $o['uid']   . "<br >";
-					echo $o['type']  . "<br> ";
 					if ( $o['type'] == 'alfred.workflow.trigger.hotkey') {
 						// We're not really going to bother to check to see if the values match;
 						// we'll just migrate them instead.
