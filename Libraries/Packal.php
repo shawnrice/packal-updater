@@ -42,7 +42,6 @@ class Packal {
 				'visit_id' => self::uuid(),
 				'user_id' => null,
 				'name' => "{$type}-{$properties['id']}",
-
 				'time' =>	date_format( date_create('now', new DateTimeZone( 'Etc/UTC' ) ), 'Y-m-d H:i:s' ),
 				'theme_id' => ($type == 'theme') ? $properties['id'] : null,
 				'workflow_revision_id' => ($type == 'workflow') ? (int) $properties['revision_id'] : null,

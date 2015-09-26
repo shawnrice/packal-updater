@@ -61,7 +61,7 @@ class CLI {
 
 	private static function print_connectivity_error() {
 		$error = "\n!!! Error: Cannot connect to Packal servers. If cached data is present, you can install themes and search anything but nothing else.\n\n";
-		print self::highlight( $error, $error );
+		print self::color( $error, 'red' );
 	}
 
 	function install_theme( $slug ) {

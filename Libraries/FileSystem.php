@@ -155,6 +155,19 @@ class FileSystem {
 		}
 	}
 
+	public static function slugify( $slug ) {
+		$slug = strtolower( $slug );
+		$slug = preg_replace( '/[^\w]{1,}/', '-', $slug );
+		$slug = preg_replace( '/[-]{2,}/', '-', $slug );
+		if ( '-' == substr( $slug, -1 ) ) {
+			$slug = substr( $slug, 0, -1 );
+		}
+		if ( '-' == substr( $slug, 0, 1 ) ) {
+			$slug = substr( $slug, 1 );
+		}
+		return $slug;
+	}
+
 }
 
 

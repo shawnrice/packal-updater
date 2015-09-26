@@ -7,14 +7,14 @@ class Themes {
 		$this->packal = new Packal( $environment );
 	}
 
-	function get_theme_uri_by_slug( $slug ) {
+	public function get_theme_uri_by_slug( $slug ) {
 		if ( false === $theme = $this->find_theme_by_slug( $slug ) ) {
 			return "Error: there is no theme with the slug `{$slug}`";
 		}
 		return $theme['uri'];
 	}
 
-	function install( $slug ) {
+	public function install( $slug ) {
 		if ( false === $uri = $this->get_theme_uri_by_slug( $slug ) ) {
 			return [ false, "Cannot install theme with {$slug} because no theme with that slug exists." ];
 		}
