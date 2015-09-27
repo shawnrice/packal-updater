@@ -110,9 +110,10 @@ function render_singlular_workflow( $workflow ) {
 			'icon' 		 => 'assets/images/icons/download' . $icon_suffix,
 			'valid'    => true,
 			'arg'			 => json_encode([
-                      'action' => 'download',
-                      'target' => $workflow['file'],
-                      'workflow' => $workflow,
+											'action'   => 'download',
+											'target'   => $workflow['file'],
+											'type'     => 'workflow',
+											'resource' => $workflow,
                     ]),
 		]);
 		$alphred->add_result([
@@ -121,8 +122,9 @@ function render_singlular_workflow( $workflow ) {
 			'valid'    => true,
 			'arg'			 => json_encode([
                       'action' => 'install',
+                      'type'  => 'workflow',
                       'target' => $workflow['file'],
-                      'workflow' => $workflow,
+                      'resource' => $workflow,
                     ]),
 		]);
 		$alphred->add_result([
@@ -130,9 +132,9 @@ function render_singlular_workflow( $workflow ) {
 			'icon' 		 => 'assets/images/icons/packal' . $icon_suffix,
 			'valid'    => true,
 			'arg'			 => json_encode([
-                      'action' => 'open',
-                      'target' => $workflow['url'],
-                      'workflow' => $workflow,
+											'action'   => 'open',
+											'target'   => $workflow['url'],
+											'workflow' => $workflow,
                     ]),
 		]);
 		$alphred->add_result([
@@ -140,9 +142,9 @@ function render_singlular_workflow( $workflow ) {
 			'icon' 		 => 'assets/images/icons/user' . $icon_suffix,
 			'valid'    => true,
 			'arg'			 => json_encode([
-                      'action' => 'open',
-                      'target' => $workflow['author_url'],
-                      'workflow' => $workflow,
+											'action'   => 'open',
+											'target'   => $workflow['author_url'],
+											'workflow' => $workflow,
                     ]),
 		]);
 		if ( isset( $workflow['github'] ) && ! empty( $workflow['github'] ) ) {
@@ -151,10 +153,10 @@ function render_singlular_workflow( $workflow ) {
 				'icon' 		 => 'assets/images/icons/github' . $icon_suffix,
 				'valid'    => true,
 				'arg'			 => json_encode([
-                      'action' => 'open',
-                      'target' => "https://github.com/{$workflow['github']}",
-                      'workflow' => $workflow,
-                    ]),
+												'action'   => 'open',
+												'target'   => "https://github.com/{$workflow['github']}",
+												'resource' => $workflow,
+	                    ]),
 			]);
 		}
 		$alphred->add_result([
@@ -162,8 +164,9 @@ function render_singlular_workflow( $workflow ) {
 			'icon' 		 => 'assets/images/icons/report' . $icon_suffix,
 			'valid'    => true,
 			'arg'			 => json_encode([
-                      'action' => 'report',
-                      'workflow' => $workflow,
+											'action'   => 'report',
+											'type'     => 'workflow',
+											'resource' => $workflow,
                     ]),
 		]);
 	} else {
@@ -275,7 +278,7 @@ function render_theme_stub( $theme ) {
 		$subtitle = substr( $subtitle, 0, 120);
 	}
 	$alphred->add_result([
-		'title'        => "{$theme['name']}",
+		'title'        => $theme['name'],
 		'subtitle'     => $subtitle,
 		'icon'         => 'assets/images/icons/bullet' . $icon_suffix,
 		'autocomplete' => "search{$separator}theme{$separator}{$theme['name']}",

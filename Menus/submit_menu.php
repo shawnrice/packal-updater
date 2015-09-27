@@ -1,44 +1,37 @@
 <?php
 
-/**
- * @todo remove dependency on vierbergenlars\SemVer and use my SemVer class instead
- */
-
-use vierbergenlars\SemVer\version;
-use vierbergenlars\SemVer\expression;
-use vierbergenlars\SemVer\SemVerException;
-
 function create_submit_menu( $possible ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
-	if ( $api_available ){
+
+	if ( $api_available ) {
 		$alphred->add_result([
-	  	'title' => 'Submit a Theme',
-	  	'uid' => 'packal-submit-theme',
-	  	'autocomplete' => "submit{$separator}theme{$separator}",
-	  	'valid' => false,
+			'title'        => 'Submit a Theme',
+			'uid'          => 'packal-submit-theme',
+			'autocomplete' => "submit{$separator}theme{$separator}",
+			'valid'        => false,
 		]);
 		$alphred->add_result([
-	  	'title' => 'Submit a Workflow',
-	  	'uid' => 'packal-submit-workflow',
-	  	'autocomplete' => "submit{$separator}workflow{$separator}",
-	  	'valid' => false,
+			'title'        => 'Submit a Workflow',
+			'uid'          => 'packal-submit-workflow',
+			'autocomplete' => "submit{$separator}workflow{$separator}",
+			'valid'        => false,
 		]);
 	} else {
 		$alphred->add_result([
-	  	'title' => 'Submit a Workflow',
-	  	'uid' => 'packal-submit-workflow',
-	  	'subtitle' => 'Cannot connect to server, and so we cannot submit a workflow',
-	  	'icon' => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Unsupported.icns',
-	  	'autocomplete' => "submit{$separator}workflow{$separator}",
-	  	'valid' => false,
+			'title'        => 'Submit a Workflow',
+			'uid'          => 'packal-submit-workflow',
+			'subtitle'     => 'Cannot connect to server, and so we cannot submit a workflow',
+			'icon'         => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Unsupported.icns',
+			'autocomplete' => "submit{$separator}workflow{$separator}",
+			'valid'        => false,
 		]);
 		$alphred->add_result([
-	  	'title' => 'Submit a Theme',
-	  	'uid' => 'packal-submit-theme',
-	  	'subtitle' => 'Cannot connect to server, and so we cannot submit a theme',
-	  	'icon' => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Unsupported.icns',
-	  	'autocomplete' => "submit{$separator}theme{$separator}",
-	  	'valid' => false,
+			'title'        => 'Submit a Theme',
+			'uid'          => 'packal-submit-theme',
+			'subtitle'     => 'Cannot connect to server, and so we cannot submit a theme',
+			'icon'         => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Unsupported.icns',
+			'autocomplete' => "submit{$separator}theme{$separator}",
+			'valid'        => false,
 		]);
 	}
 }
@@ -49,9 +42,13 @@ function submit_theme_menu( $query = false ) {
 	$themes = array_values( encode_themes( get_themes(), $me ) );
 	foreach( $themes as $theme ) :
 		$alphred->add_result([
-		  'title' => "Submit {$theme['name']} to Packal.org",
-		  'valid' => true,
-		  'arg'  => json_encode( [ 'action' => 'submit_theme', 'theme' => $theme ] ),
+			'title' => "Submit {$theme['name']} to Packal.org",
+			'valid' => true,
+			'arg'   => json_encode([
+				'action'   => 'submit',
+				'type'     => 'theme',
+				'resource' => $theme,
+			]),
 		]);
 	endforeach;
 }
@@ -79,8 +76,9 @@ function submit_workflow_menu( $query = false ) {
 			if ( true === ( $subtitle = validate_workflow_ini_file( $workflow, $packal_workflows ) ) ) {
 				$subtitle = 'Ready to submit.';
 				$arg = json_encode([
-					'action' => 'submit_workflow',
-					'path' => $workflow['path'],
+					'action' => 'submit',
+					'type' => 'workflow',
+					'resource' => $workflow,
 				]);
 			} else {
 				$subtitle = "Edit workflow.ini: {$subtitle}";
@@ -88,7 +86,7 @@ function submit_workflow_menu( $query = false ) {
 		} else {
 			// There is no workflow.ini file, so we will generate one.
 			$subtitle = 'Generate workflow.ini file';
-			$arg = json_encode([ 'action' => 'generate_ini', 'path' => $workflow['path'] ]);
+			$arg = json_encode([ 'action' => 'generate_ini', 'target' => $workflow['path'] ]);
 		}
 
 		$alphred->add_result([
@@ -148,7 +146,7 @@ function validate_workflow_ini_file( $workflow, $packal_workflows ) {
 	// Make sure that if there is already a version on Packal that the submission
 	// will be an update so that the updater functionality actually works correctly.
 	if ( isset( $packal_version ) ) {
-		if ( version::gt( $packal_version, $ini['workflow']['version'] ) ) {
+		if ( SemVer::gt( $packal_version, $ini['workflow']['version'] ) ) {
 			return true;
 		} else {
 			// return 'A version the same or greater has already been submitted on Packal. Please update the workflow.ini file';
