@@ -30,31 +30,33 @@ function create_migrate_menu( $query = false, $full = false ) {
 	$ttl = $alphred->config_read( 'workflow_map_cache' );
 	$workflows = MapWorkflows::map( $ttl );
 
-	$old_packal_workflows = json_decode( file_get_contents( "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json" ), true );
+	$old_packal_workflows = json_decode( file_get_contents( MapWorkflows::migrate_path() ), true );
 
 	if ( ! ( is_array( $old_packal_workflows ) && count( $old_packal_workflows ) > 0 ) ) {
 		return;
 	}
-
 	$alphred->console( 'There are workflows from the old Packal that need migrating.', 2 );
 
-	$alphred->add_result([
-		'title' => 'Migrate to the new Packal',
-		'subtitle' => 'You have workflows that need to be redownloaded from the new Packal in order to continue updating them.',
-		'valid' => false,
-		'autocomplete' => "update{$separator}migrate",
-	]);
-	if ( $full ) {
+	if ( ! $full ) {
 		$alphred->add_result([
-			'title' => 'Migrate all workflows',
-			'valid' => true,
-			'arg'   => json_encode([ 'action' => 'migrate-old-packal-workflows' ]),
+			'title'        => 'Migrate to the new Packal',
+			'subtitle'     => 'You have workflows that need to be redownloaded from the new Packal.',
+			'valid'        => false,
+			'autocomplete' => "update{$separator}migrate",
 		]);
+	} else {
+		$alphred->add_result([
+			'title' => 'Migrate all (' . count( $old_packal_workflows ) . ') workflows.',
+			'valid' => true,
+			'arg'   => json_encode([ 'action' => 'migrate-all-workflows' ]),
+		]);
+
 		foreach ( $old_packal_workflows as $workflow ) :
 			$alphred->add_result([
 				'title' => "Migrate `{$workflow['name']}`",
+				'icon'  => "{$workflow['path']}/icon.png",
 				'valid' => true,
-				'arg' 	=> json_encode([ 'action' => 'migrate-workflow', 'workflow' => $workflow ]),
+				'arg'   => json_encode([ 'action' => 'migrate-workflow', 'resource' => $workflow ]),
 			]);
 		endforeach;
 	}
@@ -70,13 +72,10 @@ function find_updates( $workflows ) {
 			unset( $workflows[$key] );
 		} else {
 			$ini = \Alphred\Ini::read_ini( $workflow['path'] . '/workflow.ini' );
-			// if ( isset( $))
-			$version = $ini['workflow']['version'];
-			$icon = $workflow['path'] . '/icon.png';
 			$alphred->add_result([
-				'title' => $workflow['name'],
-				'icon' => $icon,
-				'subtitle' => "Current version: {$version}",
+				'title'    => $workflow['name'],
+				'icon'     => "{$workflow['path']}/icon.png",
+				'subtitle' => "Current version: {$ini['workflow']['version']}",
 			]);
 		}
 	endforeach;

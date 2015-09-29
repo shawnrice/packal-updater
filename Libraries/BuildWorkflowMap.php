@@ -1,8 +1,15 @@
 <?php
+/**
+ *
+ * @todo Remove the hack in the function: check_for_mine()
+ *
+ */
+
+
 require_once( __DIR__ . '/../autoloader.php' );
 
 use CFPropertyList\CFPropertyList as CFPropertyList;
-use Alphred\Ini as Ini;
+// use Alphred\Ini as Ini;
 
 class MapWorkflows {
 
@@ -46,26 +53,32 @@ class MapWorkflows {
 		return false;
 	}
 
+	public function map_path() {
+		return "{$_SERVER['alfred_workflow_data']}/data/workflows/workflow_map.json";
+	}
+
 	public function my_workflows_path() {
 		return "{$_SERVER['alfred_workflow_data']}/data/workflows/mine.json";
 	}
 
+	public function migrate_path() {
+		return "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json";
+	}
+
+
 	public function clear_cache() {
-		if ( file_exists( "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json" ) ) {
-			unlink( "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json" );
-		}
-		if ( file_exists( self::map_path() ) ) {
-			unlink( self::map_path() );
-		}
+		@unlink( self::migrate_path() );
+		@unlink( self::map_path() );
+		@unlink( self::my_workflows_path() );
 		return true;
 	}
+
+
 
 	private function write_old_packal_migration( $old_packal ) {
 		// This is the old Packal workflow list.
 		if ( count( $old_packal ) > 0 ) {
-			file_put_contents(
-			  "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json",
-			  json_encode( $old_packal, JSON_PRETTY_PRINT ) );
+			file_put_contents( self::migrate_path(), json_encode( $old_packal, JSON_PRETTY_PRINT ) );
 		}
 	}
 
@@ -96,9 +109,7 @@ class MapWorkflows {
 		return false;
 	}
 
-	private function map_path() {
-		return "{$_SERVER['alfred_workflow_data']}/data/workflows/workflow_map.json";
-	}
+
 
 	private function check_for_expire_cache() {
 		if ( file_exists( "{$_SERVER['alfred_workflow_data']}/expire_local_workflow_cache" ) ) {
@@ -109,14 +120,19 @@ class MapWorkflows {
 	}
 
 	private function check_map_cache( $ttl ) {
+		// If the cache is set to false or 0, then just return false, indicating that the cache is expired
 		if ( ! $ttl ) {
-			// If the cache is set to false or 0, then just return false, indicating
-			// that the cache is expired
 			return false;
 		}
-		if ( ( filemtime( self::map_path() ) + $ttl ) > time() ) {
+		// A value of -1 means an infinite cache
+		if ( -1 == $ttl ) {
 			return true;
 		}
+		// Is there still time left in the time to live? Check the file modified time v current time
+		if ( ( time() - filemtime( self::map_path() ) ) > $ttl ) {
+			return true;
+		}
+		// The cache is not valid
 		return false;
 	}
 
@@ -126,13 +142,15 @@ class MapWorkflows {
 		}
 	}
 
+	/**
+	 * [remove_old_data description]
+	 *
+	 * @todo Remove this method
+	 *
+	 * @return [type] [description]
+	 */
 	private function remove_old_data() {
-		if ( file_exists( "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json" ) ) {
-			unlink( "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json" );
-		}
-		if ( file_exists( "{$_SERVER['alfred_workflow_data']}/data/workflows/workflow_map.json") ) {
-			unlink( "{$_SERVER['alfred_workflow_data']}/data/workflows/workflow_map.json" );
-		}
+		return self::clear_cache();
 	}
 
 	private function find_workflows_directory() {
@@ -141,7 +159,8 @@ class MapWorkflows {
 		$preferences = $preferences->toArray();
 
 		if ( isset( $preferences['syncfolder'] ) ) {
-			$workflows = str_replace( '~', $_SERVER['HOME'], $preferences['syncfolder']) . '/Alfred.alfredpreferences/workflows';
+			$workflows  = str_replace( '~', $_SERVER['HOME'], $preferences['syncfolder']);
+			$workflows .= '/Alfred.alfredpreferences/workflows';
 		} else {
 			$workflows = "{$_SERVER['HOME']}/Library/Application Support/Alfred 2/Alfred.alfredpreferences/workflows";
 		}
@@ -188,6 +207,15 @@ class MapWorkflows {
 		return $return;
 	}
 
+	/**
+	 * [check_for_mine description]
+	 *
+	 * @todo Remove the hack
+	 *
+	 * @param  [type] $plist [description]
+	 * @param  [type] $me    [description]
+	 * @return [type]        [description]
+	 */
 	private function check_for_mine( $plist, $me ) {
 		// This is a hack
 		$me = mb_ereg_replace( '[A-Za-z][^A-Za-z0-9\.\- ]', '', $me );
@@ -212,7 +240,7 @@ class MapWorkflows {
 		if ( ! file_exists( "{$directory}/workflow.ini" ) ) {
 			return false;
 		}
-		$ini = Ini::read_ini( "{$directory}/workflow.ini" );
+		$ini = \Alphred\Ini::read_ini( "{$directory}/workflow.ini" );
 		if ( ! isset( $ini['workflow']['version'] ) ) {
 			return false;
 		}

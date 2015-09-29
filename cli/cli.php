@@ -203,11 +203,10 @@ class CLI {
 				print "\n";
 			endforeach;
 		} else {
-			print "All workflows are up to date.\n";
+			print self::color( "All workflows are up to date.\n", 'green' );
 			exit(0);
 		}
 	}
-
 
 	function print_search( $search, $key, $type, $identifer ) {
 		$red    = "\033[31m";
@@ -409,55 +408,52 @@ class CLI {
 
 	function usage() {
 		global $argv;
-		print "You need to pass things to this script for it to do anything.\n";
+		print "\n";
+		print self::help();
+		print "Use this cli to interact with Packal.org from the command line.\n\n";
+		print self::color( "Error: you must pass arguments to this script.", 'red' ) . "\n";
 		$script_name = $argv[0];
 		$values = [
-			'--install-theme' => "Installs a theme. Usage: %%script_name%% %%key%% <slug>",
-			'--it' => 'Alias of `--install-theme`',
-			'--install-workflow' => 'Installs a workflow. Usage: %%script_name%% %%key%% <bundle>',
-			'--iw' => 'Alias of `--install-workflow`',
+			'--install-theme'     => "Installs a theme. Usage: %%script_name%% %%key%% <slug>",
+			'--it'                => 'Alias of `--install-theme`',
+			'--install-workflow'  => 'Installs a workflow. Usage: %%script_name%% %%key%% <bundle>',
+			'--iw'                => 'Alias of `--install-workflow`',
 			'--download-workflow' => 'Downloads a workflow. Usage: %%script_name%% %%key%% <bundle>',
-			'--dw' => 'Alias of `--download-workflow`',
+			'--dw'                => 'Alias of `--download-workflow`',
 			'--upgrade-workflows' => 'Upgrades all workflows. Usage: %%script_name%% %%key%%',
-			'--upgrade' => 'Alias of `--upgrade-workflows`',
-			'--search-themes' => 'Searches for themes on Packal.org. Usage: %%script_name%% %%key%% <string>',
-			'--st' => 'Alias of `--search-themes`',
-			'--search-workflows' => 'Searches for workflows on Packal.org. Usage: %%script_name%% %%key%% <string>',
-			'--sw' => 'Alias of `--search-workflows`',
-			'--submit-workflow' => 'Submits a workflow to Packal.org. Usage: %%script_name%% %%key%% <bundle>',
-			'--submit-theme' => 'Submits a theme to Packal.org. Usage: %%script_name%% %%key%% <???>',
-			'--clear-cache' => 'Clears the local data. Usage: %%script_name%% %%key%%',
-			'--cc' => 'Alias of `--clear-cache`',
-			'--usage' => 'Print this help text.',
-			'--version' => 'Prints the version of this cli. Usage: %%script_name%% %%key%%',
-			'--v' => 'Alias of `--version`',
+			'--upgrade'           => 'Alias of `--upgrade-workflows`',
+			'--search-themes'     => 'Searches for themes on Packal.org. Usage: %%script_name%% %%key%% <string>',
+			'--st'                => 'Alias of `--search-themes`',
+			'--search-workflows'  => 'Searches for workflows on Packal.org. Usage: %%script_name%% %%key%% <string>',
+			'--sw'                => 'Alias of `--search-workflows`',
+			'--submit-workflow'   => 'Submits a workflow to Packal.org. Usage: %%script_name%% %%key%% <bundle>',
+			'--submit-theme'      => 'Submits a theme to Packal.org. Usage: %%script_name%% %%key%% <???>',
+			'--clear-cache'       => 'Clears the local data. Usage: %%script_name%% %%key%%',
+			'--cc'                => 'Alias of `--clear-cache`',
+			'--usage'             => 'Print this help text.',
+			'--version'           => 'Prints the version of this cli. Usage: %%script_name%% %%key%%',
+			'--v'                 => 'Alias of `--version`',
 		];
 		$output = [];
 		$min_one = 0;
 		$min_two = 0;
+
 		foreach ( $values as $key => $value ) :
 			foreach( [ 'script_name', 'key' ] as $var ) :
 				$value = str_replace( "%%{$var}%%", $$var, $value );
 			endforeach;
-			if ( strlen( $key ) > $min_one ) {
-				$min_one = strlen( $key );
-			}
-			if ( strlen( $value ) > $min_two ) {
-				$min_two = strlen( $value );
-			}
 			$output[] = [ $key, $value ];
 		endforeach;
-
-		print self::print_divider();
+		$pads = self::calculate_pads( $output );
 		foreach( $output as $row ) :
-			print "\n\t" . self::pad_string( $row[0], $min_one ) . "\t" . self::pad_string( $row[1], $min_two ) . "\n";
+			print "\n\t" . self::pad_string( $row[0], reset( $pads ) ) . "\t" . self::pad_string( $row[1], next( $pads ) ) . "\n";
 		endforeach;
+		print "\n";
 	}
 
 	function version() {
 		print self::CLI_NAME . " version " . self::VERSION . "\n";
 	}
-
 
 
 	function run() {
@@ -587,6 +583,22 @@ class CLI {
 			endfor;
 		}
 		return $string;
+	}
+
+
+	private function calculate_pads( $array ) {
+		for ( $i = 0; $i < count( $array ); $i++ ) :
+			foreach( $array[$i] as $key => $value ) :
+				if ( ! isset( $max[ $key ] ) ) {
+					$max[ $key ] = strlen( $value );
+					continue;
+				}
+				if ( strlen( $value ) > $max[ $key ] ) {
+					$max[ $key ] = strlen( $value );
+				}
+			endforeach;
+		endfor;
+		return $max;
 	}
 
 	/**

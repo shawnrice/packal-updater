@@ -16,10 +16,16 @@ $files = [
 	'Libraries/SemVer.php',
 	'Libraries/Submit.php',
 	'Libraries/Themes.php',
-	'Libraries/tweaked_alphred_request.php',
 	'Libraries/Workflows.php',
 ];
 
 foreach( $files as $file ) :
 	require_once( __DIR__ . '/' . $file );
 endforeach;
+
+// This is a dumb autoloader for all the different menu files.
+foreach ( array_diff( scandir( __DIR__ . '/Menus' ), [ '.', '..', '.DS_Store'] ) as $file ) {
+	if ( 'php' === pathinfo( $file )['extension'] ) {
+		require_once( __DIR__ . "/Menus/{$file}" );
+	}
+}

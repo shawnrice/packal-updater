@@ -18,7 +18,6 @@ define( 'ENVIRONMENT', file_get_contents( __DIR__ . '/environment.txt' ) );
 define( 'DEVELOPMENT_TESTING', true );
 define( 'BASE_URL', $environments[ ENVIRONMENT ] );
 define( 'BASE_API_URL', BASE_URL . '/api/v1/' );
-define( 'WORKFLOW_ENVIRONMENT', file_get_contents( __DIR__ . '/environment.txt' ) );
 define( 'PRIMARY_CACHE_BIN', parse_url( BASE_URL, PHP_URL_HOST ) );
 define( 'BUNDLE', 'com.packal2' );
 define( 'DATA', "{$_SERVER['HOME']}/Library/Application Support/Alfred 2/Workflow Data/" . BUNDLE . '/' );

@@ -13,14 +13,8 @@
  */
 
 require_once( __DIR__ . '/autoloader.php' );
-require_once( __DIR__ . '/Libraries/BuildWorkflowMap.php' );
 
-// This is a dumb autoloader for all the different menu files.
-foreach ( array_diff( scandir( __DIR__ . '/Menus' ), [ '.', '..', '.DS_Store'] ) as $file ) {
-	if ( 'php' === pathinfo( $file )['extension'] ) {
-		require_once( __DIR__ . "/Menus/{$file}" );
-	}
-}
+
 
 function check_connection() {
 	global $alphred;
@@ -36,7 +30,7 @@ function main( $argv ) {
 	// if ( 'pong' !== check_connection() ) {
 	// 	$alphred->add_result([
 	// 		'title' => 'Cannot connect to Packal Server',
-	// 		'subtitle' => 'We will attempt to use cached data if available.',
+	// 		'subtitle' => 'Attempting to use cached data.',
 	// 		'icon' => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Unsupported.icns',
 	// 		'valid' => false,
 	// 	]);
@@ -168,7 +162,7 @@ function retrieve_remote_data( $api_endpoint ) {
 	} else if ( strpos( $api_endpoint, 'theme' ) ) {
 		$type = 'theme';
 	}
-	return $alphred->get( $api_endpoint, false, 86400, true );
+	return $alphred->get( $api_endpoint, [], 86400, true );
 }
 
 function check_for_old_packal_workflows() {
@@ -186,14 +180,13 @@ $alphred = new Alphred;
 
 if ( DEVELOPMENT_TESTING ) {
 	$alphred->add_result([
-		'title' => "Environment: " . strtoupper( WORKFLOW_ENVIRONMENT ),
+		'title' => "Environment: " . strtoupper( ENVIRONMENT ),
 		'subtitle' => 'URL: ' . BASE_API_URL,
 		'valid' => false,
 	]);
 }
 
-$icon_suffix = 'light' == $alphred->theme_background() ? '-dark.png' : '-light.png';
-// $separator = '>'; // $separator = '›'; // $separator = ':';
+$icon_suffix = ( 'light' == $alphred->theme_background() ) ? '-dark.png' : '-light.png';
 $separator = '›';
 main( $argv );
 $alphred->to_xml();
