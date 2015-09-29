@@ -5,9 +5,10 @@ function create_configure_menu( $query = false) {
 
 	$username = ( $alphred->config_read( 'username' ) ) ? $alphred->config_read( 'username' ) : 'not set';
 	$password =	( $alphred->get_password( 'packal.org' ) ) ? 'Password is set.' : 'Password is not set.';
+	$authorname = ( $alphred->config_read( 'authorname' ) ) ? $alphred->config_read( 'authorname' ) : 'not set';
 
 	$alphred->add_result([
-		'title' => 'Set Username',
+		'title' => 'Set Packal.org Username',
 		'uid' => 'packal-configure-username',
 		'arg' => 'packal-configure-username',
 		'subtitle' => "Current: {$username}.",
@@ -15,11 +16,19 @@ function create_configure_menu( $query = false) {
 		'valid' => false,
 	]);
 	$alphred->add_result([
-		'title' => 'Set Password',
+		'title' => 'Set Packal.org Password',
 		'uid' => 'packal-configure-password',
 		'subtitle' => $password,
 		'arg' => json_encode([ 'action' => 'configure', 'target' => 'password' ]),
 		'valid' => true,
+	]);
+	$alphred->add_result([
+		'title' => 'Set Author Name',
+		'uid' => 'packal-configure-author-name',
+		'subtitle' => "Current: {$authorname}.",
+		'arg' => json_encode([ 'action' => 'configure', 'target' => 'authorname' ]),
+		'autocomplete' => "configure{$separator}authorname{$separator}",
+		'valid' => false,
 	]);
 	$alphred->add_result([
 		'title' => 'Set Blacklist Options',
@@ -50,10 +59,37 @@ function config_set_username_menu( $query = false ) {
 		$subtitle .= '';
 	}
 	$alphred->add_result([
-  	'title' => $title,
-  	'subtitle' => $subtitle,
-  	'valid' => $valid,
-  	'arg' => json_encode([ 'action' => 'configure', 'target' => 'username', 'value' => $name ]),
+		'title'    => $title,
+		'subtitle' => $subtitle,
+		'valid'    => $valid,
+		'arg'      => json_encode([ 'action' => 'configure', 'target' => 'username', 'value' => $name ]),
+	]);
+}
+
+function config_set_authorname_menu( $query = false ) {
+	global $alphred, $separator, $icon_suffix, $original_query;
+	$subtitle = 'Current: ' . $alphred->config_read( 'authorname' ) . '. ';
+
+	// We need to do this below to get the case correct for the name
+	$name = end( explode( $separator, $original_query ) );
+	$title = 'Set Author Name to: ';
+	if ( $query ) {
+		$title = "{$title}`{$name}`";
+	}
+	$valid = false;
+	if ( strlen( $query ) > 2 ) {
+		$valid = true;
+	}
+	if ( ! $valid ) {
+		$subtitle .= "Keep typing for a valid Author Name.";
+	} else {
+		$subtitle .= '';
+	}
+	$alphred->add_result([
+		'title'    => $title,
+		'subtitle' => $subtitle,
+		'valid'    => $valid,
+		'arg'      => json_encode([ 'action' => 'configure', 'target' => 'authorname', 'value' => $name ]),
 	]);
 }
 

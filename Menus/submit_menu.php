@@ -36,10 +36,48 @@ function create_submit_menu( $possible ) {
 	}
 }
 
+function check_credentials() {
+	global $alphred, $separator, $icon_suffix, $api_available;
+	$me = $alphred->config_read( 'authorname' );
+	$username = $alphred->config_read( 'username' );
+	$password = $alphred->get_password( 'packal.org' );
+	if ( empty( $me ) ) {
+		return [
+			'title'    => 'Please set your `authorname` with the configure command',
+			'subtitle' => 'The `authorname` is the name you use when you write your workflows and themes.',
+		];
+	}
+	if ( empty( $username ) ) {
+		return [
+			'title'    => 'Please set your `username` with the configure command',
+			'subtitle' => 'The `username` your Packal.org login.',
+		];
+	}
+	if ( empty( $password ) ) {
+		return [
+			'title'    => 'Please set your `password` with the configure command',
+			'subtitle' => 'The `password` is your Packal.org password.',
+		];
+	}
+	return true;
+}
+
 function submit_theme_menu( $query = false ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
-	$me = $alphred->config_read( 'username' );
+
+	$me = $alphred->config_read( 'authorname' );
+	if ( true !== $result = check_credentials() ) {
+		$alphred->add_result([
+			'title'        => 'Error: ' . $result['title'],
+			'subtitle'     => $result['subtitle'],
+			'valid'        => false,
+			'autocomplete' => "configure",
+			'icon'         => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Unsupported.icns',
+		]);
+		return;
+	}
 	$themes = array_values( encode_themes( get_themes(), $me ) );
+
 	foreach( $themes as $theme ) :
 		$alphred->add_result([
 			'title' => "Submit {$theme['name']} to Packal.org",
@@ -56,9 +94,23 @@ function submit_theme_menu( $query = false ) {
 
 function submit_workflow_menu( $query = false ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
+
+
+	$me = $alphred->config_read( 'authorname' );
+	if ( true !== $result = check_credentials() ) {
+		$alphred->add_result([
+			'title'        => 'Error: ' . $result['title'],
+			'subtitle'     => $result['subtitle'],
+			'valid'        => false,
+			'autocomplete' => "configure",
+			'icon'         => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Unsupported.icns',
+		]);
+		return;
+	}
+
 	$packal_workflows = get_packal_workflows();
-	$me = $alphred->config_read( 'username' );
 	$ttl = $alphred->config_read( 'workflow_map_cache' );
+	$ttl = ( $ttl ) ? 3600 : $ttl;
 
 	// I should look to make sure that this is called somewhere earlier.
 	MapWorkflows::map( true, $ttl );

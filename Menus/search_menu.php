@@ -22,6 +22,7 @@ function create_search_menu( $possible ) {
 }
 
 function render_workflows( $workflows, $query ) {
+
 	global $alphred, $separator, $icon_suffix, $api_available;
 
 	$workflows = json_decode( $workflows, true )['workflows'];
@@ -39,6 +40,7 @@ function render_workflows( $workflows, $query ) {
 			render_workflow_stub( $workflow );
 		endforeach;
 	}
+	$alphred->background( __DIR__ . '/../download_queue.php' );
 }
 
 function render_themes( $themes, $query ) {
@@ -84,7 +86,7 @@ function render_workflow_stub( $workflow ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
 
 	$alphred->add_result([
-		'icon'     => get( $workflow['icon'], false, 604800 + rand(100000, 900000), PRIMARY_CACHE_BIN . '-icons' )[1],
+		'icon'     => get_icon( $workflow['icon'] ),
 		'title'    => "{$workflow['name']} (v{$workflow['version']})",
 		'subtitle' => substr( "{$workflow['description']}", 0, 120 ). ' (last updated: ' . $alphred->fuzzy_time_diff( strtotime( $workflow['updated'] ) ) . ')',
     'autocomplete' => "search{$separator}workflow{$separator}{$workflow['name']}",
@@ -100,8 +102,7 @@ function render_singlular_workflow( $workflow ) {
 	if ( $api_available ) {
 		$alphred->add_result([
 			'title'    => "{$workflow['name']} (v{$workflow['version']}) by {$workflow['author']}",
-			// Download the icon and put a cache expiry from eight to seventeen days
-			'icon' 		 => get( $workflow['icon'], false, 604800 + rand(100000, 900000), PRIMARY_CACHE_BIN . '-icons' )[1],
+			'icon'     => get_icon( $workflow['icon'] ),
 			'subtitle' => $workflow['description'],
 			'valid'    => false,
 		]);
@@ -121,10 +122,10 @@ function render_singlular_workflow( $workflow ) {
 			'icon' 		 => 'assets/images/icons/install' . $icon_suffix,
 			'valid'    => true,
 			'arg'			 => json_encode([
-                      'action' => 'install',
-                      'type'  => 'workflow',
-                      'target' => $workflow['file'],
-                      'resource' => $workflow,
+											'action'   => 'install',
+											'type'     => 'workflow',
+											'target'   => $workflow['file'],
+											'resource' => $workflow,
                     ]),
 		]);
 		$alphred->add_result([
@@ -172,7 +173,7 @@ function render_singlular_workflow( $workflow ) {
 	} else {
 			$alphred->add_result([
 				'title'    => "{$workflow['name']} (v{$workflow['version']}) by {$workflow['author']}",
-				'icon' 		 => get( $workflow['icon'], false, 604800 + rand(100000, 900000), PRIMARY_CACHE_BIN . '-icons' )[1],
+				// 'icon' 		 => get_icon( $workflow['icon'], 604800 + rand(100000, 900000) ),
 				'subtitle' => $workflow['description'],
 				'valid'    => false,
 			]);

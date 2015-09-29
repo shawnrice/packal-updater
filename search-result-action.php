@@ -15,7 +15,7 @@ class Action {
 		$this->workflow = new Workflows( ENVIRONMENT );
 		$this->theme    = new Themes( ENVIRONMENT );
 
-		foreach( [ 'action', 'resource', 'target', 'type' ] as $var ) :
+		foreach( [ 'action', 'resource', 'target', 'type', 'value' ] as $var ) :
 			$parsed_args[ $var ] = ( isset( $args[ $var ] ) ) ? $args[ $var ] : false;
 		endforeach;
 
@@ -30,7 +30,9 @@ class Action {
 				break;
 
 			case 'configure':
-				$this->configure( $this->target, $this->value );
+				$this->configure( $args['target'], $args['value'] );
+				$this->success = true;
+				return "Username `{$args['value']}` saved.";
 				break;
 
 			case 'download':
@@ -45,6 +47,8 @@ class Action {
 
 			case 'generate_ini':
 				$this->generate_ini( $args['target'] );
+				$this->success = true;
+				return "Generated `workflow.ini`";
 				break;
 
 			case 'install':
@@ -79,11 +83,6 @@ class Action {
 				} else if ( 'theme' == $args['type'] ) {
 					$result = $this->submit_theme( $args['resource'] );
 				}
-				$this->clear_caches();
-				break;
-
-			case 'submit_theme':
-				$this->submit( 'theme', $this->theme );
 				$this->clear_caches();
 				break;
 
@@ -196,7 +195,7 @@ class Action {
 				'icon' => 'stop',
 			]);
 			$dialog->execute();
-			return;
+			exit(1);
 		}
 		if ( ! $password = $this->alphred->get_password( 'packal.org' ) ) {
 			$dialog = new \Alphred\Dialog([
@@ -205,7 +204,7 @@ class Action {
 				'icon' => 'stop',
 			]);
 			$dialog->execute();
-			return;
+			exit(1);
 		}
 		$ini = Ini::read_ini( "{$workflow_path}/workflow.ini" );
 		$version = $ini['workflow']['version'];

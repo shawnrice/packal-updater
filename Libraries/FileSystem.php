@@ -31,7 +31,7 @@ class FileSystem {
 	    		}
     		endforeach;
     		if ( ! $valid ) {
-    			self::log( "Excluding {$file}.\n" );
+    			self::log( "Excluding {$file}." );
     			continue;
     		}
     		// Don't recurse through symbolic links...
@@ -149,7 +149,7 @@ class FileSystem {
 	private function log( $message ) {
 		if ( class_exists( 'Alphred' ) ) {
 			$alphred = new Alphred;
-			$alphred->console( "{$message}", 4 );
+			$alphred->console( "{$message}", 1 );
 		} else {
 			echo "{$message}\n";
 		}

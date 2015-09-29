@@ -12,7 +12,8 @@ class MapWorkflows {
 		if ( self::use_cache( $no_cache, $ttl ) ) {
 			return self::map_path();
 		}
-
+		$alphred = new Alphred;
+		$me = $alphred->config_read( 'authorname' );
 		$directory = self::find_workflows_directory();
 		$workflows = array_diff( scandir( $directory ), [ '.', '..' ] );
 		$files = [];
@@ -30,7 +31,7 @@ class MapWorkflows {
 			if ( self::check_for_old_packal( "{$directory}/{$workflow}" ) ) {
 				$old_packal[] = $file;
 			}
-			if ( true === self::check_for_mine( $file ) ) {
+			if ( true === self::check_for_mine( $file, $me ) ) {
 				$mine[] = $file;
 			}
 			$files[] = $file;
@@ -187,9 +188,10 @@ class MapWorkflows {
 		return $return;
 	}
 
-	private function check_for_mine( $plist ) {
-		$alphred = new Alphred;
-		$me = $alphred->config_read( 'username' );
+	private function check_for_mine( $plist, $me ) {
+		// This is a hack
+		$me = mb_ereg_replace( '[A-Za-z][^A-Za-z0-9\.\- ]', '', $me );
+		$plist['author'] = mb_ereg_replace( '[^A-Za-z0-9\.\- ]', '', $plist['author'] );
 		if ( $me == $plist['author'] ) {
 			return true;
 		}

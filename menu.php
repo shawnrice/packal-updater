@@ -105,6 +105,8 @@ function main( $argv ) {
 		} else if ( 'configure' == $parts[0] ) {
 			if ( 'username' == $parts[1] ) {
 				config_set_username_menu( false );
+			} else if ( 'authorname' == $parts[1] ) {
+				config_set_authorname_menu( false );
 			} else if ( 'blacklist' == $parts[1] ) {
 				create_blacklist_menu( false );
 			}
@@ -135,6 +137,8 @@ function main( $argv ) {
 		} else if ( 'configure' == $parts[0] ) {
 			if ( 'username' == $parts[1] ) {
 				config_set_username_menu( $parts[2] );
+			} else if ( 'authorname' == $parts[1] ) {
+				config_set_authorname_menu( $parts[2] );
 			} else if ( 'blacklist' == $parts[1] ) {
 				create_blacklist_menu( $parts[2] );
 			}

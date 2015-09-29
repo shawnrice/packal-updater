@@ -42,35 +42,19 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>argumenttype</key>
-				<integer>1</integer>
+				<key>concurrently</key>
+				<false/>
 				<key>escaping</key>
 				<integer>102</integer>
-				<key>keyword</key>
-				<string>p›</string>
-				<key>queuedelaycustom</key>
-				<integer>3</integer>
-				<key>queuedelayimmediatelyinitially</key>
-				<true/>
-				<key>queuedelaymode</key>
-				<integer>0</integer>
-				<key>queuemode</key>
-				<integer>2</integer>
-				<key>runningsubtext</key>
-				<string>All things Packal</string>
 				<key>script</key>
-				<string>php menu.php "{query}"</string>
-				<key>title</key>
-				<string>Packal</string>
+				<string>php search-result-action.php "{query}"</string>
 				<key>type</key>
 				<integer>0</integer>
-				<key>withspace</key>
-				<false/>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.input.scriptfilter</string>
+			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
-			<string>5C87F438-BD85-4F90-84AC-04056F1CEC23</string>
+			<string>1DF6B24D-DEF2-4628-A54D-E416E6A71262</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -96,19 +80,35 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>concurrently</key>
-				<false/>
+				<key>argumenttype</key>
+				<integer>1</integer>
 				<key>escaping</key>
 				<integer>102</integer>
+				<key>keyword</key>
+				<string>p›</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>1</integer>
+				<key>queuemode</key>
+				<integer>2</integer>
+				<key>runningsubtext</key>
+				<string>All things Packal</string>
 				<key>script</key>
-				<string>php search-result-action.php "{query}"</string>
+				<string>php menu.php "{query}"</string>
+				<key>title</key>
+				<string>Packal</string>
 				<key>type</key>
 				<integer>0</integer>
+				<key>withspace</key>
+				<false/>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.script</string>
+			<string>alfred.workflow.input.scriptfilter</string>
 			<key>uid</key>
-			<string>1DF6B24D-DEF2-4628-A54D-E416E6A71262</string>
+			<string>5C87F438-BD85-4F90-84AC-04056F1CEC23</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>

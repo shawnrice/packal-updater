@@ -91,6 +91,89 @@ class CLI {
 		exit(0);
 	}
 
+	function get_credentials() {
+		$username = $this->alphred->config_read( 'username' );
+		$password = $this->alphred->get_password( 'packal.org' );
+		if ( empty( $username ) ) {
+			return 'username';
+		}
+		if ( empty( $password ) ) {
+			return 'password';
+		}
+		return [ 'username' => $username, 'password' => $password ];
+	}
+
+	function submit_workflow( $bundle ) {
+		if ( is_string( $credentials = $this->get_credentials() ) ) {
+			print self::color( "Error: no `{$credentials}` has been set. Please see usage.", 'red' ) . "\n";
+			exit(1);
+		}
+		$bundle = trim( $bundle );
+
+		$path = Workflows::find_workflow_path_by_bundle( $bundle );
+		$ini = \Alphred\Ini::read_ini( "{$path}/workflow.ini" );
+		$version = $ini['workflow']['version'];
+
+		if ( ! file_exists( $path ) ) {
+			print self::color( "Error: there is no workflow with the bundle `{$bundle}`.", 'red' ) . "\n";
+		}
+		self::confirm( "Submit {$bundle} (v{$version}) to Packal.org? (Y/n): ", "Submission aborted." );
+
+		// Build the workflow
+		$archive = new BuildWorkflow( $path );
+		$filename = $archive->archive_name();
+
+		$submission = new Submit( 'workflow', [ 'file' => $filename, 'version' => $version ] );
+		$result = $submission->execute();
+		// Remove the temp directory
+		FileSystem::recurse_unlink( dirname( $filename ) );
+
+		print_r( json_decode( $result, true ) );
+
+	}
+
+	function check_version( $version ) {
+
+	}
+
+	function print_my_workflows() {
+		MapWorkflows::map( true, 10 );
+		$workflows = json_decode( file_get_contents( MapWorkflows::my_workflows_path() ), true );
+		$output = [ [ 'Number', 'Name', 'Bundle', 'Version' ] ];
+		for ( $i = 0; $i < count( $workflows ); $i++ ) :
+			if ( isset( $workflows[ $i ]['version'] ) ) {
+				$version = self::GREEN . $workflows[ $i ]['version'] . self::NORMAL;
+			} else {
+				$version = self::RED . 'x' . self::NORMAL;
+			}
+			$output[] = [
+				$i + 1 . ":",
+				$workflows[ $i ]['name'],
+				$workflows[ $i ]['bundle'],
+				$version,
+		];
+		endfor;
+		$min_one   = 0;
+		$min_two   = 0;
+		$min_three = 0;
+		foreach( $output as $row ) :
+			$min_one   = ( strlen( $row[0] ) > $min_one ) ? strlen( $row[0] ) : $min_one;
+			$min_two   = ( strlen( $row[1] ) > $min_two ) ? strlen( $row[1] ) : $min_two;
+			$min_three = ( strlen( $row[2] ) > $min_three ) ? strlen( $row[2] ) : $min_three;
+		endforeach;
+		$divider = true;
+		foreach( $output as $row ) :
+			print self::pad_string( $row[0], $min_one ) . "\t"
+					. self::pad_string( $row[1], $min_two ) . "\t"
+					. self::pad_string( $row[2], $min_three ) . "\t"
+					. $row[3] . "\n";
+			if ( $divider ) {
+				print self::print_divider();
+				$divider = false;
+			}
+		endforeach;
+	}
+
 	/**
 	 * [upgrade_workflows description]
 	 *
@@ -278,9 +361,11 @@ class CLI {
         "upgrade-workflow::",
         "upgrade-workflows::",
         "submit-workflow:",
+        "list-workflows",
         "submit-theme:",
 		    "help",
 		    "version",
+		    "usage",
 		    "clear-cache",
 		    "cc",
 		);
@@ -288,10 +373,10 @@ class CLI {
 
 		$aliases = [
 			'search-workflows' => [ 'search-workflow', 'sw' ],
-			'search-themes' => [ 'search-theme', 'st' ],
-			'install-theme' => [ 'install-themes', 'it' ],
+			'search-themes'    => [ 'search-theme', 'st' ],
+			'install-theme'    => [ 'install-themes', 'it' ],
 			'install-workflow' => [ 'install-workflows', 'iw' ],
-			'upgrade' => [ 'upgrade-workflow', 'upgrade-workflows' ],
+			'upgrade'          => [ 'upgrade-workflow', 'upgrade-workflows' ],
 		];
 
 		foreach ( $aliases as $main => $list ) :
@@ -323,7 +408,50 @@ class CLI {
 	}
 
 	function usage() {
+		global $argv;
 		print "You need to pass things to this script for it to do anything.\n";
+		$script_name = $argv[0];
+		$values = [
+			'--install-theme' => "Installs a theme. Usage: %%script_name%% %%key%% <slug>",
+			'--it' => 'Alias of `--install-theme`',
+			'--install-workflow' => 'Installs a workflow. Usage: %%script_name%% %%key%% <bundle>',
+			'--iw' => 'Alias of `--install-workflow`',
+			'--download-workflow' => 'Downloads a workflow. Usage: %%script_name%% %%key%% <bundle>',
+			'--dw' => 'Alias of `--download-workflow`',
+			'--upgrade-workflows' => 'Upgrades all workflows. Usage: %%script_name%% %%key%%',
+			'--upgrade' => 'Alias of `--upgrade-workflows`',
+			'--search-themes' => 'Searches for themes on Packal.org. Usage: %%script_name%% %%key%% <string>',
+			'--st' => 'Alias of `--search-themes`',
+			'--search-workflows' => 'Searches for workflows on Packal.org. Usage: %%script_name%% %%key%% <string>',
+			'--sw' => 'Alias of `--search-workflows`',
+			'--submit-workflow' => 'Submits a workflow to Packal.org. Usage: %%script_name%% %%key%% <bundle>',
+			'--submit-theme' => 'Submits a theme to Packal.org. Usage: %%script_name%% %%key%% <???>',
+			'--clear-cache' => 'Clears the local data. Usage: %%script_name%% %%key%%',
+			'--cc' => 'Alias of `--clear-cache`',
+			'--usage' => 'Print this help text.',
+			'--version' => 'Prints the version of this cli. Usage: %%script_name%% %%key%%',
+			'--v' => 'Alias of `--version`',
+		];
+		$output = [];
+		$min_one = 0;
+		$min_two = 0;
+		foreach ( $values as $key => $value ) :
+			foreach( [ 'script_name', 'key' ] as $var ) :
+				$value = str_replace( "%%{$var}%%", $$var, $value );
+			endforeach;
+			if ( strlen( $key ) > $min_one ) {
+				$min_one = strlen( $key );
+			}
+			if ( strlen( $value ) > $min_two ) {
+				$min_two = strlen( $value );
+			}
+			$output[] = [ $key, $value ];
+		endforeach;
+
+		print self::print_divider();
+		foreach( $output as $row ) :
+			print "\n\t" . self::pad_string( $row[0], $min_one ) . "\t" . self::pad_string( $row[1], $min_two ) . "\n";
+		endforeach;
 	}
 
 	function version() {
@@ -372,6 +500,15 @@ class CLI {
 		}
 		if ( isset( $options['upgrade'] ) ) {
 			$this->upgrade_workflows( $options['upgrade'] );
+			exit(0);
+		}
+		if ( isset( $options['submit-workflow'] ) ) {
+			print_r( $options );
+			$this->submit_workflow( $options['submit-workflow'] );
+			exit(0);
+		}
+		if ( isset( $options['usage'] ) ) {
+			$this->usage();
 			exit(0);
 		}
 		print "No arguments found.\n";

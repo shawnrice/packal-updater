@@ -56,6 +56,7 @@ function get_themes() {
 	// from NSColor objects to rgba), but I suck at objective-c, so I have to execute the program, clean
 	// the output to make it real json, and then turn it into a usable array.
 	exec( '"' . __DIR__ . '/../Resources/ReadThemes"', $themes );
+
 	$themes = '{' . substr( implode( "\n", $themes ), 0, -1 ) . '}';
 	$themes = str_replace( ';', '', $themes );
 	$themes = str_replace( ",\n}", "\n}", $themes );
@@ -85,7 +86,13 @@ function encode_themes( $themes, $me ) {
 	// This is messy.
 	$candidates = [];
 	foreach ( $themes as $key => $theme ) :
-		if ( ! isset( $theme['credits'] ) || ( $me != $theme['credits'] ) ) {
+		$alphred = new Alphred;
+		$me = $alphred->config_read( 'authorname' );
+
+		// This is a hack to get this damn thing to work.
+		$me = mb_ereg_replace( '[A-Za-z][^A-Za-z0-9\.\- ]', '', $me );
+		$theme['credits'] = mb_ereg_replace( '[^A-Za-z0-9\.\- ]', '', $theme['credits'] );
+		if ( ! isset( $theme['credits'] ) || $me !== $theme['credits'] ) {
 			unset( $themes[ $key ] );
 			continue;
 		}
@@ -106,11 +113,13 @@ function encode_themes( $themes, $me ) {
 
 function create_theme_uri( $input ) {
 	// Ugly, but effective
-	return implode( '&', array_map( function ( $v, $k ) {
-								                  	return sprintf( "%s=%s", $k, $v );
-								                  },
-								                  $input,
-								                  array_keys( $input )
-								                )
-	              );
+	return implode( '&',
+	               array_map(
+	               	function ( $v, $k ) {
+                  	return sprintf( "%s=%s", $k, $v );
+                  },
+                  $input,
+                  array_keys( $input )
+                )
+          );
 }

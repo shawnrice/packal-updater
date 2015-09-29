@@ -2,6 +2,12 @@
 
 class Submit {
 
+	/**
+	 * Constructs the submission POST request
+	 *
+	 * @param string $type   valid options: 'worfklow', 'theme', 'report'
+	 * @param array $params  the submission parameters
+	 */
 	public function __construct( $type, $params ) {
 		$this->alphred = new Alphred;
 		$types = [ 'workflow', 'theme', 'report' ];
@@ -28,6 +34,12 @@ class Submit {
 		$this->build_data();
 	}
 
+	/**
+	 * Constructs a "Workflow" submission
+	 *
+	 * @param  array $params the submission parameters for the workflow
+	 * @return bool
+	 */
 	public function workflow( $params ) {
 		if ( ! $this->ensure_keys([ 'file', 'version' ], $params ) ) {
 			return false;
@@ -36,6 +48,12 @@ class Submit {
 		return true;
 	}
 
+	/**
+	 * Constructs a "Theme" submission
+	 *
+	 * @param  array $params the submission parameters for the report
+	 * @return bool
+	 */
 	public function theme( $params ) {
 		if ( ! $this->ensure_keys([ 'name', 'description', 'tags', 'uri' ], $params ) ) {
 			return false;
@@ -45,6 +63,12 @@ class Submit {
 		return true;
 	}
 
+	/**
+	 * Constructs a "Report" submission
+	 *
+	 * @param  array $params the submission parameters for the report
+	 * @return bool
+	 */
 	public function report( $params ) {
 		if ( ! $this->ensure_keys([ 'workflow_revision_id', 'report_type', 'message' ], $params ) ) {
 			return false;
@@ -53,22 +77,41 @@ class Submit {
 		return true;
 	}
 
+	/**
+	 * Standard keys necessary for each submission
+	 *
+	 * @return array an array of keys
+	 */
 	private function standard() {
 		return [
 			'username' => $this->get_username(),
 			'password' => $this->get_password(),
-			'alfred_version' => 'alfred2',
 		];
 	}
 
+	/**
+	 * Gets the stored username from the config file
+	 *
+	 * @return string 	the username
+	 */
 	private function get_username() {
 		return $this->alphred->config_read( 'username' );
 	}
 
+	/**
+	 * Gets the stored password from the keychain
+	 *
+	 * @return string 	the user's password
+	 */
 	private function get_password() {
 		return $this->alphred->get_password( 'packal.org' );
 	}
 
+	/**
+	 * Executes the submission
+	 *
+	 * @return string 	the results from the POST request
+	 */
 	public function execute() {
 		// I should add some error handling in this
 		$result = curl_exec( $this->ch );
@@ -76,6 +119,11 @@ class Submit {
 		return $result;
 	}
 
+	/**
+	 * Builds the post fields
+	 *
+	 * The standard "http_build_query()" did not work.
+	 */
 	private function build_data( ) {
 		if ( isset( $this->postData['workflow_revision'] ) ) {
 			$this->postData['workflow_revision[version]'] = $this->postData['workflow_revision']['version'];
@@ -83,10 +131,18 @@ class Submit {
 			// Pass to a weird function that I did not write but that seems to work
 			self::curl_custom_postfields( $this->ch, $this->postData, [ $this->params['file'] ] );
 		} else {
+			// For themes and reports
 			curl_setopt( $this->ch, CURLOPT_POSTFIELDS,  http_build_query( $this->postData ) );
 		}
 	}
 
+	/**
+	 * Ensures that relevant keys are available
+	 *
+	 * @param  array $keys   the expected parameters for sucessful submission
+	 * @param  array $params the submission parameters passed
+	 * @return bool
+	 */
 	private function ensure_keys( $keys, $params ) {
 		foreach ( $keys as $key ) :
 			if ( ! isset( $params[ $key ] ) ) {
