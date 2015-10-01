@@ -95,7 +95,7 @@ class Workflows {
 	}
 
 
-	private function do_install( $new, $old = false ) {
+	private function do_install( $new, $old = false, $verify_signature = true ) {
 		if ( false !== $old ) {
 			$upgrade = true;
 			$old_workflow_path = $old['path'];
@@ -106,13 +106,17 @@ class Workflows {
 		}
 		$directory = FileSystem::make_random_temp_dir();
 		$destination = self::find_workflow_path_by_bundle( $workflow['bundle'] );
+		$to_clean = [ $directory ];
+		$signature = $new['signature'];
 		while ( true ) :
 			if ( $upgrade ) {
+				$key = "{$old_workflow_path}/packaging/{$old['bundle']}.pub";
 				if ( ! $destination ) {
 					$return = 'Workflow cannot be upgraded because it is not installed';
 					break;
 				}
 			} else {
+				$key = "{$directory}/packaging/{$new['bundle']}.pub";
 				if ( $destination ) {
 					$return = 'Workflow is already installed';
 					break;
@@ -131,6 +135,19 @@ class Workflows {
 				$return = 'Could not extract the archive';
 				break;
 			}
+			if ( $verify_signature ) {
+				if ( $upgrade ) {
+					$key = "{$destination}/packaging/{$new['bundle']}.pub";
+				} else {
+					$key = "{$unpack_directory}/packaging/{$new['bundle']}.pub";
+				}
+
+				$signature = $new['signature'];
+				if ( false === FileSystem::verify_signature( $signature, $file, $key ) ) {
+					$return = 'Could not verify file signature.';
+					break;
+				}
+			}
 			if ( $upgrade ) {
 				if ( ! Plist::migrate_plist( "{$destination}/info.plist", "{$unpack_directory}/info.plist" ) ) {
 					$return = 'Could not migrate plist settings.';
@@ -139,7 +156,8 @@ class Workflows {
 				FileSystem::recurse_unlink( $destination );
 			} else {
 				if ( ! Plist::import_sanitize( "{$unpack_directory}/info.plist" ) ) {
-					return 'Could not santize the new plist.';
+					$return = 'Could not santize the new plist.';
+					break;
 				}
 			}
 			if ( ! rename( $unpack_directory, $destination ) ) {
@@ -148,7 +166,10 @@ class Workflows {
 			}
 			break;
 		endwhile;
-		@FileSystem::clean_up([ $directory, $unpack_directory ]);
+		if ( ( false === $upgrade ) && isset( $return ) ) {
+			$to_clean[] = $destination;
+		}
+		@FileSystem::clean_up( $to_clean );
 		if ( isset( $return ) ) {
 			return $return;
 		}

@@ -53,20 +53,20 @@ class MapWorkflows {
 		return false;
 	}
 
-	public function map_path() {
+	public static function map_path() {
 		return "{$_SERVER['alfred_workflow_data']}/data/workflows/workflow_map.json";
 	}
 
-	public function my_workflows_path() {
+	public static function my_workflows_path() {
 		return "{$_SERVER['alfred_workflow_data']}/data/workflows/mine.json";
 	}
 
-	public function migrate_path() {
+	public static function migrate_path() {
 		return "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json";
 	}
 
 
-	public function clear_cache() {
+	public static function clear_cache() {
 		@unlink( self::migrate_path() );
 		@unlink( self::map_path() );
 		@unlink( self::my_workflows_path() );
@@ -75,14 +75,14 @@ class MapWorkflows {
 
 
 
-	private function write_old_packal_migration( $old_packal ) {
+	private static function write_old_packal_migration( $old_packal ) {
 		// This is the old Packal workflow list.
 		if ( count( $old_packal ) > 0 ) {
 			file_put_contents( self::migrate_path(), json_encode( $old_packal, JSON_PRETTY_PRINT ) );
 		}
 	}
 
-	private function use_cache( $no_cache, $ttl ) {
+	private static function use_cache( $no_cache, $ttl ) {
 		if ( false == $no_cache ) {
 			return false;
 		}
@@ -111,7 +111,7 @@ class MapWorkflows {
 
 
 
-	private function check_for_expire_cache() {
+	private static function check_for_expire_cache() {
 		if ( file_exists( "{$_SERVER['alfred_workflow_data']}/expire_local_workflow_cache" ) ) {
 			unlink( "{$_SERVER['alfred_workflow_data']}/expire_local_workflow_cache" );
 			return true;
@@ -119,7 +119,7 @@ class MapWorkflows {
 		return false;
 	}
 
-	private function check_map_cache( $ttl ) {
+	private static function check_map_cache( $ttl ) {
 		// If the cache is set to false or 0, then just return false, indicating that the cache is expired
 		if ( ! $ttl ) {
 			return false;
@@ -136,7 +136,7 @@ class MapWorkflows {
 		return false;
 	}
 
-	private function make_data_directory() {
+	private static function make_data_directory() {
 		if ( ! file_exists( "{$_SERVER['alfred_workflow_data']}/data/workflows/" ) ) {
 			mkdir( "{$_SERVER['alfred_workflow_data']}/data/workflows/", 0775, true );
 		}
@@ -149,11 +149,11 @@ class MapWorkflows {
 	 *
 	 * @return [type] [description]
 	 */
-	private function remove_old_data() {
+	private static function remove_old_data() {
 		return self::clear_cache();
 	}
 
-	private function find_workflows_directory() {
+	private static function find_workflows_directory() {
 		$preferences = "{$_SERVER['HOME']}/Library/Preferences/com.runningwithcrayons.Alfred-Preferences.plist";
 		$preferences = new CFPropertyList( $preferences, CFPropertyList::FORMAT_BINARY);
 		$preferences = $preferences->toArray();
@@ -167,28 +167,28 @@ class MapWorkflows {
 		return $workflows;
 	}
 
-	private function check_for_packal( $directory ) {
+	private static function check_for_packal( $directory ) {
 		if ( file_exists( "{$directory}/packaging" ) && is_dir( "{$directory}/packaging" ) ) {
 			return true;
 		}
 		return false;
 	}
 
-	private function check_for_old_packal( $directory ) {
+	private static function check_for_old_packal( $directory ) {
 		if ( file_exists( "{$directory}/packal/package.xml" ) ) {
 			return true;
 		}
 		return false;
 	}
 
-	private function check_for_plist( $directory ) {
+	private static function check_for_plist( $directory ) {
 		if ( ! file_exists( "{$directory}/info.plist" ) ) {
 			return false;
 		}
 		return true;
 	}
 
-	private function get_plist_info( $directory ) {
+	private static function get_plist_info( $directory ) {
 		if ( ! $plist = self::read_info_plist( $directory ) ) {
 			return false;
 		}
@@ -216,7 +216,7 @@ class MapWorkflows {
 	 * @param  [type] $me    [description]
 	 * @return [type]        [description]
 	 */
-	private function check_for_mine( $plist, $me ) {
+	private static function check_for_mine( $plist, $me ) {
 		// This is a hack
 		$me = mb_ereg_replace( '[A-Za-z][^A-Za-z0-9\.\- ]', '', $me );
 		$plist['author'] = mb_ereg_replace( '[^A-Za-z0-9\.\- ]', '', $plist['author'] );
@@ -226,7 +226,7 @@ class MapWorkflows {
 		return false;
 	}
 
-	private function read_info_plist( $directory ) {
+	private static function read_info_plist( $directory ) {
 		$plist = new CFPropertyList( "{$directory}/info.plist", CFPropertyList::FORMAT_XML );
 		$plist = $plist->toArray();
 
@@ -236,7 +236,7 @@ class MapWorkflows {
 		return $plist;
 	}
 
-	private function read_workflow_ini( $directory ) {
+	private static function read_workflow_ini( $directory ) {
 		if ( ! file_exists( "{$directory}/workflow.ini" ) ) {
 			return false;
 		}

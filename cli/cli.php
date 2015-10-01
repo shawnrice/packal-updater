@@ -136,6 +136,21 @@ class CLI {
 
 	}
 
+	function clear_cache( $bin = PRIMARY_CACHE_BIN ) {
+		foreach( array_diff( scandir( PRIMARY_CACHE_BIN ), [ '..', '.' ] ) as $file ) :
+			// We'll use recurse_unlink in case the data is
+			FileSystem::recurse_unlink( $file );
+		endforeach;
+	}
+
+	function clear_icons() {
+		// This function should clear out all the icons
+	}
+
+	function clear_data() {
+		// This function should clear out all the data from the data directory EXCEPT the config
+	}
+
 	function print_my_workflows() {
 		MapWorkflows::map( true, 10 );
 		$workflows = json_decode( file_get_contents( MapWorkflows::my_workflows_path() ), true );
@@ -332,7 +347,7 @@ class CLI {
 	 *********************************************************************/
 
 	private function is_phar() {
-		if ( 'Packal.phar' == end( explode( '/', __DIR__ ) ) ) {
+		if ( 'Packal.phar' == @end( explode( '/', __DIR__ ) ) ) {
 			return true;
 		}
 		return false;
@@ -471,7 +486,6 @@ class CLI {
 		// So, what are we doing here? Can we do this with a switch statement?
 		if ( isset( $options['search-themes'] ) ) {
 			print $this->print_search( $options['search-themes'], 'name', 'theme', 'slug' );
-			// echo $this->search_theme( $options['st'] );
 			exit(0);
 		}
 		if ( isset( $options['search-workflows'] ) ) {
@@ -499,12 +513,20 @@ class CLI {
 			exit(0);
 		}
 		if ( isset( $options['submit-workflow'] ) ) {
-			print_r( $options );
 			$this->submit_workflow( $options['submit-workflow'] );
+			exit(0);
+		}
+		if ( isset( $options['submit-theme'] ) ) {
+			print self::color( 'Not implemented yet.', 'red' );
+			// $this->submit_theme( $options['submit-theme'] );
 			exit(0);
 		}
 		if ( isset( $options['usage'] ) ) {
 			$this->usage();
+			exit(0);
+		}
+		if ( isset( $options['clear-cache'] ) ) {
+			$this->clear_cache();
 			exit(0);
 		}
 		print "No arguments found.\n";

@@ -7,15 +7,16 @@ function create_update_menu( $query = false, $full = false ) {
 	// want their workflow map cache to live. If so, we'll use that.
 	$ttl = $alphred->config_read( 'workflow_map_cache' );
 
-	$workflows = json_decode( file_get_contents( MapWorkflows::map( true, $ttl ) ), true );
-	$remote_workflows = check_for_updates( $endpoints['workflow'] );
+	$my_workflows = json_decode( file_get_contents( MapWorkflows::map( true, $ttl ) ), true );
+	$remote_workflows = json_decode( retrieve_remote_data( $endpoints['workflow'] ), true );
 
 	//
 	// This is the path to the file that contains the list of workflows that need to be migrated.
 	// "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json",
 	create_migrate_menu( $query, $full );
 
-	find_updates( $workflows );
+	$updates = find_updates( $my_workflows, $remote_workflows['workflows'] );
+	render_updates( $updates );
 }
 
 /**
@@ -28,7 +29,9 @@ function create_migrate_menu( $query = false, $full = false ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
 
 	$ttl = $alphred->config_read( 'workflow_map_cache' );
-	$workflows = MapWorkflows::map( $ttl );
+	$ttl = ( $ttl ) ? $ttl : 86400;
+
+	$workflows = MapWorkflows::map( false, $ttl );
 
 	$old_packal_workflows = json_decode( file_get_contents( MapWorkflows::migrate_path() ), true );
 
@@ -60,30 +63,63 @@ function create_migrate_menu( $query = false, $full = false ) {
 			]);
 		endforeach;
 	}
-
 }
 
-function find_updates( $workflows ) {
-	global $alphred, $separator, $icon_suffix, $api_available, $endpoints;
-	$updates = json_decode( retrieve_remote_data( $endpoints['workflow'] ), true );
-	// print_r( $updates );
-	foreach ( $workflows as $key => $workflow ) :
-		if ( ! $workflow['packal'] ) {
-			unset( $workflows[$key] );
-		} else {
-			$ini = \Alphred\Ini::read_ini( $workflow['path'] . '/workflow.ini' );
-			$alphred->add_result([
-				'title'    => $workflow['name'],
-				'icon'     => "{$workflow['path']}/icon.png",
-				'subtitle' => "Current version: {$ini['workflow']['version']}",
-			]);
-		}
+function recreate_array_by_bundle( $workflows ) {
+	foreach( $workflows as $key => $workflow ) :
+		$workflows[ $workflow['bundle'] ] = $workflow;
+		unset( $workflows[ $key ] );
 	endforeach;
+	return $workflows;
+}
 
+function render_updates( $updates ) {
+	global $alphred, $separator, $icon_suffix, $api_available, $endpoints;
 
-	$alphred->add_result([
-		'title' => 'All workflows up-to-date.',
-		'valid' => false,
-  ]);
+	if ( 0 === count( $updates ) ) {
+		$alphred->add_result([
+			'title' => 'All workflows up-to-date.',
+			'valid' => false,
+  	]);
+	} else {
+		$alphred->add_result([
+			'title'    => 'Update all workflows',
+			'subtitle' => 'Update ' . count( $updates ) . ' workflow(s).',
+			'valid'    => true,
+			'arg'      => json_encode([
+				'action'   => 'update-all-workflows',
+				'type'     => 'workflow',
+				'resource' => $updates,
+			]),
+		]);
+		foreach( $updates as $update ) :
+			if ( file_exists( "{$update['old']['path']}/icon.png" ) ) {
+				$icon = "{$update['old']['path']}/icon.png";
+			} else {
+				$icon = __DIR__ . '/../Resources/images/package.png';
+			}
+			$alphred->add_result([
+				'title'    => "Update `{$update['old']['name']}`",
+				'icon'     => $icon,
+				'subtitle' => "Proposed update: {$update['old']['version']} => {$update['new']['version']}",
+				'valid'    => true,
+				'arg'      => json_encode([
+					'action'   => 'update',
+					'type'     => 'workflow',
+					'resource' => $update,
+				]),
+			]);
+		endforeach;
+	}
+}
+
+function find_updates( $my_workflows, $remote_workflows ) {
+	global $alphred, $separator, $icon_suffix, $api_available, $endpoints;
+
+	$workflow = new Workflows( ENVIRONMENT );
+	$workflow->find_upgrades();
+	$updates = $workflow->upgrades;
+
+ 	return $updates;
 }
 

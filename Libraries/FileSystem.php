@@ -2,7 +2,7 @@
 
 class FileSystem {
 
-	public function make_random_temp_dir() {
+	public static function make_random_temp_dir() {
 		$letters = '0123456789abcdefghijklmnopqrstuvwxyz';
 		for ($i = 0; $i < 20; $i++ ) :
 			@$random .= $letters[ rand( 0 , strlen( $letters ) - 1 ) ];
@@ -13,7 +13,7 @@ class FileSystem {
 		return $dir;
 	}
 
-	public function recurse_copy( $source, $destination, $excluded = [] ) {
+	public static function recurse_copy( $source, $destination, $excluded = [] ) {
 
 		$excluded = [ '/\.git/', '/.*\.pyc/' ];
 
@@ -49,7 +49,7 @@ class FileSystem {
     closedir( $directory );
 	}
 
-	public function recurse_unlink( $directory ) {
+	public static function recurse_unlink( $directory ) {
 	  if ( ! $directory_handle = @opendir( $directory ) ) {
 	    return;
 	  }
@@ -72,7 +72,7 @@ class FileSystem {
 	  return;
 	}
 
-	public function read_directory( $directory, &$files ) {
+	public static function read_directory( $directory, &$files ) {
 		foreach( array_diff( scandir( $directory ), [ '.', '..' ] ) as $file ) :
 			if ( is_dir( "{$directory}/{$file}" ) ) {
 				self::read_directory( "{$directory}/{$file}", $files );
@@ -82,7 +82,7 @@ class FileSystem {
 		endforeach;
 	}
 
-	public function dir_exists( $dir ) {
+	public static function dir_exists( $dir ) {
 		return ( $dir ) && file_exists( $dir ) && is_dir( $dir );
 	}
 
@@ -146,7 +146,7 @@ class FileSystem {
 	}
 
 	// This method should not be in the FileSystem class
-	private function log( $message ) {
+	private static function log( $message ) {
 		if ( class_exists( 'Alphred' ) ) {
 			$alphred = new Alphred;
 			$alphred->console( "{$message}", 1 );
@@ -167,6 +167,38 @@ class FileSystem {
 		}
 		return $slug;
 	}
+
+
+
+	/**
+	 * Checks to the signature of a package
+	 * @param  string 	$appcast 	an xml file containing the signature (path)
+	 * @param  string 	$package 	a file that has been signed (path)
+	 * @param  string 	$key     	the public key to use for checking (path)
+	 * @return [type]          [description]
+	 */
+	public static function verify_signature( $signature, $file, $key ) {
+
+	  $data = sha1_file( $file, false );
+
+	  // fetch public key from certificate and ready it
+	  $fp = fopen( $key , 'r' );
+	  $cert = fread( $fp, filesize( $key ) );
+	  fclose( $fp );
+
+	  // Get the public key
+	  $id = openssl_get_publickey( $cert );
+
+	  // Get the result of the signature
+	  $result = openssl_verify( $data, base64_decode( $signature ), $id, OPENSSL_ALGO_SHA1 );
+
+	  // Free key from memory
+	  openssl_free_key( $id );
+
+	  // Return the result
+	  return $result;
+	}
+
 
 }
 

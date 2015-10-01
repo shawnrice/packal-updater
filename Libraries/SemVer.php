@@ -34,7 +34,7 @@ class SemVer {
 	 * @param  string $version a semantic version
 	 * @return bool          whether it is a version or not
 	 */
-	static public function check( $version ) {
+	public static function check( $version ) {
 		if ( ! is_string( $version ) ) {
 			return false;
 		}
@@ -54,7 +54,7 @@ class SemVer {
 	 * @param  string $v2 a semantic version
 	 * @return boolean	true for true; false for false
 	 */
-	static public function gt( $v1, $v2 ) {
+	public static function gt( $v1, $v2 ) {
 		return ( 1 === self::compare( $v1, $v2 ) ) ? true : false;
 	}
 
@@ -65,7 +65,7 @@ class SemVer {
 	 * @param  string $v2 a semantic version
 	 * @return boolean	true for true; false for false
 	 */
-	static public function gte( $v1, $v2 ) {
+	public static function gte( $v1, $v2 ) {
 		$product = self::compare( $v1, $v2 );
 		return ( 1 === $product || 0 === $product ) ? true : false;
 	}
@@ -77,7 +77,7 @@ class SemVer {
 	 * @param  string $v2 a semantic version
 	 * @return boolean	true for true; false for false
 	 */
-	static public function lt( $v1, $v2 ) {
+	public static function lt( $v1, $v2 ) {
 		return ( -1 === self::compare( $v1, $v2 ) ) ? true : false;
 	}
 
@@ -88,7 +88,7 @@ class SemVer {
 	 * @param  string $v2 a semantic version
 	 * @return boolean	true for true; false for false
 	 */
-	static public function lte( $v1, $v2 ) {
+	public static function lte( $v1, $v2 ) {
 		$product = self::compare( $v1, $v2 );
 		return ( -1 === $product || 0 === $product ) ? true : false;
 	}
@@ -100,7 +100,7 @@ class SemVer {
 	 * @param  string $v2 a semantic version
 	 * @return boolean	true for true; false for false
 	 */
-	static public function eq( $v1, $v2 ) {
+	public static function eq( $v1, $v2 ) {
 		return ( 0 === self::compare( $v1, $v2 ) ) ? true : false;
 	}
 
@@ -109,7 +109,7 @@ class SemVer {
 	 * @param  string $version a malformed semantic version
 	 * @return string          a semantic version
 	 */
-	static public function fix( $version ) {
+	public static function fix( $version ) {
 		return str_replace( '.-', '-', implode( '.', self::split( $version, true ) ) );
 	}
 
@@ -122,7 +122,7 @@ class SemVer {
 	 * @param  boolean $force   whether or not to coerce the string into a semantic version
 	 * @return array            an array of each part of the semantic version
 	 */
-	private function split( $version, $force = false ) {
+	private static function split( $version, $force = false ) {
 		preg_match( '/^([0-9]{1,})\.([0-9]{1,})\.([0-9]{1,})(-*[A-Za-z0-9.]*)(\+*[A-Za-z0-9.]*)$/', $version, $matches );
 
 		// Check if it isn't a valid SemVer
@@ -172,7 +172,7 @@ class SemVer {
 	 * @param  string $v2 a Semantic Version
 	 * @return int     0 is equal, -1 is less than, 1 is greater than
 	 */
-	private function compare( $v1, $v2 ) {
+	private static function compare( $v1, $v2 ) {
 		// Make sure that both are valid, if not, return null
 		if ( ! ( self::check( $v1 ) && self::check( $v2 ) ) ) {
 			return null;

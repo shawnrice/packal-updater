@@ -19,7 +19,7 @@ class Action {
 			$parsed_args[ $var ] = ( isset( $args[ $var ] ) ) ? $args[ $var ] : false;
 		endforeach;
 
-		print $this->do_action( $parsed_args );
+		print_r( $this->do_action( $parsed_args ) );
 	}
 
 	public function do_action( $args ) {
@@ -84,6 +84,14 @@ class Action {
 					$result = $this->submit_theme( $args['resource'] );
 				}
 				$this->clear_caches();
+				return $result;
+				break;
+
+			case 'update':
+				return $this->update_workflow( $args['resource'] );
+				break;
+			case 'update-all-workflows':
+				return $this->update_all_workflows( $args['resource'] );
 				break;
 
 		endswitch;
@@ -98,6 +106,31 @@ class Action {
 			$this->success = false;
 			return $result;
 		}
+	}
+
+	function update_all_workflows( $updates ) {
+		foreach( $updates as $update ) :
+			$this->update_workflow( $update );
+		endforeach;
+		return true;
+	}
+
+	private function update_workflow( $update ) {
+		if ( true === $result = $this->workflow->upgrade( $update ) ) {
+			$this->alphred->send_notification([
+				'title' => 'Packal Updater',
+				'subtitle' => 'Update successful',
+				'text' => "Updated `{$update['new']['name']}`",
+			]);
+		} else {
+			$this->alphred->send_notification([
+				'title' => 'Packal Updater',
+				'subtitle' => "Error: failed to update {$update['new']['name']}`",
+				'text' => $result,
+			]);
+		}
+		print_r( $update );
+		return false;
 	}
 
 	private function clear_caches( $bin = false ) {
