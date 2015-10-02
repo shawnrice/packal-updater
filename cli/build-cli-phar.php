@@ -68,7 +68,8 @@ foreach( $directories as $directory ) :
 	endforeach;
 endforeach;
 foreach ( $other_files as $file ) :
-	$name = end( explode( '/', $file ) );
+	$name = explode( '/', $file );
+	$name = end( $name );
 	$phar[ $name ] = file_get_contents( __DIR__ . '/' . $file );
 endforeach;
 $phar[ 'autoloader.php' ] = ''; // This is just something here for now

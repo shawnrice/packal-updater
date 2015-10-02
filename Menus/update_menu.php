@@ -7,15 +7,9 @@ function create_update_menu( $query = false, $full = false ) {
 	// want their workflow map cache to live. If so, we'll use that.
 	$ttl = $alphred->config_read( 'workflow_map_cache' );
 
-	$my_workflows = json_decode( file_get_contents( MapWorkflows::map( true, $ttl ) ), true );
-	$remote_workflows = json_decode( retrieve_remote_data( $endpoints['workflow'] ), true );
-
-	//
-	// This is the path to the file that contains the list of workflows that need to be migrated.
-	// "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json",
 	create_migrate_menu( $query, $full );
 
-	$updates = find_updates( $my_workflows, $remote_workflows['workflows'] );
+	$updates = find_updates();
 	render_updates( $updates );
 }
 
@@ -51,7 +45,10 @@ function create_migrate_menu( $query = false, $full = false ) {
 		$alphred->add_result([
 			'title' => 'Migrate all (' . count( $old_packal_workflows ) . ') workflows.',
 			'valid' => true,
-			'arg'   => json_encode([ 'action' => 'migrate-all-workflows' ]),
+			'arg'   => json_encode([
+				'action'   => 'migrate-all-workflows',
+				'resource' => $old_packal_workflows,
+			]),
 		]);
 
 		foreach ( $old_packal_workflows as $workflow ) :
@@ -59,7 +56,10 @@ function create_migrate_menu( $query = false, $full = false ) {
 				'title' => "Migrate `{$workflow['name']}`",
 				'icon'  => "{$workflow['path']}/icon.png",
 				'valid' => true,
-				'arg'   => json_encode([ 'action' => 'migrate-workflow', 'resource' => $workflow ]),
+				'arg'   => json_encode([
+					'action'   => 'migrate',
+					'resource' => $workflow
+				]),
 			]);
 		endforeach;
 	}
@@ -113,8 +113,7 @@ function render_updates( $updates ) {
 	}
 }
 
-function find_updates( $my_workflows, $remote_workflows ) {
-	global $alphred, $separator, $icon_suffix, $api_available, $endpoints;
+function find_updates() {
 
 	$workflow = new Workflows( ENVIRONMENT );
 	$workflow->find_upgrades();

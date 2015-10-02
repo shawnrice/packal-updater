@@ -61,6 +61,14 @@ class Action {
 				}
 				break;
 
+			case 'migrate':
+				return $this->migrate_workflow( $args['resource'] );
+				break;
+
+			case 'migrate-all-workflows':
+				return $this->migrate_all_workflows( $args['resource'] );
+				break;
+
 			case 'open':
 				exec( "open '{$args['target']}'" );
 				return true;
@@ -90,6 +98,7 @@ class Action {
 			case 'update':
 				return $this->update_workflow( $args['resource'] );
 				break;
+
 			case 'update-all-workflows':
 				return $this->update_all_workflows( $args['resource'] );
 				break;
@@ -97,6 +106,8 @@ class Action {
 		endswitch;
 		return "No action found.";
 	}
+
+
 
 	function check( $result, $message ) {
 		if ( true === $result ) {
@@ -108,29 +119,40 @@ class Action {
 		}
 	}
 
-	function update_all_workflows( $updates ) {
+	private function update_workflow( $update, $verify_signature = true ) {
+		if ( true === $result = $this->workflow->upgrade( $update, $verify_signature ) ) {
+			$this->alphred->send_notification([
+				'title'    => 'Packal Updater',
+				'subtitle' => 'Update successful',
+				'text'     => "Updated `{$update['new']['name']}`",
+			]);
+		} else {
+			$this->alphred->send_notification([
+				'title'    => 'Packal Updater',
+				'subtitle' => "Error: failed to update {$update['new']['name']}`",
+				'text'     => $result,
+			]);
+		}
+		return $result;
+	}
+
+	function update_all_workflows( $updates, $verify_signature = true ) {
 		foreach( $updates as $update ) :
-			$this->update_workflow( $update );
+			$this->update_workflow( $update, $verify_signature );
 		endforeach;
 		return true;
 	}
 
-	private function update_workflow( $update ) {
-		if ( true === $result = $this->workflow->upgrade( $update ) ) {
-			$this->alphred->send_notification([
-				'title' => 'Packal Updater',
-				'subtitle' => 'Update successful',
-				'text' => "Updated `{$update['new']['name']}`",
-			]);
-		} else {
-			$this->alphred->send_notification([
-				'title' => 'Packal Updater',
-				'subtitle' => "Error: failed to update {$update['new']['name']}`",
-				'text' => $result,
-			]);
-		}
-		print_r( $update );
-		return false;
+	function migrate_workflow( $workflow ) {
+		$new = Workflows::find_workflow_by_bundle_from_packal( $workflow['bundle'] );
+		return $this->update_workflow( [ 'old' => $workflow, 'new' => $new ], false );
+	}
+
+	function migrate_all_workflows( $workflows ) {
+		foreach( $workflows as $workflow ) :
+			$this->migrate_workflow( $workflow );
+		endforeach;
+		return true;
 	}
 
 	private function clear_caches( $bin = false ) {
@@ -140,12 +162,16 @@ class Action {
 	}
 
 	private function download( $url, $directory = false ) {
-		$directory = ( $directory ) ? $_SERVER['HOME'] . '/Downloads/' : $directory;
-		$file = $this->get_filename( $url );
-		if ( file_put_contents( "{$directory}{$file}", file_get_contents( $url ) ) ) {
-			return "{$directory}{$file}";
+		$directory = ( ! $directory ) ? "{$_SERVER['HOME']}/Downloads/" : $directory;
+		if ( false !== $result = FileSystem::download_file( $url, $directory ) ) {
+			return $result;
 		}
 		$this->log( "Could not download file ({$url}) to ({$directory})." );
+		$this->alphred->send_notification([
+			'title'    => 'Packal',
+			'subtitle' => 'Error',
+			'text'     => "Could not download {$url}",
+		]);
 		return false;
 	}
 
@@ -241,11 +267,30 @@ class Action {
 		}
 		$ini = Ini::read_ini( "{$workflow_path}/workflow.ini" );
 		$version = $ini['workflow']['version'];
-		if ( file_exists( "{$workflow_path}/screenshots" ) ) {
-			$workflow = new BuildWorkflow( $workflow_path, "{$workflow_path}/screenshots" );
+
+		if ( isset( $ini['packal']['screenshots_directory'] ) ) {
+			if ( file_exists( $ini['packal']['screenshots_directory'] ) ) {
+				$screenshots = $ini['packal']['screenshots_directory'];
+			} else {
+				$this->alphred->log( "Screenshots directory set in `workflow.ini` ({$ini['packal']['screenshots_directory']}) does not exist.", 3 );
+				$screenshots = false;
+			}
 		} else {
-			$workflow = new BuildWorkflow( $workflow_path );
+			$screenshots = false;
 		}
+
+		if ( isset( $ini['packal']['description_file'] ) ) {
+			if ( file_exists( $ini['packal']['description_file'] ) ) {
+				$description_file = $ini['packal']['description_file'];
+			} else {
+				$this->alphred->log( "Description file set in `workflow.ini` ({$ini['packal']['description_file']}) does not exist.", 3 );
+				$description_file = false;
+			}
+		} else {
+			$description_file = false;
+		}
+
+		$workflow = new BuildWorkflow( $workflow_path, $screenshots, $description_file );
 		// Let's actually do some submitting here
 		$json = json_encode( [
       'file' => $workflow->archive_name(),

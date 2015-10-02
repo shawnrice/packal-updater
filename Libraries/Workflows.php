@@ -178,12 +178,12 @@ class Workflows {
 	}
 
 
-	public function upgrade( $upgrade ) {
-		return $this->do_install( $upgrade['new'], $upgrade['old'] );
+	public function upgrade( $upgrade, $verify_signature = true ) {
+		return $this->do_install( $upgrade['new'], $upgrade['old'], $verify_signature );
 	}
 
-	public function install( $workflow ) {
-		return $this->do_install( $workflow );
+	public function install( $workflow, $verify_signature = true ) {
+		return $this->do_install( $workflow, $verify_signature );
 	}
 
 }

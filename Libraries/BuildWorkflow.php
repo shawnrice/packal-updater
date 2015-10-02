@@ -1,6 +1,5 @@
 <?php
 
-require_once( __DIR__ . '/functions.php' );
 // Usage:
 // $archive = new BuildWorkflow( '/path/to/alfredworkflow_directory' );
 // $filname = $archive->archive_name();
@@ -134,19 +133,33 @@ class BuildWorkflow {
 		// '/\.*\.swp/',
 	];
 
-	function __construct( $directory, $screenshots_directory = false ) {
+	function __construct( $directory, $screenshots_directory = false, $description_file = false ) {
 		$this->directory = $directory;
 		if ( ! $this->check_for_workflow() ) {
+			// Make this more informative.
 			throw new Exception( 'Nope, that did not work' );
 			// return false; // Should I raise an exception?
 		}
 
 		$this->tmp = FileSystem::make_random_temp_dir();
 		FileSystem::recurse_copy( $this->directory, $this->tmp, $this->excluded_files );
-		if ( FileSystem::dir_exists( $screenshots_directory ) ) {
-			// I could always add in something here to make sure that the directory name is called 'screenshots'
-			FileSystem::recurse_copy( $screenshots_directory, $this->tmp, $this->excluded_files );
+		if ( false !== $screenshots_directory && FileSystem::dir_exists( $screenshots_directory ) ) {
+			if ( ! file_exists( "{$this->tmp}/packal" ) ) {
+				mkdir( "{$this->tmp}/packal", 0755, true );
+			}
+			if ( ! file_exists( "{$this->tmp}/packal/{$screenshots_directory}" ) ) {
+				FileSystem::recurse_copy( $screenshots_directory, "{$this->tmp}/packal/screenshots/", $this->excluded_files );
+			}
 		}
+		if ( false !== $description_file && file_exists( $description_file ) ) {
+			if ( ! file_exists( "{$this->tmp}/packal" ) ) {
+				mkdir( "{$this->tmp}/packal", 0755, true );
+			}
+			if ( ! file_exists( "{$this->tmp}/packal/README.md" ) ) {
+				copy( $description_file, "{$this->tmp}/packal/README.md" );
+			}
+		}
+
 		$this->files = [];
 		FileSystem::read_directory( $this->tmp, $this->files );
 		$this->create_archive();
