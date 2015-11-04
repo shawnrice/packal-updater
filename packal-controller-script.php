@@ -31,7 +31,9 @@ if ( $q == 'open-gui' ) {
 
 
 	// Start the webserver
-	if ( ( strpos( $osx, '10.9' ) !== FALSE ) || ( strpos( $osx, '10.10' ) !== FALSE ) ) {
+	if ( ( strpos( $osx, '10.9' ) !== FALSE ) 
+	    || ( strpos( $osx, '10.10' ) !== FALSE ) 
+	    || ( strpos( $osx, '10.11' ) !== FALSE ) ) {
 		// Since we're using Mavericks, we can just use the native php 5.4 binary.
 		exec( "nohup php -S localhost:7893 -t gui/ > /dev/null 2>&1 &" );
 	} else {
