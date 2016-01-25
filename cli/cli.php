@@ -534,11 +534,16 @@ class CLI {
 	 */
 	function help() {
 		// We store the help text in a text file and just replace the placeholders
-		$text         = file_get_contents( __DIR__ . '/Resources/help_template.txt' );
+		if ( self::is_phar() ) {
+			$text = file_get_contents( 'Resources/help_template.txt' );
+		} else {
+			$text = file_get_contents( __DIR__ . '/../Resources/help_template.txt' );
+		}
+
 		$replacements = [
 			'VERSION'   => self::VERSION,
 			'CLI_NAME'  => self::CLI_NAME,
-			'COPYRIGHT' => "2015" . ( ( 2015 === date('Y', time() ) ) ? '.' : '-' . date('Y', time() ) . '.' ),
+			'COPYRIGHT' => '2015' . ( ( 2015 === date('Y', time() ) ) ? '.' : '-' . date('Y', time() ) . '.' ),
 		];
 		foreach ( $replacements as $key => $val ) {
 			$text = str_replace( "%%{$key}%%", $val, $text );
@@ -557,6 +562,9 @@ class CLI {
 		print self::color( 'Error: you must pass arguments to this script.', 'red' ) . "\n";
 
 		$script_name = $argv[0];
+		if ( false !== strrpos( $script_name, '/' ) ) {
+			$script_name = substr( $script_name, strrpos( $script_name, '/' ) + 1 );
+		}
 
 		// The newlines here symbolize an end of a
 		$values = [
