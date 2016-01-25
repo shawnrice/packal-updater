@@ -24,7 +24,7 @@ foreach ( $files as $file ) :
 endforeach;
 
 // This is a dumb autoloader for all the different menu files.
-foreach ( array_diff( scandir( __DIR__ . '/Menus' ), [ '.', '..', '.DS_Store'] ) as $file ) :
+foreach ( array_diff( scandir( __DIR__ . '/Menus' ), [ '.', '..', '.DS_Store' ] ) as $file ) :
 	if ( 'php' === pathinfo( $file )['extension'] ) {
 		require_once( __DIR__ . "/Menus/{$file}" );
 	}

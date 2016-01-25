@@ -15,29 +15,28 @@
 require_once( __DIR__ . '/autoloader.php' );
 
 
-
+// Checks to make sure that Packal is reachable via grabbing a very low-payload URL off Packal
 function check_connection() {
 	global $alphred;
-	return $alphred->get( BASE_API_URL . 'ping', false, 0, false );
+	return $alphred->get( BASE_URL . '/ping', false, 0, false );
 }
 
 function main( $argv ) {
 	global $alphred, $separator, $icon_suffix, $api_available, $endpoints, $original_query;
 
-	$api_available = true;
-	// COMMENTED FOR TESTING
-	// @todo uncomment the lines below
-	// if ( 'pong' !== check_connection() ) {
-	// 	$alphred->add_result([
-	// 		'title' => 'Cannot connect to Packal Server',
-	// 		'subtitle' => 'Attempting to use cached data.',
-	// 		'icon' => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Unsupported.icns',
-	// 		'valid' => false,
-	// 	]);
-	// 	$api_available = false;
-	// }
+	// Check to see if
+	$api_available = ( 'pong' === check_connection() ) ? true : false;
 
-	$commands = [ 'search', 'submit', 'configure', 'update', 'clear-caches' ];
+	if ( ! $api_available ) {
+		$alphred->add_result([
+			'icon'     => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Unsupported.icns',
+			'subtitle' => 'Attempting to use cached data.',
+			'title'    => 'Cannot connect to Packal Server',
+			'valid'    => false,
+		]);
+	}
+
+	$commands  = [ 'search', 'submit', 'configure', 'update', 'clear-caches' ];
 	$endpoints = [
 		'workflow' => BASE_API_URL . 'workflow?all',
 		'theme'    => BASE_API_URL . 'theme?all',
@@ -179,13 +178,15 @@ $alphred = new Alphred;
 
 if ( DEVELOPMENT_TESTING ) {
 	$alphred->add_result([
-		'title'    => 'Environment: ' . strtoupper( ENVIRONMENT ),
+		'icon'     => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/BurningIcon.icns',
 		'subtitle' => 'URL: ' . BASE_API_URL,
+		'title'    => 'Environment: ' . strtoupper( ENVIRONMENT ),
 		'valid'    => false,
 	]);
 }
 
 $icon_suffix = ( 'light' === $alphred->theme_background() ) ? '-dark.png' : '-light.png';
-$separator = '›';
+// $separator = '›';
+$separator = '»';
 main( $argv );
 $alphred->to_xml();

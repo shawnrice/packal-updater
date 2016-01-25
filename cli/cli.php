@@ -72,7 +72,7 @@ class CLI {
 		} else {
 			print self::highlight( $result[1], "Installing {$result[1]}.\n" );
 		}
-		exit(0);
+		exit( 0 );
 	}
 
 	public function install_workflow( $bundle ) {
@@ -88,7 +88,7 @@ class CLI {
 			exit(1);
 		}
 		print self::color( "Successfully installed `{$workflow['name']}`.\n", 'green' );
-		exit(0);
+		exit( 0 );
 	}
 
 	private function get_credentials() {
@@ -219,7 +219,7 @@ class CLI {
 			endforeach;
 		} else {
 			print self::color( "All workflows are up to date.\n", 'green' );
-			exit(0);
+			exit( 0 );
 		}
 	}
 
@@ -346,60 +346,79 @@ class CLI {
 	 * "Meta" Methods
 	 *********************************************************************/
 
+	/**
+	 * Checks if the CLI is a phar or not
+	 *
+	 * @return boolean whether or not the cli is a phar
+	 */
 	private function is_phar() {
-		if ( 'Packal.phar' == @end( explode( '/', __DIR__ ) ) ) {
-			return true;
-		}
-		return false;
+		return ( 'Packal.phar' === @end( explode( '/', __DIR__ ) ) ) ? true : false;
 	}
 
+	/**
+	 * Determines the options the cli was run with
+	 *
+	 * @return array [description]
+	 */
 	function parse_options() {
-		$shortopts  = "";
+		$shortopts  = '';
 		// $shortopts .= "s:";
 		// $shortopts .= "f:";  // Required value
 		// $shortopts .= "v::"; // Optional value
 		// $shortopts .= "abc"; // These options do not accept values
 
 		$longopts  = array(
-				"st:",
-        "search-theme:",
-        "search-themes:",
-        "sw:",
-        "search-workflow:",
-        "search-workflows:",
-        "it:",
-        "install-theme:",
-        "iw:",
-        "install-workflow:",
-        "upgrade::",
-        "upgrade-workflow::",
-        "upgrade-workflows::",
-        "submit-workflow:",
-        "list-workflows",
-        "submit-theme:",
-		    "help",
-		    "version",
-		    "usage",
-		    "clear-cache",
-		    "cc",
+			"st:",
+			"search-theme:",
+			"search-themes:",
+			"sw:",
+			"search-workflow:",
+			"search-workflows:",
+			"it:",
+			"install-theme:",
+			"iw:",
+			"install-workflow:",
+			"upgrade::",
+			"upgrade-workflow::",
+			"upgrade-workflows::",
+			"submit-workflow:",
+			"list-workflows",
+			"submit-theme:",
+			"help",
+			"version",
+			"usage",
+			"clear-cache",
+			"cc",
 		);
 		$options = getopt( $shortopts, $longopts );
 
+		// A list of aliases for commands
 		$aliases = [
-			'search-workflows' => [ 'search-workflow', 'sw' ],
-			'search-themes'    => [ 'search-theme', 'st' ],
-			'install-theme'    => [ 'install-themes', 'it' ],
-			'install-workflow' => [ 'install-workflows', 'iw' ],
-			'upgrade'          => [ 'upgrade-workflow', 'upgrade-workflows' ],
+			'search-workflows' => [ 'search-workflow', 		'sw' ],
+			'search-themes'    => [ 'search-theme', 			'st' ],
+			'install-theme'    => [ 'install-themes', 		'it' ],
+			'install-workflow' => [ 'install-workflows', 	'iw' ],
+			'upgrade'          => [ 'upgrade-workflow', 	'upgrade-workflows' ],
 		];
 
+		// Applies a list of aliases for the commands
 		foreach ( $aliases as $main => $list ) :
 			self::aliases( $main, $list, $options );
 		endforeach;
+
+		// Return the selected options
 		return $options;
 	}
 
+	/**
+	 * Translates an alias into the main command
+	 *
+	 * @param  string $main     the main command chosen
+	 * @param  array  $aliases  the array of aliases for the main command
+	 * @param  array  &$options the options array via getopts (passed by reference)
+	 */
 	function aliases( $main, $aliases, &$options ) {
+		// Go through all the aliases and set the appropriate ones
 		foreach ( $aliases as $alias ) :
 			if ( in_array( $alias, array_keys( $options ) ) ) {
 				$options[ $main ] = $options[ $alias ];
@@ -408,12 +427,18 @@ class CLI {
 		endforeach;
 	}
 
-	function help( $options = [] ) {
-		$text = file_get_contents( 'Resources/help_template.txt' );
+	/**
+	 * Constructs the help text for the cli from a template
+	 *
+	 * @return string          the final help text
+	 */
+	function help() {
+		// We store the help text in a text file and just replace the placeholders
+		$text         = file_get_contents( 'Resources/help_template.txt' );
 		$replacements = [
-			'VERSION' => self::VERSION,
-			'CLI_NAME' => self::CLI_NAME,
-			'COPYRIGHT' => "2015" . ( ( 2015 == date('Y', time() ) ) ? '.' : '-' . date('Y', time() ) . '.' ),
+			'VERSION'   => self::VERSION,
+			'CLI_NAME'  => self::CLI_NAME,
+			'COPYRIGHT' => "2015" . ( ( 2015 === date('Y', time() ) ) ? '.' : '-' . date('Y', time() ) . '.' ),
 		];
 		foreach ( $replacements as $key => $val ) {
 			$text = str_replace( "%%{$key}%%", $val, $text );
@@ -421,62 +446,81 @@ class CLI {
 		return $text;
 	}
 
+	/**
+	 * Prints usage data for the CLI utility
+	 */
 	function usage() {
 		global $argv;
 		print "\n";
 		print self::help();
 		print "Use this cli to interact with Packal.org from the command line.\n\n";
-		print self::color( "Error: you must pass arguments to this script.", 'red' ) . "\n";
+		print self::color( 'Error: you must pass arguments to this script.', 'red' ) . "\n";
+
 		$script_name = $argv[0];
+
+		// The newlines here symbolize an end of a
 		$values = [
-			'--install-theme'     => "Installs a theme. Usage: %%script_name%% %%key%% <slug>",
-			'--it'                => 'Alias of `--install-theme`',
+			'--install-theme'     => 'Installs a theme. Usage: %%script_name%% %%key%% <slug>',
+			'--it'                => 'Alias of `--install-theme`' . "\n",
 			'--install-workflow'  => 'Installs a workflow. Usage: %%script_name%% %%key%% <bundle>',
-			'--iw'                => 'Alias of `--install-workflow`',
+			'--iw'                => 'Alias of `--install-workflow`' . "\n",
 			'--download-workflow' => 'Downloads a workflow. Usage: %%script_name%% %%key%% <bundle>',
-			'--dw'                => 'Alias of `--download-workflow`',
+			'--dw'                => 'Alias of `--download-workflow`' . "\n",
 			'--upgrade-workflows' => 'Upgrades all workflows. Usage: %%script_name%% %%key%%',
-			'--upgrade'           => 'Alias of `--upgrade-workflows`',
+			'--upgrade'           => 'Alias of `--upgrade-workflows`' . "\n",
 			'--search-themes'     => 'Searches for themes on Packal.org. Usage: %%script_name%% %%key%% <string>',
-			'--st'                => 'Alias of `--search-themes`',
+			'--st'                => 'Alias of `--search-themes`' . "\n",
 			'--search-workflows'  => 'Searches for workflows on Packal.org. Usage: %%script_name%% %%key%% <string>',
-			'--sw'                => 'Alias of `--search-workflows`',
-			'--submit-workflow'   => 'Submits a workflow to Packal.org. Usage: %%script_name%% %%key%% <bundle>',
-			'--submit-theme'      => 'Submits a theme to Packal.org. Usage: %%script_name%% %%key%% <???>',
+			'--sw'                => 'Alias of `--search-workflows`' . "\n",
+			'--submit-workflow'   => 'Submits a workflow to Packal.org. Usage: %%script_name%% %%key%% <bundle>' . "\n",
+			'--submit-theme'      => 'Submits a theme to Packal.org. Usage: %%script_name%% %%key%% <???>' . "\n",
 			'--clear-cache'       => 'Clears the local data. Usage: %%script_name%% %%key%%',
-			'--cc'                => 'Alias of `--clear-cache`',
-			'--usage'             => 'Print this help text.',
+			'--cc'                => 'Alias of `--clear-cache`' . "\n",
+			'--usage'             => 'Print this help text.' . "\n",
 			'--version'           => 'Prints the version of this cli. Usage: %%script_name%% %%key%%',
-			'--v'                 => 'Alias of `--version`',
+			'--v'                 => 'Alias of `--version`' . "\n",
 		];
 		$output = [];
 		$min_one = 0;
 		$min_two = 0;
 
+		// Build initial output
 		foreach ( $values as $key => $value ) :
-			foreach( [ 'script_name', 'key' ] as $var ) :
+			// Replace placeholders with actual values
+			foreach ( [ 'script_name', 'key' ] as $var ) :
 				$value = str_replace( "%%{$var}%%", $$var, $value );
 			endforeach;
 			$output[] = [ $key, $value ];
 		endforeach;
+		// Add in appropriate spacing to make things pretty and line up
 		$pads = self::calculate_pads( $output );
-		foreach( $output as $row ) :
-			print "\n\t" . self::pad_string( $row[0], reset( $pads ) ) . "\t" . self::pad_string( $row[1], next( $pads ) ) . "\n";
+
+		// Actually print out the usage
+		foreach ( $output as $row ) :
+			print "\n\t" . self::pad_string( $row[0], reset( $pads ) ) . "\t" . self::pad_string( $row[1], next( $pads ) );
 		endforeach;
 		print "\n";
 	}
 
+	/**
+	 * Prints version data for the CLI
+	 */
 	function version() {
 		print self::CLI_NAME . " version " . self::VERSION . "\n";
 	}
 
-
+	/**
+	 * Runs a command
+	 *
+	 * Basically, this is the command router. I can find a more elegant way to do this, probably.
+	 */
 	function run() {
 		$options = $this->parse_options();
 
+		// First check to see if there are no options. If no, then print the usage data and exit
 		if ( empty( $options ) ) {
 			$this->usage();
-			exit(1);
+			exit( 1 );
 		}
 
 		if ( ! $this->packal->ping() ) {
@@ -486,51 +530,52 @@ class CLI {
 		// So, what are we doing here? Can we do this with a switch statement?
 		if ( isset( $options['search-themes'] ) ) {
 			print $this->print_search( $options['search-themes'], 'name', 'theme', 'slug' );
-			exit(0);
+			exit( 0 );
 		}
 		if ( isset( $options['search-workflows'] ) ) {
 			print $this->print_search( $options['search-workflows'], 'name', 'workflow', 'bundle' );
-			exit(0);
+			exit( 0 );
 		}
 		if ( isset( $options['help'] ) ) {
 			print $this->help();
-			exit(0);
+			exit( 0 );
 		}
 		if ( isset( $options['version'] ) ) {
 			print $this->help();
-			exit(0);
+			exit( 0 );
 		}
 		if ( isset( $options['install-theme'] ) ) {
 			$this->install_theme( $options['install-theme'] );
-			exit(0);
+			exit( 0 );
 		}
 		if ( isset( $options['install-workflow'] ) ) {
 			$this->install_workflow( $options['install-workflow'] );
-			exit(0);
+			exit( 0 );
 		}
 		if ( isset( $options['upgrade'] ) ) {
 			$this->upgrade_workflows( $options['upgrade'] );
-			exit(0);
+			exit( 0 );
 		}
 		if ( isset( $options['submit-workflow'] ) ) {
 			$this->submit_workflow( $options['submit-workflow'] );
-			exit(0);
+			exit( 0 );
 		}
 		if ( isset( $options['submit-theme'] ) ) {
 			print self::color( 'Not implemented yet.', 'red' );
 			// $this->submit_theme( $options['submit-theme'] );
-			exit(0);
+			exit( 0 );
 		}
 		if ( isset( $options['usage'] ) ) {
 			$this->usage();
-			exit(0);
+			exit( 0 );
 		}
 		if ( isset( $options['clear-cache'] ) ) {
 			$this->clear_cache();
-			exit(0);
+			exit( 0 );
 		}
+		// Debugging... we should not get here.
 		print "No arguments found.\n";
-		print_r($options);
+		print_r( $options );
 	}
 
 	/*********************************************************************
@@ -539,15 +584,27 @@ class CLI {
 
 	/**
 	 * [input description]
-	 * @param  boolean $prompt [description]
-	 * @param  boolean $hidden [description]
-	 * @return [type]          [description]
+	 * @param  string|boolean $prompt the prompt text
+	 * @param  boolean 				$hidden whether or not to hide the user's input text
+	 * @return string         the text the user inputted
 	 */
-	private function input( $prompt = false, $hidden = false ) {
-		if ( $prompt ) { print $prompt; }
-		if ( $hidden ) { system( 'stty -echo' ); }
+	private static function input( $prompt = false, $hidden = false ) {
+		// If there was a prompt, then print the prompt
+		if ( $prompt ) {
+			print $prompt;
+		}
+		// If we are to hide the input (for passwords), then turn off
+		// input echoing in the terminal.
+		if ( $hidden ) {
+			system( 'stty -echo' );
+		}
+		// Get whatever was typed into the terminal
 		$return = trim( fgets( STDIN ) );
-		if ( $hidden ) { system( 'stty echo' ); }
+		// If we were to hide the input, turn it back on.
+		if ( $hidden ) {
+			system( 'stty echo' );
+		}
+		// Return the text grabbed
 		return $return;
 	}
 
@@ -593,9 +650,9 @@ class CLI {
 	/**
 	 * Adds whitespace to a string to make columns match up
 	 *
-	 * @param  [type] $string [description]
-	 * @param  [type] $max    [description]
-	 * @return [type]         [description]
+	 * @param  string $string the string to pad
+	 * @param  int 		$max    the max number of columns to pad to
+	 * @return string         the padded string
 	 */
 	private function pad_string( $string, $max ) {
 		$len = strlen( $string );
@@ -607,10 +664,15 @@ class CLI {
 		return $string;
 	}
 
-
+	/**
+	 * Determines the longest string to figure out how much to pad other strings
+	 * @param  array $array an array of strings
+	 * @return int        	how long the pad should be
+	 */
 	private function calculate_pads( $array ) {
+		// Go through each item in the array
 		for ( $i = 0; $i < count( $array ); $i++ ) :
-			foreach( $array[$i] as $key => $value ) :
+			foreach ( $array[$i] as $key => $value ) :
 				if ( ! isset( $max[ $key ] ) ) {
 					$max[ $key ] = strlen( $value );
 					continue;
@@ -626,14 +688,14 @@ class CLI {
 	/**
 	 * Scrubs out undesirable characters and line breaks
 	 *
-	 * @param  [type] $string [description]
-	 * @return [type]         [description]
+	 * @param  string $string a string to be scrubbed
+	 * @return string         a scrubbed string
 	 */
-	private function scrub( $string ) {
+	private static function scrub( $string ) {
 		$replacements = [
 			"&#39;" => "'",
-			"\n" => ' ',
-			"\t" => ' ',
+			"\n"    => ' ',
+			"\t"    => ' ',
 		];
 		foreach ( $replacements as $search => $replace ) :
 			$string = str_replace( $search, $replace, $string );
@@ -647,29 +709,41 @@ class CLI {
 	 * @param  [type] $string [description]
 	 * @return [type]         [description]
 	 */
-	private function trim( $string ) {
-		$cols   = exec( 'tput cols' );
+	private static function trim( $string ) {
+		// Determines the number of columns in the terminal view
+		$cols = exec( 'tput cols' );
 		if ( strlen( $string ) < $cols ) {
+			// If the string is less than the columns, then just return the string
 			return $string;
 		}
+		// Return as much of the string as possible, but truncated with an ellipsis
 		return substr( $string, 0, $cols ) . '...';
 	}
 
-	private function print_divider() {
+	/**
+	 * Makes text for a divider
+	 * @return string text that represents a divider
+	 */
+	private static function print_divider() {
+		// Get the appropriate size of a divider based on the terminal size
 		$cols = exec( 'tput cols' ) - 10;
 		$out = '';
+		// Just concatenate a bunch of the same string based on the size of the terminal
 		for ( $i = 0; $i < $cols; $i++ ) :
 			$out .= '-';
 		endfor;
+		// Return the divided with a newline
 		return $out . "\n";
 	}
 
 	/**
 	 * Colors the search text red
 	 *
-	 * @param  [type] $search [description]
-	 * @param  [type] $string [description]
-	 * @return [type]         [description]
+	 * @todo  fix weird case altering (maybe move to a preg instead of str replace)
+	 *
+	 * @param  string $search the string to highlight (needle)
+	 * @param  string $string the overall string (haystack)
+	 * @return string         the string with the highlighted text
 	 */
 	private static function highlight( $search, $string ) {
 		$red    = "\033[31m";
@@ -679,6 +753,16 @@ class CLI {
 		return str_ireplace( $search, "{$red}{$search}{$normal}", $string );
 	}
 
+	/**
+	 * Colors a message a particular color
+	 *
+	 * Current options are just red or green.
+	 * @todo  Add in more colors
+	 *
+	 * @param  string $message the message to color
+	 * @param  string $color   the color to use
+	 * @return string          the newly colored string
+	 */
 	private static function color( $message, $color ) {
 		$colors = [
 			'red'    => "\033[31m",
@@ -690,7 +774,7 @@ class CLI {
 		}
 		return "{$colors[$color]}{$message}{$colors['normal']}";
 	}
-
 }
 
+// Instantiate a new CLI
 $cli = new CLI();
