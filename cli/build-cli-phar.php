@@ -17,7 +17,6 @@ $phar_name    = 'Packal.phar';
 // Directories to add wholesale
 $directories = [
 	'Libraries/CFPropertyList/classes/CFPropertyList',
-	'Resources',
 ];
 // Specific files to add into the phar
 $other_files = [
@@ -32,6 +31,7 @@ $other_files = [
 	'Libraries/Packal.php',
 	'Libraries/Themes.php',
 	'Libraries/Workflows.php',
+	'Resources/help_template.txt',
 	'config.php',
 	'environment.txt',
 	// 'Resources/help_template.txt',
@@ -78,8 +78,8 @@ endforeach;
 
 // Cycle through these directories and include everything
 foreach( $directories as $directory ) :
-	foreach( array_diff( scandir( __DIR__ . '/' . $directory ), ['.', '..', '.DS_Store' ] ) as $file ) :
-		$phar[ "{$directory}/{$file}" ] = file_get_contents( __DIR__ . "/{$directory}/{$file}" );
+	foreach( array_diff( scandir( __DIR__ . '/../' . $directory ), ['.', '..', '.DS_Store' ] ) as $file ) :
+		$phar[ "{$directory}/{$file}" ] = file_get_contents( __DIR__ . "/../{$directory}/{$file}" );
 	endforeach;
 endforeach;
 
@@ -87,7 +87,7 @@ endforeach;
 foreach ( $other_files as $file ) :
 	$name = explode( '/', $file );
 	$name = end( $name );
-	$phar[ $name ] = file_get_contents( __DIR__ . '/' . $file );
+	$phar[ $name ] = file_get_contents( __DIR__ . '/../' . $file );
 endforeach;
 // Why is this line here again?
 $phar[ 'autoloader.php' ] = ''; // This is just something here for now

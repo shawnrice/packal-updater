@@ -6,7 +6,7 @@
 // Do other things here
 // When done:
 // $archive->remove_temp_dir();
-// $dir = '/Users/Sven/Dropbox/app syncing/alfred2/Alfred.alfredpreferences/workflows/user.workflow.67A4F4B2-CAD7-41E5-8EC9-322620012FFF/';
+// $dir = '/Users/srice1271/Dropbox/app syncing/alfred2/Alfred.alfredpreferences/workflows/user.workflow.67A4F4B2-CAD7-41E5-8EC9-322620012FFF';
 // $archive = new BuildWorkflow( $dir );
 // $filename = $archive->archive_name();
 // echo "File: {$filename}\n";
