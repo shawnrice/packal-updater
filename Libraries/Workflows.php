@@ -10,18 +10,18 @@ class Workflows {
 	function __construct( $environment ) {
 		// Do I need environment for this one?
 		$this->alphred = new Alphred;
-		$this->packal = new Packal( $environment );
+		$this->packal  = new Packal( $environment );
 	}
 
 	function find_upgrades() {
-		$packal_workflows = $this->packal->download_workflow_data();
-		$packal_workflows = $packal_workflows['workflows'];
-		$my_workflows = json_decode( file_get_contents( MapWorkflows::map() ), true );
+		$packal_workflows    = $this->packal->download_workflow_data();
+		$packal_workflows    = $packal_workflows['workflows'];
+		$my_workflows        = json_decode( file_get_contents( MapWorkflows::map() ), true );
 		$my_packal_workflows = $this->alphred->filter( $my_workflows, 1, 'packal', [ 'match_type' => MATCH_STARTSWITH ] );
 		$this->upgrades = [];
-		foreach( $packal_workflows as $workflow ) :
-			foreach( $my_packal_workflows as $my_packal_workflow ) :
-				if ( $workflow['bundle'] == $my_packal_workflow['bundle'] ) {
+		foreach ( $packal_workflows as $workflow ) :
+			foreach ( $my_packal_workflows as $my_packal_workflow ) :
+				if ( $workflow['bundle'] === $my_packal_workflow['bundle'] ) {
 					if ( SemVer::gt( $workflow['version'], $my_packal_workflow['version'] ) ) {
 						$this->upgrades[] = [ 'old' => $my_packal_workflow, 'new' => $workflow ];
 					}
@@ -44,7 +44,7 @@ class Workflows {
 	}
 
 	public static function create_unique_workflow_directory() {
-		$directory = self::find_workflows_directory() . "/" . self::generate_workflow_directory_name();
+		$directory = self::find_workflows_directory() . '/' . self::generate_workflow_directory_name();
 		if ( ! file_exists( $directory ) ) {
 			mkdir( $directory, 0775 );
 			return $directory;
@@ -55,8 +55,8 @@ class Workflows {
 	public static function generate_workflow_directory_name() {
 		$chars = str_split( '0123456789ABCDEF' );
 		$output = 'user.workflow.';
-		foreach( [ 8, 4, 4, 4, 12 ] as $number ) :
-			for( $i = 0; $i < $number; $i++ ) :
+		foreach ( [ 8, 4, 4, 4, 12 ] as $number ) :
+			for ( $i = 0; $i < $number; $i++ ) :
 				$output .= $chars[ rand( 0, 15 ) ];
 			endfor;
 			$output .= '-';
@@ -67,7 +67,7 @@ class Workflows {
 	public static function find_workflow_installed_by_bundle( $bundle ) {
 		$workflows = json_decode( file_get_contents( MapWorkflows::map() ), true );
 		foreach ( $workflows as $workflow ) :
-			if ( $bundle == $workflow['bundle'] ) {
+			if ( $bundle === $workflow['bundle'] ) {
 				return true;
 			}
 		endforeach;
@@ -77,7 +77,7 @@ class Workflows {
 	public static function find_workflow_path_by_bundle( $bundle ) {
 		$workflows = json_decode( file_get_contents( MapWorkflows::map() ), true );
 		foreach ( $workflows as $workflow ) :
-			if ( $bundle == $workflow['bundle'] ) {
+			if ( $bundle === $workflow['bundle'] ) {
 				return $workflow['path'];
 			}
 		endforeach;
@@ -87,7 +87,7 @@ class Workflows {
 	public function find_workflow_by_bundle_from_packal( $bundle ) {
 		$workflows = $this->packal->download_workflow_data();
 		foreach( $workflows['workflows'] as $workflow ) :
-			if ( $bundle == $workflow['bundle'] ) {
+			if ( $bundle === $workflow['bundle'] ) {
 				return $workflow;
 			}
 		endforeach;
@@ -104,10 +104,10 @@ class Workflows {
 			$upgrade = false;
 			$workflow = $new;
 		}
-		$directory = FileSystem::make_random_temp_dir();
+		$directory   = FileSystem::make_random_temp_dir();
 		$destination = self::find_workflow_path_by_bundle( $workflow['bundle'] );
-		$to_clean = [ $directory ];
-		$signature = $new['signature'];
+		$to_clean    = [ $directory ];
+		$signature   = $new['signature'];
 		while ( true ) :
 			if ( $upgrade ) {
 				$key = "{$old_workflow_path}/packaging/{$old['bundle']}.pub";
