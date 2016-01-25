@@ -59,54 +59,88 @@ class CLI {
 		$this->run();
 	}
 
+	/**
+	 * Prints an connectivity error message
+	 */
 	private static function print_connectivity_error() {
 		$error = "\n!!! Error: Cannot connect to Packal servers. If cached data is present, you can install themes and search anything but nothing else.\n\n";
 		print self::color( $error, 'red' );
 	}
 
+	/**
+	 * Installs a theme
+	 * @param  string $slug the slug of the theme (unique identifier)
+	 */
 	public function install_theme( $slug ) {
 		$result = $this->theme->install( $slug );
-		if ( false == $result[0] ) {
+		if ( false === $result[0] ) {
 			print self::highlight( 'Error', "Error: there is no theme with the slug `{$result[1]['slug']}`.\n" );
-			exit(1);
-		} else {
-			print self::highlight( $result[1], "Installing {$result[1]}.\n" );
+			exit( 1 );
 		}
+
+		// Successfully installed, so say so and exit with 0.
+		print self::highlight( $result[1], "Installing {$result[1]}.\n" );
 		exit( 0 );
 	}
 
+	/**
+	 * Installs a workflow
+	 * @param  string $bundle the bundle id of the workflow
+	 */
 	public function install_workflow( $bundle ) {
+		// Find the workflow from the manifest
 		$workflow = $this->workflow->find_workflow_by_bundle_from_packal( $bundle );
+
+		// All errors are returned as strings, so see if we have an error
 		if ( is_string( $workflow ) ) {
+			// $workflow, in this context, is an error message, so just print it and exit 1
 			print self::color( "!!! Error: {$workflow}\n", 'red' );
-			exit(1);
+			exit( 1 );
 		}
+		// Install the workflow
 		$result = $this->workflow->install( $workflow );
+
+		// All errors are returned as strings, so see if we have an error
 		if ( is_string( $result ) ) {
-			$error = "!!! Error: " . $result . '.';
+			// $result, in this context, is an error message, so just print it and exit 1
+			$error = "!!! Error: {$result}.";
 			print self::highlight( $error, $error ) . "\n";
-			exit(1);
+			exit( 1 );
 		}
+
+		// Successfully installed, so say so and exit with 0.
 		print self::color( "Successfully installed `{$workflow['name']}`.\n", 'green' );
 		exit( 0 );
 	}
 
+	/**
+	 * Get the stored credentials for the user
+	 * @return string|array a string is an error status, an array are valid(?) credentials
+	 */
 	private function get_credentials() {
+		// Get the username
 		$username = $this->alphred->config_read( 'username' );
+		// Get the password
 		$password = $this->alphred->get_password( 'packal.org' );
+
+		// Check to make sure we have a username
 		if ( empty( $username ) ) {
+			// We don't have a username, so return 'username', which will be interpreted as an error message
 			return 'username';
 		}
+		// Check to make sure we have a password
 		if ( empty( $password ) ) {
+			// We don't have a password, so return 'password', which will be interpreted as an error message
 			return 'password';
 		}
+		// We got a username and a password, so return them as an array
 		return [ 'username' => $username, 'password' => $password ];
 	}
 
 	public function submit_workflow( $bundle ) {
 		if ( is_string( $credentials = $this->get_credentials() ) ) {
 			print self::color( "Error: no `{$credentials}` has been set. Please see usage.", 'red' ) . "\n";
-			exit(1);
+			exit( 1 );
 		}
 		$bundle = trim( $bundle );
 
@@ -136,9 +170,13 @@ class CLI {
 
 	}
 
+	/**
+	 * Clears a cache bin
+	 * @param  string $bin the name of the cache bin
+	 */
 	function clear_cache( $bin = PRIMARY_CACHE_BIN ) {
-		foreach( array_diff( scandir( PRIMARY_CACHE_BIN ), [ '..', '.' ] ) as $file ) :
-			// We'll use recurse_unlink in case the data is
+		foreach ( array_diff( scandir( PRIMARY_CACHE_BIN ), [ '..', '.' ] ) as $file ) :
+			// We'll use recurse_unlink in case the data is in nested bins (dirs)
 			FileSystem::recurse_unlink( $file );
 		endforeach;
 	}
@@ -200,34 +238,62 @@ class CLI {
 	function upgrade_workflows( $workflows = [] ) {
 		$this->workflow->find_upgrades();
 		if ( count( $this->workflow->upgrades ) > 0 ) {
-			$output = self::RED . "There are " . count( $this->workflow->upgrades ) . " upgrade(s)." . self::NORMAL . " available\n";
-			foreach( $this->workflow->upgrades as $upgrade ) {
-				$output .= "{$upgrade['old']['name']} -- {$upgrade['old']['bundle']} -- (" . self::RED . "{$upgrade['old']['version']}" . self::NORMAL . " -> " . self::GREEN . "{$upgrade['new']['version']}" . self::NORMAL . "), ";
+			$output = self::RED
+								. "There are "
+								. count( $this->workflow->upgrades )
+								. " upgrade(s)."
+								. self::NORMAL
+								. " available\n";
+			foreach ( $this->workflow->upgrades as $upgrade ) {
+				$output .= "{$upgrade['old']['name']} -- {$upgrade['old']['bundle']} -- ("
+								. self::RED
+								. "{$upgrade['old']['version']}"
+								. self::NORMAL
+								. " -> "
+								. self::GREEN
+								. "{$upgrade['new']['version']}"
+								. self::NORMAL
+								. "), ";
 			}
+			// Remove the ', ' from the end and replace it with a newline
 			$output = substr( $output, 0, -2 ) . "\n";
+			// Actually print the output
 			print $output;
-			$this->confirm( 'Continue with upgrades? (Y/n): ', 'Canceled upgrades.' );
-			foreach( $this->workflow->upgrades as $upgrade ) :
-			// 	print_r( $upgrade );
-			// exit();
-				if ( true !== $output = $this->workflow->upgrade( $upgrade ) ) {
+
+			// Ask the user if s/he wants to proceed with the upgrade. Saying 'no', exits the program
+			self::confirm( 'Continue with upgrades? (Y/n): ', 'Canceled upgrades.' );
+
+			// We know they said "yes" (otherwise the program would have ended), so continue with the upgrades
+			// 	and upgrade each workflow, one workflow at a time.
+			foreach ( $this->workflow->upgrades as $upgrade ) :
+				if ( true !== ( $output = $this->workflow->upgrade( $upgrade ) ) ) {
 					print self::highlight( $output, $output );
 				} else {
-					print "Upgrade successful.";
+					print 'Upgrade successful.';
 				}
 				print "\n";
 			endforeach;
 		} else {
+			// All workflows are up to date, so print a message as such and color it green.
 			print self::color( "All workflows are up to date.\n", 'green' );
 			exit( 0 );
 		}
 	}
 
+	/**
+	 * Prints search results to the terminal
+	 * @param  [type] $search    [description]
+	 * @param  [type] $key       [description]
+	 * @param  [type] $type      [description]
+	 * @param  [type] $identifer [description]
+	 * @return [type]            [description]
+	 */
 	function print_search( $search, $key, $type, $identifer ) {
 		$red    = "\033[31m";
 		$green  = "\033[32m";
 		$normal = "\033[0m";
 
+		// Do the search
 		$items = $this->packal->search( $search, $key, $type, $identifer );
 
 		// Construct initial header
@@ -246,10 +312,11 @@ class CLI {
 		// Add a divider
 		$output .= self::print_divider();
 
-		$out = [];
-		$id_max = 0;
+		$out      = [];
+		$id_max   = 0;
 		$name_max = 0;
 
+		// Get and normalize the data
 		foreach ( $items as $item ) :
 			$id = ( 'theme' == $type ) ? $this->theme->find_slug( $item['url'] ) : $item[ $identifer ];
 			if ( strlen( $id ) > $id_max ) { $id_max = strlen( $id ); }
@@ -257,10 +324,11 @@ class CLI {
 			$out[] = [ $identifer => $id, 'name' => $item['name'], 'desc' => self::scrub( $item['description'] ) ];
 		endforeach;
 
+		// Pad the strings to make things easier to read
 		foreach( $out as $key => $val ) :
 			$out[ $key ][ $identifer ] = self::pad_string( $val[ $identifer ], $id_max );
-			$out[ $key ]['name'] = self::pad_string( $val['name'], $name_max );
-			$out[ $key ] = self::trim( self::highlight( $search, implode( "\t", $out[ $key ] ) ) );
+			$out[ $key ]['name']       = self::pad_string( $val['name'], $name_max );
+			$out[ $key ]               = self::trim( self::highlight( $search, implode( "\t", $out[ $key ] ) ) );
 		endforeach;
 
 		// Add column labels
@@ -631,16 +699,16 @@ class CLI {
 	 * @return [type] [description]
 	 */
 	private function confirm( $prompt = false, $canceled = false ) {
-		$prompt = ( $prompt ) ? $prompt : "Continue (Y/n): ";
-		$canceled = ( ( $canceled ) ? $canceled : "Canceled action." ) . "\n";
-		$answer = strtolower( self::get_input( $prompt ) );
+		$prompt   = ( $prompt ) ? $prompt : "Continue (Y/n): ";
+		$canceled = ( ( $canceled ) ? $canceled : 'Canceled action.' ) . "\n";
+		$answer   = strtolower( self::get_input( $prompt ) );
 		if ( empty( $answer ) ) {
 			return true;
 		} else if ( in_array( $answer, [ 'y', 'ye', 'yes' ] ) ) {
 			return true;
 		}
 		print $canceled;
-		exit(1);
+		exit( 1 );
 	}
 
 	/*********************************************************************
