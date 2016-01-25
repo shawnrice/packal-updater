@@ -21,28 +21,29 @@ class FileSystem {
 		if ( ! file_exists( $destination ) ) {
 			mkdir( $destination );
 		}
-		while( false !== ( $file = readdir( $directory ) ) ) :
-			if ( ( $file != '.' ) && ( $file != '..' ) ) {
-				$valid = true;
-				foreach ( $excluded as $pattern ) :
-					if ( preg_match( $pattern, $file ) ) {
-						$valid = false;
-						break;
-					}
-				endforeach;
-				if ( ! $valid ) {
-					self::log( "Excluding {$file}." );
-					continue;
+		while ( false !== ( $file = readdir( $directory ) ) ) :
+			if ( in_array( $file, [ '.', '..' ] ) ) {
+				continue;
+			}
+			$valid = true;
+			foreach ( $excluded as $pattern ) :
+				if ( preg_match( $pattern, $file ) ) {
+					$valid = false;
+					break;
 				}
-				// Don't recurse through symbolic links...
-				if ( is_link( "{$source}/{$file}" ) ) {
-					continue;
-				}
-				if ( is_dir( "{$source}/{$file}" ) ) {
-					self::recurse_copy( "{$source}/{$file}", "{$destination}/{$file}" );
-				} else {
-					copy( "{$source}/{$file}", "{$destination}/{$file}" );
-				}
+			endforeach;
+			if ( ! $valid ) {
+				self::log( "Excluding {$file}." );
+				continue;
+			}
+			// Don't recurse through symbolic links...
+			if ( is_link( "{$source}/{$file}" ) ) {
+				continue;
+			}
+			if ( is_dir( "{$source}/{$file}" ) ) {
+				self::recurse_copy( "{$source}/{$file}", "{$destination}/{$file}" );
+			} else {
+				copy( "{$source}/{$file}", "{$destination}/{$file}" );
 			}
 		endwhile;
 
