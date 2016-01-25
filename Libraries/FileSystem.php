@@ -4,7 +4,7 @@ class FileSystem {
 
 	public static function make_random_temp_dir() {
 		$letters = '0123456789abcdefghijklmnopqrstuvwxyz';
-		for ($i = 0; $i < 20; $i++ ) :
+		for ( $i = 0; $i < 20; $i++ ) :
 			@$random .= $letters[ rand( 0 , strlen( $letters ) - 1 ) ];
 		endfor;
 
@@ -17,46 +17,46 @@ class FileSystem {
 
 		$excluded = [ '/\.git/', '/.*\.pyc/' ];
 
-    $directory = opendir( $source );
-    if ( ! file_exists( $destination ) ) {
-    	mkdir( $destination );
-    }
-    while( false !== ( $file = readdir( $directory ) ) ) :
-      if ( ( $file != '.' ) && ( $file != '..' ) ) {
-      	$valid = true;
-      	foreach ( $excluded as $pattern ) :
-	    		if ( preg_match( $pattern, $file ) ) {
-	    			$valid = false;
-	    			break;
-	    		}
-    		endforeach;
-    		if ( ! $valid ) {
-    			self::log( "Excluding {$file}." );
-    			continue;
-    		}
-    		// Don't recurse through symbolic links...
-    		if ( is_link( "{$source}/{$file}" ) ) {
-    			continue;
-    		}
-        if ( is_dir( "{$source}/{$file}" ) ) {
-          self::recurse_copy( "{$source}/{$file}", "{$destination}/{$file}" );
-        } else {
-          copy( "{$source}/{$file}", "{$destination}/{$file}" );
-        }
-      }
-    endwhile;
+		$directory = opendir( $source );
+		if ( ! file_exists( $destination ) ) {
+			mkdir( $destination );
+		}
+		while( false !== ( $file = readdir( $directory ) ) ) :
+			if ( ( $file != '.' ) && ( $file != '..' ) ) {
+				$valid = true;
+				foreach ( $excluded as $pattern ) :
+					if ( preg_match( $pattern, $file ) ) {
+						$valid = false;
+						break;
+					}
+				endforeach;
+				if ( ! $valid ) {
+					self::log( "Excluding {$file}." );
+					continue;
+				}
+				// Don't recurse through symbolic links...
+				if ( is_link( "{$source}/{$file}" ) ) {
+					continue;
+				}
+				if ( is_dir( "{$source}/{$file}" ) ) {
+					self::recurse_copy( "{$source}/{$file}", "{$destination}/{$file}" );
+				} else {
+					copy( "{$source}/{$file}", "{$destination}/{$file}" );
+				}
+			}
+		endwhile;
 
-    closedir( $directory );
+		closedir( $directory );
 	}
 
 	public static function recurse_unlink( $directory ) {
-	  if ( ! $directory_handle = @opendir( $directory ) ) {
-	    return;
-	  }
+		if ( ! $directory_handle = @opendir( $directory ) ) {
+			return;
+		}
 
-	  while ( false !== ( $file = readdir( $directory_handle ) ) ) :
-	    if( $file == '.' || $file == '..' ) {
-	      continue;
+		while ( false !== ( $file = readdir( $directory_handle ) ) ) :
+	    if ( $file == '.' || $file == '..' ) {
+				continue;
 	    }
 	    if ( is_dir( "{$directory}/{$file}" ) ) {
 	    	self::recurse_unlink( "{$directory}/{$file}" );
@@ -66,14 +66,14 @@ class FileSystem {
 
 	  endwhile;
 
-	  closedir( $directory_handle );
-	  @rmdir( $directory );
+		closedir( $directory_handle );
+		@rmdir( $directory );
 
-	  return;
+		return;
 	}
 
 	public static function read_directory( $directory, &$files ) {
-		foreach( array_diff( scandir( $directory ), [ '.', '..' ] ) as $file ) :
+		foreach ( array_diff( scandir( $directory ), [ '.', '..' ] ) as $file ) :
 			if ( is_dir( "{$directory}/{$file}" ) ) {
 				self::read_directory( "{$directory}/{$file}", $files );
 			} else {
@@ -115,18 +115,18 @@ class FileSystem {
 	}
 
 	public static function verify_download( $file, $md5 ) {
-		return md5_file( $file ) == $md5;
+		return md5_file( $file ) === $md5;
 	}
 
 	public static function extract_archive( $archive, $destination ) {
 		$zip = new ZipArchive;
 		if ( true === $zip->open( $archive ) ) {
-		  $zip->extractTo( $destination );
-		  $zip->close();
-		 } else {
-		 	return false;
-		 }
-		 return true;
+			$zip->extractTo( $destination );
+			$zip->close();
+		} else {
+			return false;
+		}
+		return true;
 	}
 
 
@@ -140,7 +140,7 @@ class FileSystem {
 	}
 
 	public static function clean_up( $directories ) {
-		foreach( $directories as $directory ) :
+		foreach ( $directories as $directory ) :
 			self::recurse_unlink( $directory );
 		endforeach;
 	}
@@ -151,7 +151,7 @@ class FileSystem {
 			$alphred = new Alphred;
 			$alphred->console( "{$message}", 1 );
 		} else {
-			echo "{$message}\n";
+			print "{$message}\n";
 		}
 	}
 
@@ -159,10 +159,10 @@ class FileSystem {
 		$slug = strtolower( $slug );
 		$slug = preg_replace( '/[^\w]{1,}/', '-', $slug );
 		$slug = preg_replace( '/[-]{2,}/', '-', $slug );
-		if ( '-' == substr( $slug, -1 ) ) {
+		if ( '-' === substr( $slug, -1 ) ) {
 			$slug = substr( $slug, 0, -1 );
 		}
-		if ( '-' == substr( $slug, 0, 1 ) ) {
+		if ( '-' === substr( $slug, 0, 1 ) ) {
 			$slug = substr( $slug, 1 );
 		}
 		return $slug;
@@ -179,24 +179,24 @@ class FileSystem {
 	 */
 	public static function verify_signature( $signature, $file, $key ) {
 
-	  $data = sha1_file( $file, false );
+		// Get the hash of the file
+		$data = sha1_file( $file, false );
+		// fetch public key from certificate and ready it
+		$fp   = fopen( $key , 'r' );
+		$cert = fread( $fp, filesize( $key ) );
+		fclose( $fp );
 
-	  // fetch public key from certificate and ready it
-	  $fp = fopen( $key , 'r' );
-	  $cert = fread( $fp, filesize( $key ) );
-	  fclose( $fp );
+		// Get the public key
+		$id = openssl_get_publickey( $cert );
 
-	  // Get the public key
-	  $id = openssl_get_publickey( $cert );
+		// Get the result of the signature
+		$result = openssl_verify( $data, base64_decode( $signature ), $id, OPENSSL_ALGO_SHA1 );
 
-	  // Get the result of the signature
-	  $result = openssl_verify( $data, base64_decode( $signature ), $id, OPENSSL_ALGO_SHA1 );
+		// Free key from memory
+		openssl_free_key( $id );
 
-	  // Free key from memory
-	  openssl_free_key( $id );
-
-	  // Return the result
-	  return $result;
+		// Return the result
+		return $result;
 	}
 
 
