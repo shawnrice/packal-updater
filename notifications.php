@@ -8,15 +8,15 @@ if ( ! isset( $argv[1] ) || ! ( $messages = json_decode( $argv[1], true ) ) ) {
 }
 
 if ( 0 === count( $messages ) ) {
-	exit(0);
+	exit( 0 );
 }
 
-$alphred  = new Alphred;
+$alphred = new Alphred;
 
 if ( isset( $messages['subtitle'] ) ) {
 	$subtitle = $messages['subtitle'];
 } else {
-	$subtitle = ( 'pass' == $messages[ 'status' ] ) ?
+	$subtitle = ( 'pass' === $messages[ 'status' ] ) ?
 		$messages['action'] . ' Completed' : $messages['action'] . ' Failed';
 }
 
@@ -27,7 +27,7 @@ if ( isset( $messages['text'] ) ) {
 }
 
 $alphred->send_notification([
-  'title' 	 => 'Packal',
-  'subtitle' => $subtitle,
-  'text' 		 => $text,
+	'title' 	 => 'Packal',
+	'subtitle' => $subtitle,
+	'text' 		 => $text,
 ]);

@@ -40,7 +40,7 @@ function main( $argv ) {
 	$commands = [ 'search', 'submit', 'configure', 'update', 'clear-caches' ];
 	$endpoints = [
 		'workflow' => BASE_API_URL . 'workflow?all',
-		'theme'    => BASE_API_URL . 'theme?all'
+		'theme'    => BASE_API_URL . 'theme?all',
 	];
 
 	$updates = check_for_updates( $endpoints['workflow'] );
@@ -64,76 +64,75 @@ function main( $argv ) {
 	endforeach;
 	$parts = array_values( $parts );
 
-	if ( 0 == count( $parts ) ) {
+	if ( 0 === count( $parts ) ) {
 		return create_root_menu( $alphred->filter( $commands, $query ) );
 	}
 
-	if ( 1 == count( $parts ) ) {
-		if ( 'search' == $parts[0] ) {
+	if ( 1 === count( $parts ) ) {
+		if ( 'search' === $parts[0] ) {
 			return create_search_menu( false );
-		} else if ( 'submit' == $parts[0] ) {
+		} else if ( 'submit' === $parts[0] ) {
 			return create_submit_menu( false );
-		} else if ( 'configure' == $parts[0] ) {
+		} else if ( 'configure' === $parts[0] ) {
 			return create_configure_menu( false );
-		} else if ( 'update' == $parts[0] ) {
+		} else if ( 'update' === $parts[0] ) {
 			return create_update_menu( false, false );
 		}
 		return;
 	}
 
-	if ( 2 == count( $parts ) ) {
-		if ( 'search' == $parts[0] ) {
-			if ( 'theme' == $parts[1] ) {
+	if ( 2 === count( $parts ) ) {
+		if ( 'search' === $parts[0] ) {
+			if ( 'theme' === $parts[1] ) {
 				$themes = $alphred->get( $endpoints['theme'], 3600, true );
 				render_themes( $themes, '' );
-			} else if ( 'workflow' == $parts[1] ) {
+			} else if ( 'workflow' === $parts[1] ) {
 				$workflows = $alphred->get( $endpoints['workflow'], 3600, true );
 				render_workflows( $workflows, '' );
 			}
-		} else if ( 'submit' == $parts[0] ) {
-			if ( 'theme' == $parts[1] ) {
+		} else if ( 'submit' === $parts[0] ) {
+			if ( 'theme' === $parts[1] ) {
 				submit_theme_menu( false );
-			} else if ( 'workflow' == $parts[1] ) {
+			} else if ( 'workflow' === $parts[1] ) {
 				submit_workflow_menu( false );
 			}
-		} else if ( 'configure' == $parts[0] ) {
-			if ( 'username' == $parts[1] ) {
+		} else if ( 'configure' === $parts[0] ) {
+			if ( 'username' === $parts[1] ) {
 				config_set_username_menu( false );
-			} else if ( 'authorname' == $parts[1] ) {
+			} else if ( 'authorname' === $parts[1] ) {
 				config_set_authorname_menu( false );
-			} else if ( 'blacklist' == $parts[1] ) {
+			} else if ( 'blacklist' === $parts[1] ) {
 				create_blacklist_menu( false );
 			}
-		} else if ( 'update' == $parts[0] ) {
-			if ( 'migrate' == $parts[1] ) {
+		} else if ( 'update' === $parts[0] ) {
+			if ( 'migrate' === $parts[1] ) {
 				create_migrate_menu( false, true );
 			}
-
 		}
 		return;
 	}
-	if ( 3 == count( $parts ) ) {
-		if ( 'search' == $parts[0] ) {
-			if ( 'theme' == $parts[1] ) {
+	if ( 3 === count( $parts ) ) {
+		if ( 'search' === $parts[0] ) {
+			if ( 'theme' === $parts[1] ) {
 				$themes = $alphred->get( $endpoints['theme'], 3600, true );
 				render_themes( $themes, $parts[2] );
-			} else if ( 'workflow' == $parts[1] ) {
-				$alphred->console('Test');
+			} else if ( 'workflow' === $parts[1] ) {
+				$alphred->console( 'Test' );
 				$workflows = $alphred->get( $endpoints['workflow'], 3600, true );
 				render_workflows( $workflows, $parts[2] );
 			}
-		} else if ( 'submit' == $parts[0] ) {
-			if ( 'theme' == $parts[1] ) {
+		} else if ( 'submit' === $parts[0] ) {
+			if ( 'theme' === $parts[1] ) {
 				submit_theme_menu( $parts[2] );
-			} else if ( 'workflow' == $parts[1] ) {
+			} else if ( 'workflow' === $parts[1] ) {
 				submit_workflow_menu( $parts[2] );
 			}
-		} else if ( 'configure' == $parts[0] ) {
-			if ( 'username' == $parts[1] ) {
+		} else if ( 'configure' === $parts[0] ) {
+			if ( 'username' === $parts[1] ) {
 				config_set_username_menu( $parts[2] );
-			} else if ( 'authorname' == $parts[1] ) {
+			} else if ( 'authorname' === $parts[1] ) {
 				config_set_authorname_menu( $parts[2] );
-			} else if ( 'blacklist' == $parts[1] ) {
+			} else if ( 'blacklist' === $parts[1] ) {
 				create_blacklist_menu( $parts[2] );
 			}
 		}
@@ -180,13 +179,13 @@ $alphred = new Alphred;
 
 if ( DEVELOPMENT_TESTING ) {
 	$alphred->add_result([
-		'title' => "Environment: " . strtoupper( ENVIRONMENT ),
+		'title'    => 'Environment: ' . strtoupper( ENVIRONMENT ),
 		'subtitle' => 'URL: ' . BASE_API_URL,
-		'valid' => false,
+		'valid'    => false,
 	]);
 }
 
-$icon_suffix = ( 'light' == $alphred->theme_background() ) ? '-dark.png' : '-light.png';
+$icon_suffix = ( 'light' === $alphred->theme_background() ) ? '-dark.png' : '-light.png';
 $separator = '›';
 main( $argv );
 $alphred->to_xml();

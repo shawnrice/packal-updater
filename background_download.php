@@ -1,17 +1,20 @@
 <?php
 /**
  * Script is used to download files in the background
+ *
+ * Invoke with php $script_name <URL> <DOWNLOAD_DIRECTORY> <TIME TO LIVE>
  */
 
 // Set date/time to avoid warnings/errors.
 if ( ! ini_get( 'date.timezone' ) ) {
-	ini_set( 'date.timezone', exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' ) );
+	ini_set( 'date.timezone', exec( 'tz='ls -l /etc/localtime' && echo ${tz#*/zoneinfo/}' ) );
 }
 
+// Require the filesystem class
 require_once( 'Libraries/FileSystem.php' );
 
 if ( ! isset( $argv ) || 4 != count( $argv ) ) {
-	print "Error: invalid use. Example usage:\n\t`php '" . __FILE__ . "' '<url>' '<download_directory>' '<ttl>'`\n";
+	print "Error: invalid use. Example usage:\n\t'php '" . __FILE__ . "' '<url>' '<download_directory>' '<ttl>''\n";
 	exit(1);
 }
 
@@ -20,18 +23,18 @@ $destination = $argv[2];
 $ttl = isset( $argv[3] ) ? $argv[3] : -1;
 
 if ( ! file_exists( $destination ) ) {
-	print "Error: `{$destination}` does not exist.\n";
-	exit(1);
+	print "Error: '{$destination}' does not exist.\n";
+	exit( 1 );
 }
 
 if ( ! FileSystem::verify_url( $url ) ) {
-	print "Error: `{$url}` is not a valid URL.\n";
-	exit(1);
+	print "Error: '{$url}' is not a valid URL.\n";
+	exit( 1 );
 }
 
 $path = get_icon_path( $url, $destination );
 if ( check_cache( $path, $ttl ) ) {
-	exit(0);
+	exit( 0 );
 }
 download_file( $url, $destination );
 

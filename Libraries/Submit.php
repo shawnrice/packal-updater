@@ -22,6 +22,12 @@ class Submit {
 		curl_setopt( $this->ch, CURLOPT_POST, true );
 		curl_setopt( $this->ch, CURLOPT_SAFE_UPLOAD, true );
 
+		// We'll ignore anything SSL on development and staging environements.
+		if ( 'development' === ENVIRONMENT || 'staging' === ENVIRONMENT ) {
+			curl_setopt( $this->ch, CURLOPT_SSL_VERIFYHOST, false );
+			curl_setopt( $this->ch, CURLOPT_SSL_VERIFYPEER, false );
+		}
+
 		// Call the submit method
 		if ( ! call_user_func_array( [ $this, $type ], [ $params ] ) ) {
 			die( 'Could not call user method' );
@@ -41,7 +47,7 @@ class Submit {
 	 * @return bool
 	 */
 	public function workflow( $params ) {
-		if ( ! $this->ensure_keys([ 'file', 'version' ], $params ) ) {
+		if ( ! $this->ensure_keys( [ 'file', 'version' ], $params ) ) {
 			return false;
 		}
 		$this->postData = [ 'workflow_revision' => $params ];
@@ -55,7 +61,7 @@ class Submit {
 	 * @return bool
 	 */
 	public function theme( $params ) {
-		if ( ! $this->ensure_keys([ 'name', 'description', 'tags', 'uri' ], $params ) ) {
+		if ( ! $this->ensure_keys( [ 'name', 'description', 'tags', 'uri' ], $params ) ) {
 			return false;
 		}
 		$params['tags'] = implode( ',', $params['tags'] );
@@ -70,7 +76,7 @@ class Submit {
 	 * @return bool
 	 */
 	public function report( $params ) {
-		if ( ! $this->ensure_keys([ 'workflow_revision_id', 'report_type', 'message' ], $params ) ) {
+		if ( ! $this->ensure_keys( [ 'workflow_revision_id', 'report_type', 'message' ], $params ) ) {
 			return false;
 		}
 		$this->postData = [ 'report' => $params ];
@@ -124,7 +130,7 @@ class Submit {
 	 *
 	 * The standard "http_build_query()" did not work.
 	 */
-	private function build_data( ) {
+	private function build_data() {
 		if ( isset( $this->postData['workflow_revision'] ) ) {
 			$this->postData['workflow_revision[version]'] = $this->postData['workflow_revision']['version'];
 			unset( $this->postData['workflow_revision'] );
@@ -143,7 +149,7 @@ class Submit {
 	 * @param  array $params the submission parameters passed
 	 * @return bool
 	 */
-	private function ensure_keys( $keys, $params ) {
+	private function ensure_keys( array $keys, array $params ) {
 		foreach ( $keys as $key ) :
 			if ( ! isset( $params[ $key ] ) ) {
 				return false;
@@ -161,66 +167,66 @@ class Submit {
 	 * @param array $files "name => path"
 	 * @return bool
 	 */
-	private function curl_custom_postfields($ch, array $assoc = array(), array $files = array()) {
+	private function curl_custom_postfields( $ch, array $assoc = array(), array $files = [] ) {
 
 	    // invalid characters for "name" and "filename"
-	    static $disallow = array("\0", "\"", "\r", "\n");
+	    static $disallow = [ "\0", "\"", "\r", "\n" ];
 
 	    // initialize body
-	    $body = array();
+	    $body = [];
 
 	    // build normal parameters
-	    foreach ($assoc as $k => $v) {
-	        $k = str_replace($disallow, "_", $k);
-	        $body[] = implode("\r\n", array(
-	            "Content-Disposition: form-data; name=\"{$k}\"",
-	            "",
-	            filter_var($v),
-	        ));
+	    foreach ( $assoc as $k => $v ) {
+					$k      = str_replace( $disallow, "_", $k );
+					$body[] = implode( "\r\n", [
+            "Content-Disposition: form-data; name=\"{$k}\"",
+            '',
+            filter_var( $v ),
+	        ]);
 	    }
 
 	    // build file parameters
-	    foreach ($files as $k => $v) {
-	        switch (true) {
-	            case false === $v = realpath(filter_var($v)):
-	            case !is_file($v):
-	            case !is_readable($v):
+	    foreach ( $files as $k => $v ) {
+	        switch ( true ) {
+	            case false === $v = realpath( filter_var( $v ) ):
+	            case ! is_file( $v ):
+	            case ! is_readable( $v ):
 	                continue; // or return false, throw new InvalidArgumentException
 	        }
-	        $data = file_get_contents($v);
-	        $v = call_user_func("end", explode(DIRECTORY_SEPARATOR, $v));
+					$data = file_get_contents($v);
+					$v    = call_user_func( 'end', explode(DIRECTORY_SEPARATOR, $v));
 
 	        // THIS IS A TERRIBLE HACK
 	        $k = 'workflow_revision[file]';
-	        list($k, $v) = str_replace($disallow, "_", array($k, $v));
+	        list( $k, $v ) = str_replace( $disallow, "_", [ $k, $v ] );
 	        $body[] = implode("\r\n", array(
 	            "Content-Disposition: form-data; name=\"{$k}\"; filename=\"{$v}\"",
-	            "Content-Type: application/octet-stream",
-	            "",
+	            'Content-Type: application/octet-stream',
+	            '',
 	            $data,
 	        ));
 	    }
 
 	    // generate safe boundary
 	    do {
-	        $boundary = "---------------------" . md5(mt_rand() . microtime());
-	    } while (preg_grep("/{$boundary}/", $body));
+	        $boundary = '---------------------' . md5( mt_rand() . microtime() );
+	    } while ( preg_grep( "/{$boundary}/", $body ) );
 
 	    // add boundary for each parameters
-	    array_walk($body, function (&$part) use ($boundary) {
+	    array_walk( $body, function ( &$part ) use ( $boundary ) {
 	        $part = "--{$boundary}\r\n{$part}";
 	    });
 
 	    // add final boundary
 	    $body[] = "--{$boundary}--";
-	    $body[] = "";
+	    $body[] = '';
 
 	    // set options
 	    return curl_setopt_array($ch, array(
 	        CURLOPT_POST       => true,
-	        CURLOPT_POSTFIELDS => implode("\r\n", $body),
+	        CURLOPT_POSTFIELDS => implode( "\r\n", $body ),
 	        CURLOPT_HTTPHEADER => array(
-	            "Expect: 100-continue",
+	            'Expect: 100-continue',
 	            "Content-Type: multipart/form-data; boundary={$boundary}", // change Content-Type
 	        ),
 	    ));

@@ -4,11 +4,12 @@
 if ( ! ini_get( 'date.timezone' ) ) {
 	ini_set( 'date.timezone', exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' ) );
 }
+
 require_once( __DIR__ . '/config.php' );
 require_once( __DIR__ . '/Libraries/FileSystem.php' );
 
 $queue = CACHE . 'queue-' . ENVIRONMENT . '.txt';
-$dir = CACHE . PRIMARY_CACHE_BIN . '-icons/';
+$dir   = CACHE . PRIMARY_CACHE_BIN . '-icons/';
 
 if ( ! file_exists( $dir ) ) {
 	mkdir( $dir, 0775, true );
@@ -16,7 +17,7 @@ if ( ! file_exists( $dir ) ) {
 
 run_workflow_queue( $queue );
 
-function run_workflow_queue( $queue )  {
+function run_workflow_queue( $queue ) {
 	print "Starting queue for file `{$queue}` at " . date('Y-m-d H:i:s', time() ) . ".\n";
 	if ( ! file_exists( $queue ) ) {
 		print "Error: File `{$queue}` does not exist.\n";
@@ -45,7 +46,7 @@ function download_workflow_icon( $line ) {
 		return false;
 	}
 	file_put_contents( $icon, file_get_contents( $line ) );
-	if ( 0 == filesize( $icon ) ) {
+	if ( 0 === filesize( $icon ) ) {
 		unlink( $icon );
 	}
 	return true;
@@ -55,7 +56,7 @@ function download_theme_icon( $line ) {
 	global $dir;
 	$icon = $dir . get_theme_icon_name( $line );
 	file_put_contents( $icon, file_get_contents( $line ) );
-	if ( 0 == filesize( $icon ) ) {
+	if ( 0 === filesize( $icon ) ) {
 		unlink( $icon );
 	}
 }

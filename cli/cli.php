@@ -41,12 +41,12 @@ if ( ! ini_get( 'date.timezone' ) ) {
  */
 
 class CLI {
-	const VERSION = '0.0.1';
+	const VERSION  = '0.0.1';
 	const CLI_NAME = 'packal-cli';
 
-	const GREEN =  "\033[32m";
-	const RED = "\033[31m";
-	const NORMAL = "\033[0m";
+	const GREEN    = "\033[32m";
+	const RED      = "\033[31m";
+	const NORMAL   = "\033[0m";
 
 	public function __construct( $options = [] ) {
 		self::autoloader();
@@ -64,7 +64,7 @@ class CLI {
 		print self::color( $error, 'red' );
 	}
 
-	function install_theme( $slug ) {
+	public function install_theme( $slug ) {
 		$result = $this->theme->install( $slug );
 		if ( false == $result[0] ) {
 			print self::highlight( 'Error', "Error: there is no theme with the slug `{$result[1]['slug']}`.\n" );
@@ -75,7 +75,7 @@ class CLI {
 		exit(0);
 	}
 
-	function install_workflow( $bundle ) {
+	public function install_workflow( $bundle ) {
 		$workflow = $this->workflow->find_workflow_by_bundle_from_packal( $bundle );
 		if ( is_string( $workflow ) ) {
 			print self::color( "!!! Error: {$workflow}\n", 'red' );
@@ -91,7 +91,7 @@ class CLI {
 		exit(0);
 	}
 
-	function get_credentials() {
+	private function get_credentials() {
 		$username = $this->alphred->config_read( 'username' );
 		$password = $this->alphred->get_password( 'packal.org' );
 		if ( empty( $username ) ) {
@@ -103,7 +103,7 @@ class CLI {
 		return [ 'username' => $username, 'password' => $password ];
 	}
 
-	function submit_workflow( $bundle ) {
+	public function submit_workflow( $bundle ) {
 		if ( is_string( $credentials = $this->get_credentials() ) ) {
 			print self::color( "Error: no `{$credentials}` has been set. Please see usage.", 'red' ) . "\n";
 			exit(1);
@@ -117,7 +117,7 @@ class CLI {
 		if ( ! file_exists( $path ) ) {
 			print self::color( "Error: there is no workflow with the bundle `{$bundle}`.", 'red' ) . "\n";
 		}
-		self::confirm( "Submit {$bundle} (v{$version}) to Packal.org? (Y/n): ", "Submission aborted." );
+		self::confirm( "Submit {$bundle} (v{$version}) to Packal.org? (Y/n): ", 'Submission aborted.' );
 
 		// Build the workflow
 		$archive = new BuildWorkflow( $path );
@@ -671,7 +671,7 @@ class CLI {
 	 * @param  [type] $string [description]
 	 * @return [type]         [description]
 	 */
-	private function highlight( $search, $string ) {
+	private static function highlight( $search, $string ) {
 		$red    = "\033[31m";
 		$green  = "\033[32m";
 		$normal = "\033[0m";
@@ -679,7 +679,7 @@ class CLI {
 		return str_ireplace( $search, "{$red}{$search}{$normal}", $string );
 	}
 
-	private function color( $message, $color ) {
+	private static function color( $message, $color ) {
 		$colors = [
 			'red'    => "\033[31m",
 			'green'  => "\033[32m",
