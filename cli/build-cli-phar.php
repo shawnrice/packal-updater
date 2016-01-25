@@ -70,8 +70,7 @@ $phar[ $main_stub ] = file_get_contents( __DIR__ . "/{$main_stub}" );
 $alphred_dir = "{$_SERVER['HOME']}/projects/Alfred/alphred/";
 
 $phar[ "Alphred/Main.php" ] = file_get_contents( $alphred_dir . "/Main.php" );
-// foreach( [ 'classes', 'commands' ] as $directory ) :
-foreach( [ 'classes' ] as $directory ) :
+foreach( [ 'classes', 'commands' ] as $directory ) :
 	foreach( array_diff( scandir( $alphred_dir . $directory ), ['.', '..', '.DS_Store' ] ) as $filename ) :
     $phar[ "Alphred/{$directory}/{$filename}" ] = file_get_contents( $alphred_dir . "/{$directory}/{$filename}" );
 	endforeach;

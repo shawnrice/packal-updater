@@ -18,16 +18,16 @@ function generate_ini( $path ) {
 	}
 	if ( count( $workflow ) > 0 ) {
 		if ( count( $workflow['packal']['tags'] ) > 0 ) {
-			$workflow['packal']['tags'] = explode(',', $workflow['packal']['tags'] );
-			array_walk($workflow['packal']['tags'], create_function('&$val', '$val = trim($val);'));
+			$workflow['packal']['tags'] = explode( ',', $workflow['packal']['tags'] );
+			array_walk( $workflow['packal']['tags'], create_function( '&$val', '$val = trim($val);' ) );
 		}
 		if ( count( $workflow['packal']['categories'] ) > 0 ) {
-			$workflow['packal']['categories'] = explode(',', $workflow['packal']['categories']);
-			array_walk($workflow['packal']['categories'], create_function('&$val', '$val = trim($val);'));
+			$workflow['packal']['categories'] = explode( ',', $workflow['packal']['categories'] );
+			array_walk( $workflow['packal']['categories'], create_function( '&$val', '$val = trim($val);' ) );
 		}
 		ksort( $workflow['packal'] );
 	}
-	$return = pashua_dialog( $path, $workflow );
+	$return   = pashua_dialog( $path, $workflow );
 	$workflow = $return[0];
 	if ( $workflow ) {
 		Ini::write_ini( $workflow, $ini );

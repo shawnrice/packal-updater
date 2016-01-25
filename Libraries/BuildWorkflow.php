@@ -176,9 +176,9 @@ class BuildWorkflow {
 	private function create_archive() {
 		$zip = new ZipArchive();
 		if ( true !== $zip->open( $this->archive_name(), ZipArchive::CREATE ) ) {
-	    return false;
+			return false;
 		}
-		foreach( $this->files as $file ) :
+		foreach ( $this->files as $file ) :
 			$zip->addFile( $file, str_replace( $this->tmp . '/', '', $file ) );
 		endforeach;
 		$zip->close();
@@ -193,5 +193,4 @@ class BuildWorkflow {
 		}
 		return true;
 	}
-
 }

@@ -17,11 +17,12 @@ $environments = [
 $home = $_SERVER['HOME'];
 
 // The current environment is defined in environment.txt
+define( 'ENVIRONMENT', 					file_get_contents( __DIR__ . '/environment.txt' ) );
 define( 'BASE_URL', 						$environments[ ENVIRONMENT ] );
+
 define( 'BASE_API_URL', 				BASE_URL . '/api/v1/' );
 define( 'BUNDLE', 							'com.packal2' );
 define( 'CACHE', 								"{$home}/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/" . BUNDLE . '/' );
 define( 'DATA', 								"{$home}/Library/Application Support/Alfred 2/Workflow Data/" . BUNDLE . '/' );
 define( 'DEVELOPMENT_TESTING',  true );
-define( 'ENVIRONMENT', 					file_get_contents( __DIR__ . '/environment.txt' ) );
 define( 'PRIMARY_CACHE_BIN', 		parse_url( BASE_URL, PHP_URL_HOST ) );
