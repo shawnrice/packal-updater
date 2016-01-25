@@ -236,12 +236,15 @@ class CLI {
 	 * @return [type]            [description]
 	 */
 	function upgrade_workflows( $workflows = [] ) {
+		// Find out if there are any upgrades available
 		$this->workflow->find_upgrades();
+		// If there are upgrades available, then start doing them, otherwise
+		// tell them there are none and upgrade.
 		if ( count( $this->workflow->upgrades ) > 0 ) {
 			$output = self::RED
-								. "There are "
+								. 'There are '
 								. count( $this->workflow->upgrades )
-								. " upgrade(s)."
+								. ' upgrade(s).'
 								. self::NORMAL
 								. " available\n";
 			foreach ( $this->workflow->upgrades as $upgrade ) {
@@ -249,11 +252,11 @@ class CLI {
 								. self::RED
 								. "{$upgrade['old']['version']}"
 								. self::NORMAL
-								. " -> "
+								. ' -> '
 								. self::GREEN
 								. "{$upgrade['new']['version']}"
 								. self::NORMAL
-								. "), ";
+								. '), ';
 			}
 			// Remove the ', ' from the end and replace it with a newline
 			$output = substr( $output, 0, -2 ) . "\n";
