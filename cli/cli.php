@@ -1,4 +1,11 @@
 <?php
+/**
+ * Main entry point for the Packal CLI
+ *
+ * Don't move this anywhere, really.
+ *
+ */
+
 
 // This is needed because, Macs don't read EOLs well.
 if ( ! ini_get( 'auto_detect_line_endings' ) ) {
@@ -8,7 +15,6 @@ if ( ! ini_get( 'auto_detect_line_endings' ) ) {
 if ( ! ini_get( 'date.timezone' ) ) {
 	ini_set( 'date.timezone', exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' ) );
 }
-
 
 /**
  * ANSI Colors
@@ -41,7 +47,7 @@ if ( ! ini_get( 'date.timezone' ) ) {
  */
 
 class CLI {
-	const VERSION  = '0.0.1';
+	const VERSION  = '0.9.1';
 	const CLI_NAME = 'packal-cli';
 
 	const GREEN    = "\033[32m";
@@ -49,13 +55,16 @@ class CLI {
 	const NORMAL   = "\033[0m";
 
 	public function __construct( $options = [] ) {
+		// Autoload the necessary files (contextually)
 		self::autoloader();
-
+		// Make the necessary directories to run
 		self::make_directories();
+		// Create the necessary variables to function
 		$this->alphred  = new Alphred;
 		$this->packal   = new Packal( ENVIRONMENT );
 		$this->workflow = new Workflows( ENVIRONMENT );
 		$this->theme    = new Themes( ENVIRONMENT );
+		// Run
 		$this->run();
 	}
 
@@ -190,6 +199,9 @@ class CLI {
 	}
 
 	function print_my_workflows() {
+		print "\n";
+		print "These are the workflows that you have created. A red 'x' means no readable workflow.ini file is present.";
+		print "\n\n" ;
 		// Create the map of the workflows (grab the cache if available)
 		MapWorkflows::map( true, 10 );
 		// Grab the worklow data from the json file
@@ -204,18 +216,18 @@ class CLI {
 				$version = self::RED . 'x' . self::NORMAL;
 			}
 			$output[] = [
-				$i + 1 . ":",
+				$i + 1 . ':',
 				$workflows[ $i ]['name'],
 				$workflows[ $i ]['bundle'],
 				$version,
-		];
+			];
 		endfor;
 
 		// Now we have the information, so we need to go about normalizing the data; first, grab the string lengths
 		$min_one   = 0;
 		$min_two   = 0;
 		$min_three = 0;
-		foreach( $output as $row ) :
+		foreach ( $output as $row ) :
 			$min_one   = ( strlen( $row[0] ) > $min_one ) ? strlen( $row[0] ) : $min_one;
 			$min_two   = ( strlen( $row[1] ) > $min_two ) ? strlen( $row[1] ) : $min_two;
 			$min_three = ( strlen( $row[2] ) > $min_three ) ? strlen( $row[2] ) : $min_three;
@@ -337,7 +349,7 @@ class CLI {
 		endforeach;
 
 		// Pad the strings to make things easier to read
-		foreach( $out as $key => $val ) :
+		foreach ( $out as $key => $val ) :
 			$out[ $key ][ $identifer ] = self::pad_string( $val[ $identifer ], $id_max );
 			$out[ $key ]['name']       = self::pad_string( $val['name'], $name_max );
 			$out[ $key ]               = self::trim( self::highlight( $search, implode( "\t", $out[ $key ] ) ) );
@@ -358,15 +370,15 @@ class CLI {
 	 * Autoloads the necessary files
 	 */
 	private function autoloader() {
-
+		// We load different files is we're executing as a phar or as cli.php
 		if ( self::is_phar() ) {
 			$files = [
-				'config.php',
+				'../config.php',
 				'Alphred/Main.php',
 				'BuildThemeMap.php',
 				'BuildWorkflow.php',
 				'BuildWorkflowMap.php',
-				'Libraries/CFPropertyList/classes/CFPropertyList/CFPropertyList.php',
+				'../Libraries/CFPropertyList/classes/CFPropertyList/CFPropertyList.php',
 				'PlistMigration.php',
 				'SemVer.php',
 				'Submit.php',
@@ -378,34 +390,37 @@ class CLI {
 			];
 		} else {
 			$files = [
-				'config.php',
-				'Libraries/Alphred.phar',
-				'Libraries/BuildThemeMap.php',
-				'Libraries/BuildWorkflow.php',
-				'Libraries/BuildWorkflowMap.php',
-				'Libraries/CFPropertyList/classes/CFPropertyList/CFPropertyList.php',
-				'Libraries/PlistMigration.php',
-				'Libraries/SemVer.php',
-				'Libraries/Submit.php',
-				'Libraries/functions.php',
-				'Libraries/FileSystem.php',
-				'Libraries/Packal.php',
-				'Libraries/Themes.php',
-				'Libraries/Workflows.php',
-
+				'../config.php',
+				'../Libraries/Alphred.phar',
+				'../Libraries/BuildThemeMap.php',
+				'../Libraries/BuildWorkflow.php',
+				'../Libraries/BuildWorkflowMap.php',
+				'../Libraries/CFPropertyList/classes/CFPropertyList/CFPropertyList.php',
+				'../Libraries/PlistMigration.php',
+				'../Libraries/SemVer.php',
+				'../Libraries/Submit.php',
+				'../Libraries/functions.php',
+				'../Libraries/FileSystem.php',
+				'../Libraries/Packal.php',
+				'../Libraries/Themes.php',
+				'../Libraries/Workflows.php',
 			];
 		}
 
-		foreach( $files as $file ) {
+		foreach ( $files as $file ) {
 			require_once( __DIR__ . '/' . $file );
 		}
 
-			// Set some variables here so that Alphred plays nicely, etc....
+		// Set some variables here so that Alphred plays nicely, etc....
 		$_SERVER['alfred_workflow_data']     = DATA;
 		$_SERVER['alfred_workflow_cache']    = CACHE;
 		$_SERVER['alfred_workflow_bundleid'] = BUNDLE;
 	}
 
+	/**
+	 * Makes necessary directories for the workflow to function
+
+	 */
 	private function make_directories() {
 		$directories = [
 			DATA,
@@ -519,7 +534,7 @@ class CLI {
 	 */
 	function help() {
 		// We store the help text in a text file and just replace the placeholders
-		$text         = file_get_contents( 'Resources/help_template.txt' );
+		$text         = file_get_contents( __DIR__ . '/Resources/help_template.txt' );
 		$replacements = [
 			'VERSION'   => self::VERSION,
 			'CLI_NAME'  => self::CLI_NAME,

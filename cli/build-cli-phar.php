@@ -39,7 +39,7 @@ $other_files = [
 // This is the main file
 $main_stub   = 'cli.php';
 // Build from this directory; don't add in extra subdirs
-$build_dir   = '.';
+$build_dir   = __DIR__;
 
 // Compression settings for the phar itself
 $compression = 'BZ2';
@@ -61,26 +61,24 @@ $phar = new Phar(
 // Start buffering the phar so as to add files
 $phar->startBuffering();
 // Add in the main stub, i.e. the first "file" or controller file
-$default_stub = $phar->createDefaultStub( $main_stub );
+$default_stub       = $phar->createDefaultStub( $main_stub );
 $phar[ $main_stub ] = file_get_contents( __DIR__ . "/{$main_stub}" );
 
-// Add an unpacked version of Alphred; we're doing this so we don't have the
-// awkwardness of using a phar within a phar. Too many levels and layers that
-// way.
+// Add an unpacked version of Alphred; we're doing this so we don't have the awkwardness of
+// using a phar within a phar. Too many levels and layers that way.
 $alphred_dir = "{$_SERVER['HOME']}/projects/Alfred/alphred/";
 
-$phar[ "Alphred/Main.php" ] = file_get_contents( $alphred_dir . "/Main.php" );
-foreach( [ 'classes', 'commands' ] as $directory ) :
-	foreach( array_diff( scandir( $alphred_dir . $directory ), ['.', '..', '.DS_Store' ] ) as $filename ) :
-    $phar[ "Alphred/{$directory}/{$filename}" ] = file_get_contents( $alphred_dir . "/{$directory}/{$filename}" );
+$phar[ 'Alphred/Main.php' ] = file_get_contents( $alphred_dir . '/Main.php' );
+foreach ( [ 'classes', 'commands' ] as $directory ) :
+	foreach ( array_diff( scandir( $alphred_dir . $directory ), [ '.', '..', '.DS_Store' ] ) as $filename ) :
+		$phar[ "Alphred/{$directory}/{$filename}" ] = file_get_contents( $alphred_dir . "/{$directory}/{$filename}" );
 	endforeach;
 endforeach;
 // Done adding Alphred
 
-
 // Cycle through these directories and include everything
 foreach( $directories as $directory ) :
-	foreach( array_diff( scandir( $directory ), ['.', '..', '.DS_Store' ] ) as $file ) :
+	foreach( array_diff( scandir( __DIR__ . '/' . $directory ), ['.', '..', '.DS_Store' ] ) as $file ) :
 		$phar[ "{$directory}/{$file}" ] = file_get_contents( __DIR__ . "/{$directory}/{$file}" );
 	endforeach;
 endforeach;
@@ -112,7 +110,7 @@ if ( file_exists( $phar_name . '.' . strtolower($compression) ) ) {
 // rename( $phar_name . '.' . strtolower($compression), $phar_name );
 
 // Go ahead and change the permissions to make it executable
-exec( "chmod +x {$phar_name}", $return, $code );
+exec( "cd '" . __DIR__ . "'; chmod +x {$phar_name}", $return, $code );
 // Print messages about build status
 if ( 0 === $code ) {
 	print "Built Phar {$phar_name}\n";
