@@ -190,9 +190,13 @@ class CLI {
 	}
 
 	function print_my_workflows() {
+		// Create the map of the workflows (grab the cache if available)
 		MapWorkflows::map( true, 10 );
+		// Grab the worklow data from the json file
 		$workflows = json_decode( file_get_contents( MapWorkflows::my_workflows_path() ), true );
+		// Start the output with the column names
 		$output = [ [ 'Number', 'Name', 'Bundle', 'Version' ] ];
+		// Go through the workflows and add each's information to the output queue
 		for ( $i = 0; $i < count( $workflows ); $i++ ) :
 			if ( isset( $workflows[ $i ]['version'] ) ) {
 				$version = self::GREEN . $workflows[ $i ]['version'] . self::NORMAL;
@@ -206,6 +210,8 @@ class CLI {
 				$version,
 		];
 		endfor;
+
+		// Now we have the information, so we need to go about normalizing the data; first, grab the string lengths
 		$min_one   = 0;
 		$min_two   = 0;
 		$min_three = 0;
@@ -214,14 +220,17 @@ class CLI {
 			$min_two   = ( strlen( $row[1] ) > $min_two ) ? strlen( $row[1] ) : $min_two;
 			$min_three = ( strlen( $row[2] ) > $min_three ) ? strlen( $row[2] ) : $min_three;
 		endforeach;
+		// Set the divider flag to be true
 		$divider = true;
-		foreach( $output as $row ) :
+		// Go through and pad each string and print it
+		foreach ( $output as $row ) :
 			print self::pad_string( $row[0], $min_one ) . "\t"
 					. self::pad_string( $row[1], $min_two ) . "\t"
 					. self::pad_string( $row[2], $min_three ) . "\t"
 					. $row[3] . "\n";
 			if ( $divider ) {
 				print self::print_divider();
+				// turn off the divider after we've printed the column headings
 				$divider = false;
 			}
 		endforeach;
@@ -439,37 +448,42 @@ class CLI {
 		// $shortopts .= "abc"; // These options do not accept values
 
 		$longopts  = array(
-			"st:",
-			"search-theme:",
-			"search-themes:",
-			"sw:",
-			"search-workflow:",
-			"search-workflows:",
-			"it:",
-			"install-theme:",
-			"iw:",
-			"install-workflow:",
-			"upgrade::",
-			"upgrade-workflow::",
-			"upgrade-workflows::",
-			"submit-workflow:",
-			"list-workflows",
-			"submit-theme:",
-			"help",
-			"version",
-			"usage",
-			"clear-cache",
-			"cc",
+			'st:',
+			'search-theme:',
+			'search-themes:',
+			'sw:',
+			'search-workflow:',
+			'search-workflows:',
+			'it:',
+			'install-theme:',
+			'iw:',
+			'install-workflow:',
+			'list-workflows',
+			'lw',
+			'print-workflows',
+			'pw',
+			'upgrade::',
+			'upgrade-workflow::',
+			'upgrade-workflows::',
+			'submit-workflow:',
+			'list-workflows',
+			'submit-theme:',
+			'help',
+			'version',
+			'usage',
+			'clear-cache',
+			'cc',
 		);
 		$options = getopt( $shortopts, $longopts );
 
 		// A list of aliases for commands
 		$aliases = [
-			'search-workflows' => [ 'search-workflow', 		'sw' ],
-			'search-themes'    => [ 'search-theme', 			'st' ],
-			'install-theme'    => [ 'install-themes', 		'it' ],
-			'install-workflow' => [ 'install-workflows', 	'iw' ],
-			'upgrade'          => [ 'upgrade-workflow', 	'upgrade-workflows' ],
+			'search-workflows' => [ 'search-workflow', 	 'sw' ],
+			'search-themes'    => [ 'search-theme', 		 'st' ],
+			'install-theme'    => [ 'install-themes', 	 'it' ],
+			'install-workflow' => [ 'install-workflows', 'iw' ],
+			'upgrade'          => [ 'upgrade-workflow',  'upgrade-workflows' ],
+			'print-workflows'  => [ 'list-workflows', 'lw', 'pw' ],
 		];
 
 		// Applies a list of aliases for the commands
@@ -531,6 +545,10 @@ class CLI {
 
 		// The newlines here symbolize an end of a
 		$values = [
+			'--print-workflows'   => 'Prints the workflows you have written. Usage: %%script_name%% %%key%%',
+			'--list-workflows'    => 'Alias of `--print-workflows`',
+			'--pw'                => 'Alias of `--print-workflows`',
+			'--lw'                => 'Alias of `--print-workflows`' . "\n",
 			'--install-theme'     => 'Installs a theme. Usage: %%script_name%% %%key%% <slug>',
 			'--it'                => 'Alias of `--install-theme`' . "\n",
 			'--install-workflow'  => 'Installs a workflow. Usage: %%script_name%% %%key%% <bundle>',
@@ -599,6 +617,10 @@ class CLI {
 		}
 
 		// So, what are we doing here? Can we do this with a switch statement?
+		if ( isset( $options['print-workflows'] ) ) {
+			print $this->print_my_workflows();
+			exit( 0 );
+		}
 		if ( isset( $options['search-themes'] ) ) {
 			print $this->print_search( $options['search-themes'], 'name', 'theme', 'slug' );
 			exit( 0 );
