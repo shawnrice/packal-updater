@@ -136,7 +136,7 @@ class BuildWorkflow {
 	function __construct( $directory, $screenshots_directory = false, $description_file = false ) {
 		$this->directory = $directory;
 		if ( ! $this->check_for_workflow() ) {
-			// Make this more informative.
+			// @todo Make this more informative.
 			throw new Exception( 'Nope, that did not work' );
 			// return false; // Should I raise an exception?
 		}
