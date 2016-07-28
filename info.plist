@@ -19,6 +19,17 @@
 				<string></string>
 			</dict>
 		</array>
+		<key>2BF4F0C5-F584-44E2-9216-78FF884C965C</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>DC36F13D-1A70-4093-948E-569723637CD2</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
 		<key>47D96588-97DE-4BD3-BCD4-E23FC751B881</key>
 		<array>
 			<dict>
@@ -74,6 +85,17 @@
 				<string></string>
 			</dict>
 		</array>
+		<key>DC36F13D-1A70-4093-948E-569723637CD2</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>EEB94641-1F4D-4E1C-82DD-69E4E582A9E4</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
 	</dict>
 	<key>createdby</key>
 	<string>Shawn Patrick Rice</string>
@@ -88,6 +110,8 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>concurrently</key>
+				<false/>
 				<key>escaping</key>
 				<integer>127</integer>
 				<key>script</key>
@@ -124,6 +148,14 @@
 				<integer>127</integer>
 				<key>keyword</key>
 				<string>packal</string>
+				<key>queuedelaycustom</key>
+				<integer>1</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<false/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
 				<key>runningsubtext</key>
 				<string>Talking to server and processing data...</string>
 				<key>script</key>
@@ -145,6 +177,8 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>concurrently</key>
+				<false/>
 				<key>escaping</key>
 				<integer>127</integer>
 				<key>script</key>
@@ -166,6 +200,14 @@
 				<integer>0</integer>
 				<key>escaping</key>
 				<integer>127</integer>
+				<key>queuedelaycustom</key>
+				<integer>1</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<false/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
 				<key>script</key>
 				<string>php script-set-option.php "{query}"</string>
 				<key>title</key>
@@ -220,6 +262,59 @@
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>env</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>DC36F13D-1A70-4093-948E-569723637CD2</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>packal</string>
+				<key>text</key>
+				<string>Packal Info</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>2BF4F0C5-F584-44E2-9216-78FF884C965C</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>EEB94641-1F4D-4E1C-82DD-69E4E582A9E4</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string>See https://github.com/shawnrice/packal
@@ -230,6 +325,11 @@ Or http://www.packal.org</string>
 		<dict>
 			<key>ypos</key>
 			<real>130</real>
+		</dict>
+		<key>2BF4F0C5-F584-44E2-9216-78FF884C965C</key>
+		<dict>
+			<key>ypos</key>
+			<real>430</real>
 		</dict>
 		<key>47D96588-97DE-4BD3-BCD4-E23FC751B881</key>
 		<dict>
@@ -255,6 +355,16 @@ Or http://www.packal.org</string>
 		<dict>
 			<key>ypos</key>
 			<real>130</real>
+		</dict>
+		<key>DC36F13D-1A70-4093-948E-569723637CD2</key>
+		<dict>
+			<key>ypos</key>
+			<real>420</real>
+		</dict>
+		<key>EEB94641-1F4D-4E1C-82DD-69E4E582A9E4</key>
+		<dict>
+			<key>ypos</key>
+			<real>450</real>
 		</dict>
 		<key>F3825148-0DEF-4920-8AA9-2675D7B90496</key>
 		<dict>

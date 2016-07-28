@@ -3,11 +3,12 @@
 /**
  *
  * This is the file that receives the input from the script filter and then starts everything.
- * 
+ *
  */
 
 require_once( 'functions.php' );
 require_once( 'alfred.bundler.php' );
+require_once( __DIR__ . '/init.php' );
 
 // firstRun();
 
@@ -20,7 +21,7 @@ $q = $argv[1];
 
 $bundle = 'com.packal';
 $HOME = exec( 'echo $HOME' );
-$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
+$data = DATA_DIR;
 
 // Implement bundler.
 // Mod to handle more args.
@@ -40,7 +41,7 @@ if ( $q == 'open-gui' ) {
 		// No GUI for you.
 		die();
 	}
-	
+
 	// Start the webserver kill script
 	exec( "nohup '$dir/check-and-kill-webserver.sh'  > /dev/null 2>&1 &" );
 	exec( "nohup php '$dir/gui/webserver-keep-alive-update.php'  > /dev/null 2>&1 &" );
@@ -79,7 +80,7 @@ if ( strpos( $q, 'update-' ) !== FALSE ) {
 			} else {
 				$plist = $workflows[ str_replace( 'update-', '', $q ) ] . '/info.plist';
 				$name = exec( "/usr/libexec/PlistBuddy -c \"Print :name\" '$plist' 2> /dev/null" );
-				echo "Error updating " . $name; 
+				echo "Error updating " . $name;
 			}
 		}
 	}
@@ -118,7 +119,7 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 	if ( ( $set[0] == 'packalAccount') && ( $set[1] == '1' ) ) {
 		$cmd = ( "php cli/packal.php setOption packalAccount 1" );
 		exec( $cmd );
-		$script = 'tell application "Alfred 2" to run trigger "set-option" in workflow "com.packal" with argument "username:"';
+		$script = 'tell application "' . ALFRED_VERSION . '" to run trigger "set-option" in workflow "com.packal" with argument "username:"';
 		exec( "osascript -e '$script'" );
 		die();
 	}
@@ -140,7 +141,7 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 	}
 
 	if ( $set[0] == 'workflowReporting' ) {
-		
+
 		// Possible Data Correction
 		if ( $set[1] == 'null' )
 			$set[1] = 0;
@@ -191,7 +192,7 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 
 if ( strpos( $q, 'set-' ) !== FALSE ) {
 	$option = str_replace( 'set-', '', $q );
-	$script = 'tell application "Alfred 2" to run trigger "set-option" in workflow "com.packal" with argument "' . $option . ': "';
+	$script = 'tell application "' . ALFRED_VERSION . '" to run trigger "set-option" in workflow "com.packal" with argument "' . $option . ': "';
 	exec( "osascript -e '$script'" );
 	die();
 }

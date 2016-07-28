@@ -1,6 +1,7 @@
 <?php
 
 require_once( '../functions.php' );
+require_once( __DIR__ . '/../init.php' );
 firstRun();
 
 // Set date/time to avoid warnings/errors.
@@ -10,9 +11,9 @@ if ( ! ini_get('date.timezone') ) {
 }
 
 $HOME = exec( 'echo $HOME' );
-$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
+$data = DATA_DIR;
 
-$workflowsDir = realpath( __DIR__ . "/../../" );
+$workflowsDir = __DIR__ . '/../../';
 
 // Start script.
 if ( isset( $_GET[ 'action' ] ) )
@@ -27,7 +28,7 @@ if ( ! file_exists( "$data/config/firstRun" ) )
 
 if ( ! file_exists( "$data/config/config.xml" ) ) {
   $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
-  $config = new SimpleXMLElement( $d );  
+  $config = new SimpleXMLElement( $d );
   $config->packalAccount = 0;
   $config->forcePackal = 0;
   $config->backups = 3;
@@ -81,7 +82,7 @@ if ( isset( $page ) ) {
       break;
     case 'status' :
       status();
-      break;  
+      break;
     default:
     // Of course, we shouldn't get here because all the calls to this file
     // are controlled.
@@ -112,7 +113,7 @@ if ( isset( $page ) ) {
       break;
     case 'deleteFile' :
       deleteFile();
-      break; 
+      break;
     default:
       echo "Action";
       break;
@@ -210,7 +211,7 @@ function backups() {
       directory = <?php echo "'/$data/backups/'"; ?> + $( this ).attr( 'id' ) + '.alfredworkflow';
       $( '.ui-dialog-content' ).html( 'Delete <code>`' + $( this ).attr( 'title' ) + '.alfredworkflow`</code>?' );
       $( '.ui-dialog-content' ).attr( 'title', directory );
-      $( "#delete-backup-dialog" ).dialog( 'open' );   
+      $( "#delete-backup-dialog" ).dialog( 'open' );
     });
     $( '.fa-folder-open' ).click( function() {
       directory = <?php echo "'/$data/backups/'"; ?> + $( this ).attr( 'id' );
@@ -252,10 +253,10 @@ function backups() {
       resizable: false,
       buttons: {
         Yes: function() {
-          $.get( "packal.php", { action: 'deleteFile', 'file': $( this ).attr( 'title' ) }, 
-              function() { 
-                $( '.pane' ).load( 'packal.php', { 'page': 'backup' } ); 
-              } 
+          $.get( "packal.php", { action: 'deleteFile', 'file': $( this ).attr( 'title' ) },
+              function() {
+                $( '.pane' ).load( 'packal.php', { 'page': 'backup' } );
+              }
             );
           $( this ).dialog( "close" );
         },
@@ -320,7 +321,7 @@ function blacklist() {
 
       $bundleFix = str_replace( '.', '-', $bundle );
       ?>
-      
+
       <div id=<?php echo "'$bundleFix'"; ?> class = <?php echo "'$classes'"; ?> >
         <div id=<?php echo "'disabled-$bundleFix'"?> class=<?php echo "'blacklisted$disabled $bundle'"?>>
           <i class=<?php echo "'fa fa-times disabled-x'"?>></i>
@@ -331,7 +332,7 @@ function blacklist() {
           <img alt='workflow icon' src=<?php echo "'serve_image.php?file=$file'"; ?> class = 'wficon' />
         </div>
       </div>
-    
+
       <?php
     endforeach;
   }
@@ -420,7 +421,7 @@ function settings() {
           <option <?php if ($config->packalAccount == 0) echo 'selected'; ?>>do not</option>
           <option <?php if ($config->packalAccount == 1) echo 'selected'; ?>>do</option>
         </select>
-        have a Packal account<span class='packal-account'> with the username 
+        have a Packal account<span class='packal-account'> with the username
         <input name='username' type='text' placeholder='My Packal Username'
         value=<?php echo "'$config->username'"; ?> title='This is your Packal Username.'></span>.
       </p>
@@ -435,13 +436,13 @@ function settings() {
       </select>
       of updated workflows.
       </p>
-      
+
       <p>
       Please <select name='workflowReporting' class='workflow-reporting'>
         <option <?php if ($config->workflowReporting == 1) echo 'selected'; ?>>do</option>
         <option <?php if ($config->workflowReporting == 0) echo 'selected'; ?>>do not</option>
       </select>
-      send anonymous workflow data to Packal.<a href='#' 
+      send anonymous workflow data to Packal.<a href='#'
       title='This workflow will send information about which workflows you have installed, whether
        or not they are enabled or disabled, and whether or not you downloaded them from Packal.
        The reporting is as anonymous as possible. For more information, click the "about" tab.'>
@@ -455,7 +456,7 @@ function settings() {
       </select>
       want Packal to update all my workflows (regardless of whether or not they were downloaded from Packal).
       </p> -->
-<!-- 
+<!--
       <p>When updating workflows without the GUI, notify me
       <select name='notifications' class='notification-options'>
         <option <?php if ($config->notifications == 2) echo 'selected'; ?>>per workflow updated</option>
@@ -464,7 +465,7 @@ function settings() {
       </select>
       .
       </p> -->
-      
+
     <span id='packal-username'></span>
     <span id='number-of-backups'></span>
     <span id='workflow-reporting'></span>
@@ -530,13 +531,13 @@ function settings() {
         $( this ).css( 'width', width + 5 );
       });
       $( document ).ready( function() {
-        var selects = [ 
+        var selects = [
           'packal-username',
           'number-of-backups',
           'workflow-reporting',
           'force-packal',
-          'notification-options' 
-        ]; 
+          'notification-options'
+        ];
         for ( var x in selects ) {
           $( '#' + selects[x] ).html( $( '.' + selects[x] ).val() );
           width = $( '#' + selects[x] ).width();
@@ -637,9 +638,9 @@ function status() {
     } else if ( in_array( $bundle, $manifestBundles ) ) {
       if ( isset( $config->username ) && ( $config->username ) ) {
         if ( ! ( in_array( "$bundle", $meta[ 'mineOnPackal' ] ) ) )
-          $meta[ 'availableOnPackal' ][] = $bundle;  
+          $meta[ 'availableOnPackal' ][] = $bundle;
       } else {
-        $meta[ 'availableOnPackal' ][] = $bundle;  
+        $meta[ 'availableOnPackal' ][] = $bundle;
       }
     }
 
@@ -665,7 +666,7 @@ function status() {
         <div id="fusion_ad">
           <a href="http://fusionads.net" class='hijack'>Powered by Fusion</a>
         </div>
-<?php 
+<?php
       }
   if ( $updates ) {
 ?>
@@ -681,14 +682,14 @@ function status() {
     The manifest was last updated <strong><?php echo "$time" ; ?></strong>
     <?php
       if ( $connection !== FALSE )
-        echo "<span class='update-manifest'>(Update)</span>";    
+        echo "<span class='update-manifest'>(Update)</span>";
     ?>
   </p>
 </div>
 <p class='clearfix'> </p>
 <div><p>You have <strong><?php echo count( $workflows ); ?></strong> workflows installed with Bundle IDs.</p></div>
 <p class='clearfix'> </p>
-<?php 
+<?php
 if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
   ?>
   <div><p>Of those, <strong><?php echo count( $meta[ 'myWorkflows' ] ) ?></strong> are ones that you wrote.</p>
@@ -730,7 +731,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
 <p class='clearfix'> </p>
 <div>
   <p>
-    Of the others, 
+    Of the others,
     <strong><?php echo count( $meta[ 'availableOnPackal' ] ); ?></strong>
     can be downloaded and updated from Packal.
   </p>
@@ -741,7 +742,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
     foreach ( $meta[ 'availableOnPackal' ] as $m ) :
       if ( ! empty( $m ) ) {
       echo '<div><p><strong>' . $wf[ $m ][ 'name' ] . '</strong>';
-      echo " ($m)" . "</p><div id='" . $wf[ $m ][ 'url' ] . 
+      echo " ($m)" . "</p><div id='" . $wf[ $m ][ 'url' ] .
         "' class='url-open'>View on Packal</div></div>";
       }
     endforeach;
@@ -753,7 +754,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
 <p class='clearfix'> </p>
   <div>
     <p>
-      There are 
+      There are
       <strong><?php echo count( $wf ); ?></strong>
       workflows available on Packal.
     </p>
@@ -764,7 +765,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
 ?>
   <div>
     <p>
-      You've written 
+      You've written
       <strong><?php echo count( $meta[ 'mineOnPackal' ] ); ?></strong>
       of the ones on Packal.
     </p>
@@ -784,7 +785,7 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
       (document.head || document.getElementsByTagName('head')[0]).appendChild(fusion);
     })();
     // function tag() {
-    //   // 
+    //   //
     //   console.log( 'hello' );
     // }
   </script>
@@ -832,9 +833,9 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
     setTimeout(function() {
       $( '.pane' ).load( 'packal.php', { 'page': 'updates' } );
     }, 1000);
-    
+
   });
-  $( document ).ready( function() { 
+  $( document ).ready( function() {
     if ( <?php echo date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) ); ?> > 86400 ) {
       console.log( 'test' );
       $.ajax({
@@ -892,7 +893,7 @@ function about() {
   </p>
   <h3>Anonymous Workflow Reporting</h3>
   <p>
-    This workflow has the possibility to send the Packal website information 
+    This workflow has the possibility to send the Packal website information
     about which workflows you have installed. The information sent includes only
     the Bundle IDs of the workflows you have installed along with the names,
     whether or not they are enabled/disabled, and whether or not they were downloaded
@@ -907,18 +908,18 @@ function about() {
   </p>
   <p>
     Nothing else about your system is sent, and the reporting mechanism ignores workflows
-    without Bundle IDs. The information is used in order to determine the popularity of 
-    workflows in order to display better statistics for the workflows on Packal to be 
+    without Bundle IDs. The information is used in order to determine the popularity of
+    workflows in order to display better statistics for the workflows on Packal to be
     displayed for trending/popular workflows as well as for reports to workflow developers
     about the popularity of their work. If you want a more detailed understanding of the
     reporting mechanism, look at the file name <code>report-usage-data.php</code> in the
     workflow root.
   </p>
   <h2>Support this Project</h2>
-  <p>The Packal Updater Workflow is an extension of 
-    <a href='http://www.packal.org' class='hijack'>Packal.org</a>, which is 
-    developed, maintained, and <em>funded</em> by Shawn Patrick Rice. While 
-    there are ads on the website, they don't cover the server costs. If you'd 
+  <p>The Packal Updater Workflow is an extension of
+    <a href='http://www.packal.org' class='hijack'>Packal.org</a>, which is
+    developed, maintained, and <em>funded</em> by Shawn Patrick Rice. While
+    there are ads on the website, they don't cover the server costs. If you'd
     like to chip in to help Packal running, then click the little, yellow button
     below.
   </p>
@@ -946,47 +947,47 @@ function about() {
   </p>
   <p>
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, 
+    along with this program.  If not,
     <a href='http://www.gnu.org/licenses/' class='hijack'>see the license here</a>.
   </p>
 
   <h2>Credit Where Credit is Due</h2>
   <p>
-    I have to thank <a href='http://www.packal.org/users/deanishe' class='hijack'>Dean Jackson</a> and 
+    I have to thank <a href='http://www.packal.org/users/deanishe' class='hijack'>Dean Jackson</a> and
     <a href='http://www.packal.org/users/tyler-eich' class='hijack'>Tyler Eich</a> for feedback and testing.
   </p>
-  
+
   <p>
     This workflow uses <a href='http://dferg.us/'>David Ferguson</a>'s <a href='http://dferg.us/workflows-class/' class='hijack'>Workflows Class</a>.
   </p>
 
   <p>
-    It also uses <a href='http://rodneyrehm.de/en/' class='hijack'>Rodney Rehm</a>'s and 
-    <a href='https://github.com/ckruse' class='hijack'>Christian Kruse</a>'s 
+    It also uses <a href='http://rodneyrehm.de/en/' class='hijack'>Rodney Rehm</a>'s and
+    <a href='https://github.com/ckruse' class='hijack'>Christian Kruse</a>'s
     <a href='https://github.com/rodneyrehm/CFPropertyList' class='hijack'>CFProperty List</a> class to aid with plist migration.
   </p>
 
   <p>
     For the dynamic layout of this "application," code was used from the overly
-    talented <a href='http://www.linkedin.com/in/manoela' class='hijack'>Manoela 
-    "Mary Lou" Ilic</a> from 
+    talented <a href='http://www.linkedin.com/in/manoela' class='hijack'>Manoela
+    "Mary Lou" Ilic</a> from
     <a href='http://tympanus.net/codrops/' class='hijack'>Codrops</a>.
   </p>
 
   <p>
-    Specifically, the 
+    Specifically, the
     <a href='http://tympanus.net/codrops/2013/09/30/animated-border-menus/'
-     class='hijack'>menus</a> were adapted as was a bit of the 
-    <a href='http://tympanus.net/codrops/2013/05/21/natural-language-form-with-custom-input-elements/' 
+     class='hijack'>menus</a> were adapted as was a bit of the
+    <a href='http://tympanus.net/codrops/2013/05/21/natural-language-form-with-custom-input-elements/'
      class='hijack'>settings form</a>.
   </p>
   <p>
-    GUI icons from 
+    GUI icons from
     <a href='http://fortawesome.github.io/Font-Awesome/' class='hijack'>
     Font Awesome</a>.
   </p>
   <p>
-    The workflow icons from the 
+    The workflow icons from the
     <a href='http://www.archlinux.org/packages/extra/any/oxygen-icons/download' class='hijack'>
     Oxygen set</a>.
   </p>
@@ -1083,7 +1084,7 @@ function updates() {
         $( '#updating-overlay' ).hide();
       });
     });
-    $( document ).ready( function() { 
+    $( document ).ready( function() {
     if ( <?php echo date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) ); ?> > 86400 ) {
       $.ajax({
         url: 'packal.php',
@@ -1183,10 +1184,10 @@ function writeConfig() {
   echo "$key: $value";
 }
 
-function openDirectory() { 
+function openDirectory() {
   if ( strpos( $_GET[ 'directory' ] , 'http://') !== FALSE )
     $dir = $_GET[ 'directory' ] ;
-  else 
+  else
     $dir = $_GET[ 'directory' ];
   exec( "open '$dir'" );
 }
@@ -1195,7 +1196,7 @@ function updateManifest() {
   global $data;
   if ( getManifest() == FALSE ) {
     $time = getManifestModTime();
-    echo "The manifest was last updated <strong>$time</strong> However it couldn't be updated because of no viable Internet connection.";  
+    echo "The manifest was last updated <strong>$time</strong> However it couldn't be updated because of no viable Internet connection.";
     die();
   }
 
@@ -1224,7 +1225,7 @@ function deleteFile() {
 
 function printCopyrightYear() {
   $year = date( 'Y', mktime() );
-  
+
   if ( $year != 2014 )
     echo "2014 – $year";
   else

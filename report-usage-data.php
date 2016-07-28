@@ -11,6 +11,7 @@
  *
  */
 
+require_once( __DIR__ . '/init.php ' );
 
 // Since we're going to use date functions, we'll just make sure that we set the date
 // to avoid any dumb warnings that php will give us.
@@ -25,7 +26,7 @@ $bundle = 'com.packal';
 // Set the user's home directory
 $HOME = exec( 'echo $HOME' );
 // The location of the data directory
-$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
+$data = DATA_DIR;
 
 // If the data directory doesn't exist, then we'll just wait for another time.
 if ( ! file_exists( $data ) )
@@ -53,7 +54,7 @@ if ( ! file_exists( "$data/usage" ) ) {
 }
 
 // This is your unique identifier. If you're reading this, just run the command and see what's up.
-$unique = hash( "sha256", 
+$unique = hash( "sha256",
 	exec( 'ioreg -rd1 -c IOPlatformExpertDevice | awk \'/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }\'' ) );
 
 $unique = utf8_encode( $unique );
@@ -130,12 +131,12 @@ die();
 // Some helpful functions.
 
 function getWorkflowData( $dir ) {
-	$plist = "$dir/info.plist";	
+	$plist = "$dir/info.plist";
 	if ( ! file_exists( $plist ) )
 		return FALSE;
-	
+
 	$bundle = utf8_encode( trim( readPlistValue( 'bundleid', $plist ) ) );
-	
+
 	if ( ! $bundle )
 		return FALSE;
 
@@ -162,24 +163,24 @@ function getWorkflowData( $dir ) {
 
 }
 
-function checkConnection() { 
+function checkConnection() {
 	ini_set( 'default_socket_timeout', 1);
 
 	// First test
-	exec( "ping -c 1 -t 1 www.google.com", $pingResponse, $pingError);
+	exec( "ping -c 1 -t 1 www.github.com", $pingResponse, $pingError);
 	if ( $pingError == 14 )
 		return FALSE;
 
 	// Second Test
-    $connection = @fsockopen("www.google.com", 80, $errno, $errstr, 1);
+    $connection = @fsockopen("www.github.com", 80, $errno, $errstr, 1);
 
-    if ( $connection ) { 
-        $status = TRUE;  
+    if ( $connection ) {
+        $status = TRUE;
         fclose( $connection );
     } else {
         $status = FALSE;
     }
-    return $status; 
+    return $status;
 }
 
 function readPlistValue( $key, $plist ) {

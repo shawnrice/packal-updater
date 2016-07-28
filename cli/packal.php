@@ -2,11 +2,13 @@
 
 require_once( __DIR__ . '/includes/plist-migration.php' );
 require_once( __DIR__ . '/../alfred.bundler.php' );
+require_once( __DIR__ . '/../init.php' );
+
 $cliDir = __DIR__;
-$bundle   = "com.packal";
+$bundle   = 'com.packal';
 $HOME     = exec( 'echo $HOME' );
-$data     = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
-$cache    = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle";
+$data     = DATA_DIR;
+$cache    = CACHE_DIR;
 
 $manifest = "$data/manifest.xml";
 $config   = "$data/config/config.xml";
@@ -51,7 +53,7 @@ function setOption( $opt = array() ) {
   $value = $opt[1];
   if ( $value == 'null' )
     $value = '';
-  
+
   $options = array( 'backups',
                     'auto_add',
                     'workflowReporting',
@@ -182,7 +184,7 @@ function checkUpdates( $opt = array() ) {
       $i++;
 
     }
-    
+
   endforeach;
 
   if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) ) {
@@ -318,7 +320,7 @@ function doUpdate( $bundle, $force = FALSE ) {
   // Backup the bundle.
   echo `"$cliDir/packal.sh" backup "$bundle"`;
   $cmd = "'" . __DIR__ . "/packal.sh' replaceFiles " . escapeshellarg( $dir ) . ' ' . escapeshellarg( $cache . '/update/' . "$bundle/tmp/");
-  
+
   exec( "$cmd" );
 
   `rm -fR "$cache/update/$bundle"`;
@@ -359,9 +361,9 @@ function doUpdateAll( $force = FALSE ) {
         continue;
 
       $updatable[] = array( (string) $w->name, "Forced Update", (string) $w->version, (string) $w->bundle );
-    
+
     }
-    
+
   endforeach;
 
   if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) )

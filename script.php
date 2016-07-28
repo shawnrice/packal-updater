@@ -7,6 +7,7 @@
 
 require_once( 'libraries/workflows.php' );
 require_once( 'functions.php' );
+require_once( __DIR__ . '/init.php' );
 
 // Set date/time to avoid warnings/errors.
 if ( ! ini_get('date.timezone') ) {
@@ -29,13 +30,13 @@ $bundle = 'com.packal';
 $q      = $argv;
 $w      = new Workflows;
 $HOME   = exec( 'echo $HOME' );
-$data   = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
-$cache  = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle";
+$data   = DATA_DIR;
+$cache  = CACHE_DIR;
 
 $connection = checkConnection();
 
 if ( $connection === FALSE ) {
-      $w->result( '', '', 'Warning: no viable Internet connection', 
+      $w->result( '', '', 'Warning: no viable Internet connection',
       'Some features of this workflow will be unavailable without a solid Internet connection', 'assets/icons/task-attention.png', 'no', '');
 }
 
@@ -59,7 +60,7 @@ generateEndpoints();
 // Not all of these are used right now.
 if ( ! file_exists( "$data/config/config.xml" ) ) {
   $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
-  $config = new SimpleXMLElement( $d );  
+  $config = new SimpleXMLElement( $d );
   $config->packalAccount = 0;
   $config->forcePackal = 0;
   $config->backups = 3;
@@ -78,7 +79,7 @@ if ( ! file_exists( "$data/manifest.xml" ) ) {
   // This should be taken care of in the firstRun() call,
   // but the redundancy is fine.
     if ( getManifest() == FALSE ) {
-      $w->result( '', '', 'Error: Packal Updater', 
+      $w->result( '', '', 'Error: Packal Updater',
         'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', 'assets/icons/task-reject.png', 'no', '');
       echo $w->toxml();
       die();
@@ -100,7 +101,7 @@ $manifest  = @simplexml_load_file( "$data/manifest.xml" );
 // The manifest is not valid. Let's try to get it before we fail.
 if ( empty( $manifest ) ) {
   if ( getManifest() === FALSE ) {
-    $w->result( '', '', 'Error: Packal Updater', 
+    $w->result( '', '', 'Error: Packal Updater',
       'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', 'assets/icons/task-reject.png', 'no', '');
     echo $w->toxml();
     die();
@@ -108,7 +109,7 @@ if ( empty( $manifest ) ) {
   // So, the we didn't get an error, but let's try to make sure it is valid XML.
   $manifest = @simplexml_load_file( "$data/manifest.xml" );
   if ( empty( $manifest ) ) {
-    $w->result( '', '', 'Error: Packal Updater', 
+    $w->result( '', '', 'Error: Packal Updater',
       'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', 'assets/icons/task-reject.png', 'no', '');
     echo $w->toxml();
     die();
@@ -186,10 +187,10 @@ if ( empty( $q[1] ) ) {
   }
 
   if ( $gui === TRUE ) {
-    $w->result( 'open-gui', 'open-gui', "Open Graphical 'Application'", 
+    $w->result( 'open-gui', 'open-gui', "Open Graphical 'Application'",
     'Configure this workflow, Update workflows, and learn about this workflow. (RECOMMENDED)', 'assets/icons/applications-education-miscellaneous.png', 'yes', '');
   } else {
-    $w->result( '', '', "GUI Not Available'", 
+    $w->result( '', '', "GUI Not Available'",
     'A GUI to configure and operate this workflow is available if you have OS X 10.9 or 10.10.', 'assets/icons/applications-education-miscellaneous.png', 'no', '');
   }
 
@@ -200,24 +201,24 @@ if ( empty( $q[1] ) ) {
 
   // if ( isset( $config->authorName ) && ( ! empty( $config->authorName ) ) {
   //   $w->result( '', '', 'Informational',
-  //     "There are $count workflows in the manifest," . 
+  //     "There are $count workflows in the manifest," .
   //     " of which, you have " . count( $packal ) .
-  //     " installed, and you wrote " . $mywf . " of those.", '', 'no', '');    
+  //     " installed, and you wrote " . $mywf . " of those.", '', 'no', '');
   // }
 
   $w->result( 'blacklist', 'blacklist', 'Manage Blacklist', 'Configure which workflows Packal updates', 'assets/icons/flag-black.png', 'no', 'blacklist' );
 
   $w->result( '', '', 'Informational',
-    "There are $count workflows in the manifest," . 
+    "There are $count workflows in the manifest," .
     " of which, you have " . count( $packal ) .
     " installed, and you wrote " . $mywf . " of those.", 'assets/icons/help-about.png', 'no', '');
 
     $w->result( '', 'setup', 'Configure', 'Make this workflow work best for you.', 'assets/icons/applications-system.png', 'no', 'setup');
-  
+
   // Option to install a cron script
-  // 
-  if ( file_exists( '../' . $json[ 'alfred.cron.spr' ] ) && 
-        ( ! file_exists( "$HOME/Library/Application Support/Alfred 2/Workflow Data/alfred.cron.spr/scripts/packal_updater") ) ) {
+  //
+  if ( file_exists( '../' . $json[ 'alfred.cron.spr' ] ) &&
+        ( ! file_exists( DATA_DIR . '/../alfred.cron.spr/scripts/packal_updater') ) ) {
     $plist = '../' . $json[ 'alfred.cron.spr' ] . '/info.plist';
     $icon = '../' . $json[ 'alfred.cron.spr' ] . '/icons/timer.png';
     if ( exec( "/usr/libexec/PlistBuddy -c \"Print :disabled\" '$plist' 2> /dev/null" ) != 'true' )
@@ -281,12 +282,12 @@ if ( strpos( $q[1], 'setup' ) !== FALSE ) {
         if ( ! empty( $config->$k ) )
           $message = "Current value: " . $config->$k;
         else
-          $message = "< not set >";  
+          $message = "< not set >";
       }
     } else {
         $message = "Not set.";
     }
-    
+
     // Setup icons per option
     $icon = 'assets/icons/';
     switch ( $k ) :
@@ -324,7 +325,7 @@ if ( strpos( $q[1], 'setup' ) !== FALSE ) {
 
 } else if ( strpos( $q[1], 'blacklist' ) !== FALSE ) {
   // Option to Blacklist a workflow
-  
+
   // @TODO: Sort the workflows by name.
   foreach ( $json as $k => $v ) :
     if ( file_exists( "../$v/packal/package.xml" ) ) {
@@ -347,6 +348,6 @@ echo $w->toxml();
 die();
 
 
-  
+
 
 ?>

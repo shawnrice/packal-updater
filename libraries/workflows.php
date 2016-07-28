@@ -7,6 +7,9 @@
 * Revised: 		6/6/2013
 * Version:		0.3.3
 */
+
+require_once( __DIR__ . '/../init.php' );
+
 class Workflows {
 
 	private $cache;
@@ -38,8 +41,8 @@ class Workflows {
 			$this->bundle = $bundleid;
 		endif;
 
-		$this->cache = $this->home. "/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/".$this->bundle;
-		$this->data  = $this->home. "/Library/Application Support/Alfred 2/Workflow Data/".$this->bundle;
+		$this->cache = CACHE_DIR;
+		$this->data  = DATA_DIR;
 
 		if ( !file_exists( $this->cache ) ):
 			exec("mkdir '".$this->cache."'");

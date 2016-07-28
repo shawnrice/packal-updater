@@ -1,6 +1,7 @@
 <?php
 
 $bundle = 'com.packal';
+require_once( __DIR__ . '/init.php' );
 
 function getManifest() {
 	global $bundle;
@@ -8,12 +9,8 @@ function getManifest() {
 	if ( checkConnection() === FALSE )
 		return FALSE;
 
-	$dir = exec( 'echo $HOME' ) . 
-		"/Library/Application Support/Alfred 2/Workflow Data/$bundle" .
-		"/manifest.xml";
-
-	file_put_contents( "$dir", 
-		file_get_contents( 'https://raw.github.com/packal/repository/master/manifest.xml' ) );
+	$dir = DATA_DIR . '/manifest.xml';
+	file_put_contents( $dir, file_get_contents( 'https://raw.github.com/packal/repository/master/manifest.xml' ) );
 
 	return TRUE;
 }
@@ -22,8 +19,8 @@ function firstRun() {
 	global $bundle;
 
 	$HOME        = exec( 'echo $HOME' );
-	$data        = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
-	$cache       = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle";
+	$data        = DATA_DIR;
+	$cache       = CACHE_DIR;
 	$config      = "$data/config";
 	$endpoints   = "$data/endpoints";
 	$backups     = "$data/backups";
@@ -38,7 +35,7 @@ function firstRun() {
 	// Generate Default Config File
 	if ( ! file_exists( "$data/config/config.xml" ) ) {
 	  $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
-	  $config = new SimpleXMLElement( $d );  
+	  $config = new SimpleXMLElement( $d );
 	  $config->packalAccount = 0;
 	  $config->forcePackal = 0;
 	  $config->backups = 3;
@@ -72,24 +69,24 @@ function generateEndpoints( $force = FALSE ) {
 	global $bundle;
 
 	$HOME = exec( 'echo $HOME' );
-	$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
-	
+	$data = DATA_DIR;
+
 	if ( ! file_exists( "$data/endpoints" ) && is_dir( "$data/endpoints" ) ) {
 		mkdir( "$data/endpoints" );
 	}
-	
+
 	if ( ( ! ( file_exists( "$data/endpoints/endpoints.json" ) && file_exists( "$data/endpoints/endpoints.list" ) ) )
 		|| ( filemtime( "$data/endpoints/endpoints.json" ) < filemtime( dirname( __DIR__ ) ) ) || ( $force !== FALSE ) ) {
-	
+
 		// Okay, we need to update the files.
 		$dirs = array_diff( scandir( dirname( __DIR__ ) ), array( '.', '..', '.git', '.DS_Store' ) );
-	
+
 		if ( file_exists( "$data/endpoints/endpoints.list" ) )
 			unlink( "$data/endpoints/endpoints.list" );
 			$fp = fopen( "$data/endpoints/endpoints.list", 'w');
-		
+
 			$me = basename( __DIR__ );
-		
+
 		foreach ( $dirs as $d ) :
 			$d = str_replace( '//', '/', str_replace( $me, '', __DIR__ ) . "/$d"  );
 			$bundle = readPlistValue( 'bundleid', "$d/info.plist" );
@@ -110,24 +107,24 @@ function readPlistValue( $key, $plist ) {
   return exec( "/usr/libexec/PlistBuddy -c \"Print :$key\" '$plist' 2> /dev/null" );
 }
 
-function checkConnection() { 
+function checkConnection() {
 	ini_set( 'default_socket_timeout', 1);
 
 	// First test
-	exec( "ping -c 1 -t 1 www.google.com", $pingResponse, $pingError);
+	exec( "ping -c 1 -t 1 www.github.com", $pingResponse, $pingError);
 	if ( $pingError == 14 )
 		return FALSE;
 
 	// Second Test
-    $connection = @fsockopen("www.google.com", 80, $errno, $errstr, 1);
+    $connection = @fsockopen("www.github.com", 80, $errno, $errstr, 1);
 
-    if ( $connection ) { 
-        $status = TRUE;  
+    if ( $connection ) {
+        $status = TRUE;
         fclose( $connection );
     } else {
         $status = FALSE;
     }
-    return $status; 
+    return $status;
 }
 
 function countFiles( $dir ) {

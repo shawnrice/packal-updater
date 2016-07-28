@@ -2,9 +2,10 @@
 
 require_once( 'libraries/workflows.php' );
 require_once( 'functions.php' );
+require_once( __DIR__ . '/init.php' );
 
 $HOME   = exec( 'echo $HOME' );
-$data   = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
+$data   = DATA_DIR;
 $config = simplexml_load_file( "$data/config/config.xml" );
 
 $option = substr( $argv[1], 0, strpos( $argv[1], ':' ) );
@@ -14,11 +15,11 @@ $w = new Workflows;
 
 function setOption() {
 	global $data, $config, $option, $value, $w;
-	
+
 	if ( empty( $value ) ) {
 		if ( isset( $config->$option ) && ( ! empty( $config->$option ) ) ) {
 			if ( $option == 'backups' ) {
-				$value = (int) $config->$option;	
+				$value = (int) $config->$option;
 			} else {
 				$value = $config->$option;
 			}
@@ -48,7 +49,7 @@ function setOption() {
 			$w->result( 'option-set-packalAccount-0', 'option-set-packalAccount-0', 'I do not have an account on Packal.org', "", '', 'yes', '' );
 		}
 	} else {
-		if ( empty( $value ) ) 
+		if ( empty( $value ) )
 			$w->result( "option-set-$option-$value", "option-set-$option-$value", $options[ $option ], "$value", '', 'no', '' );
 		else if ( $option == 'backups' ) {
 			if ( ( $value > 9 ) || ( $value < 0 ) ) {
