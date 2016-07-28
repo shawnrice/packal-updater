@@ -112,7 +112,7 @@ function migratePlist( $current, $new ) {
 
 		}
 	}
-	return TRUE;
+	return true;
 
 	/**
 	 *

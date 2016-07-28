@@ -69,10 +69,10 @@ function setOption( $opt = array() ) {
 
   if ( ( ! in_array( $opt[0], $options ) ) && ( ! in_array( $opt[0], $bool ) ) ) {
     echo "Error: invalid option.";
-    return FALSE;
+    return false;
   } else if ( in_array( $opt[0], $bool ) && ( ! ( $value == 0 || $value == 1 ) ) ) {
     echo "Error: $opt[0] value must be 0 or 1.";
-    return FALSE;
+    return false;
   } else if ( ( $opt[0] == "backup" ) && ( ! is_numeric( $value ) ) ) {
     echo "Error: $opt[0] value must be numeric.";
   }
@@ -125,19 +125,19 @@ function checkUpdates( $opt = array() ) {
 
   if ( isset( $opt[0] ) ) {
     if ( $opt[0] == 1 )
-      $yes = TRUE;
+      $yes = true;
     else
-      $yes = FALSE;
+      $yes = false;
   } else {
-    $yes = FALSE;
+    $yes = false;
   }
   if ( isset( $opt[1] ) ) {
     if ( $opt[1] == 1 )
-      $force = TRUE;
+      $force = true;
     else
-      $force = FALSE;
+      $force = false;
   } else {
-    $force = FALSE;
+    $force = false;
   }
 
   $xml = simplexml_load_file( "$manifest" );
@@ -173,7 +173,7 @@ function checkUpdates( $opt = array() ) {
       echo "\n";
       $i++;
     } else {
-      if ( $force == FALSE )
+      if ( $force == false )
         continue;
 
       echo "Checking $i... Forcing Update for $w->name ($w->bundle)";
@@ -189,7 +189,7 @@ function checkUpdates( $opt = array() ) {
 
   if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) ) {
     echo "Everything is up to date.\n";
-    return FALSE;
+    return false;
   }
 
   echo "Updates available for: ";
@@ -227,21 +227,21 @@ function checkUpdates( $opt = array() ) {
 
 /**
  * Get update confirmation from the user via command line
- * @param bool $yes = FALSE Automatically confirm.
+ * @param bool $yes = false Automatically confirm.
  */
-function getConfirmation( $yes = FALSE ) {
+function getConfirmation( $yes = false ) {
 
   if ( $yes ) {
     echo "Update? (Y/n): y\n";
-    return TRUE;
+    return true;
   }
 
   $conf = readline( "Update? (Y/n): " );
 
   if ( empty( $conf ) || ( $conf == 'y' ) || ( $conf == 'Y' ) )
-    $response = TRUE;
+    $response = true;
   else if ( $conf == 'n' || $conf == 'N' )
-    $response = FALSE;
+    $response = false;
   else {
     echo "Invalid entry. Please choose y or n.\n";
     $response = getConfirmation();
@@ -253,9 +253,9 @@ function getConfirmation( $yes = FALSE ) {
 /**
  * [doUpdate description]
  * @param {[type]} $bundle [description]
- * @param {[type]} $force  =             FALSE [description]
+ * @param {[type]} $force  =             false [description]
  */
-function doUpdate( $bundle, $force = FALSE ) {
+function doUpdate( $bundle, $force = false ) {
 
   global $data, $cache, $manifest, $repo, $cliDir;
 
@@ -273,7 +273,7 @@ function doUpdate( $bundle, $force = FALSE ) {
   if ( ! $force ) {
     if ( ! file_exists( "$dir/packal/package.xml" ) ) {
       echo "Error: No package information exists.";
-      return FALSE;
+      return false;
     }
   }
 
@@ -306,7 +306,7 @@ function doUpdate( $bundle, $force = FALSE ) {
 
   if ( ! $valid ) {
     echo "Error: Cannot verify signature for $xml->file from $bundle.";
-    return FALSE;
+    return false;
   }
 
   // Why can't I just include the function, call it, and be done with it?
@@ -329,11 +329,11 @@ function doUpdate( $bundle, $force = FALSE ) {
   exec( "$tn -title 'Packal Updater' -message '$xml->name has been updated to version $xml->version'" );
 
   echo "TRUE";
-  return TRUE;
+  return true;
 
 }
 
-function doUpdateAll( $force = FALSE ) {
+function doUpdateAll( $force = false ) {
   global $manifest, $cache, $cliDir;
 
   $xml = simplexml_load_file( "$manifest" );
@@ -357,7 +357,7 @@ function doUpdateAll( $force = FALSE ) {
         $updatable[] = array( (string) $w->name, (string) $wf->version, (string) $w->version, (string) $w->bundle );
       }
     } else {
-      if ( $force == FALSE )
+      if ( $force == false )
         continue;
 
       $updatable[] = array( (string) $w->name, "Forced Update", (string) $w->version, (string) $w->bundle );
@@ -367,7 +367,7 @@ function doUpdateAll( $force = FALSE ) {
   endforeach;
 
   if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) )
-    return FALSE;
+    return false;
 
   foreach ( $updatable as $u ) :
     doUpdate( $u[3] );

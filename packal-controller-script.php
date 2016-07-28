@@ -32,10 +32,16 @@ if ( $q == 'open-gui' ) {
 
 
 	// Start the webserver
-	if ( ( strpos( $osx, '10.9' ) !== FALSE ) 
-	    || ( strpos( $osx, '10.10' ) !== FALSE ) 
-	    || ( strpos( $osx, '10.11' ) !== FALSE ) ) {
-		// Since we're using Mavericks, we can just use the native php 5.4 binary.
+	if ( ( strpos( $osx, '10.9' ) !== false ) || ( strpos( $osx, '10.10' ) !== false ) || ( strpos( $osx, '10.11' ) !== false ) ) {
+		// since the gui doesn't run inside the alfred process, it doesn't get the correct variables, so we'll save these to a tmp
+		// file and then reconstitute the data on the other side.
+		$operation_data = [ 'data_dir' => DATA_DIR, 'cache_dir' => CACHE_DIR, 'alfred_version' => ALFRED_VERSION ];
+		if ( ! file_exists( '/tmp/com.packal' ) ) {
+			mkdir( '/tmp/com.packal' );
+		}
+		file_put_contents( '/tmp/com.packal/config.json', json_encode( $operation_data ) );
+
+		// Since we're using Mavericks or greater, we can just use the native php 5.4 binary.
 		exec( "nohup php -S localhost:7893 -t gui/ > /dev/null 2>&1 &" );
 	} else {
 		// Not using Mavericks, so php 5.3 is installed.
@@ -48,7 +54,7 @@ if ( $q == 'open-gui' ) {
 	exec( "nohup '$dir/check-and-kill-webserver.sh'  > /dev/null 2>&1 &" );
 	exec( "nohup php '$dir/gui/webserver-keep-alive-update.php'  > /dev/null 2>&1 &" );
 
-	// // Wait a second so that we can make sure that the webserver has started before we open the viewer.
+	// Wait a second so that we can make sure that the webserver has started before we open the viewer.
 	sleep(2);
 
 	$viewer = __load( 'viewer', 'default', 'utility' );
@@ -66,7 +72,7 @@ if ( $q == 'open-gui' ) {
 }
 
 
-if ( strpos( $q, 'update-' ) !== FALSE ) {
+if ( strpos( $q, 'update-' ) !== false ) {
 	$workflows = json_decode( file_get_contents( "$data/endpoints/endpoints.json" ), TRUE );
 	$wf = array_keys( $workflows );
 	if ( str_replace( 'update-', '', $q ) == 'all' ) {
@@ -93,7 +99,7 @@ $tn = __load( 'terminal-notifier' , 'default' , 'utility' );
 $endpoints = json_decode( file_get_contents( "$data/endpoints/endpoints.json" ), TRUE );
 
 
-if ( strpos( $q, 'option-set-' ) !== FALSE ) {
+if ( strpos( $q, 'option-set-' ) !== false ) {
 	$set = str_replace( 'option-set-', '', $q );
 	$set = explode( '-', $set );
 	$set[1] = (string) $set[1];
@@ -192,14 +198,14 @@ if ( strpos( $q, 'option-set-' ) !== FALSE ) {
 
 }
 
-if ( strpos( $q, 'set-' ) !== FALSE ) {
+if ( strpos( $q, 'set-' ) !== false ) {
 	$option = str_replace( 'set-', '', $q );
 	$script = 'tell application "' . ALFRED_VERSION . '" to run trigger "set-option" in workflow "com.packal" with argument "' . $option . ': "';
 	exec( "osascript -e '$script'" );
 	die();
 }
 
-if ( strpos( $q, 'blacklist-' ) !== FALSE ) {
+if ( strpos( $q, 'blacklist-' ) !== false ) {
 	$workflow = str_replace( 'blacklist-', '', $q );
 	$blacklist = json_decode( file_get_contents( "$data/config/blacklist.json" ), TRUE );
 	if ( ! in_array( $workflow, $blacklist ) ) {
@@ -212,7 +218,7 @@ if ( strpos( $q, 'blacklist-' ) !== FALSE ) {
 	die();
 }
 
-if ( strpos( $q, 'whitelist-' ) !== FALSE ) {
+if ( strpos( $q, 'whitelist-' ) !== false ) {
 	$workflow = str_replace( 'whitelist-', '', $q );
 	$blacklist = json_decode( file_get_contents( "$data/config/blacklist.json" ), TRUE );
 	if ( in_array( $workflow, $blacklist ) ) {
@@ -225,7 +231,7 @@ if ( strpos( $q, 'whitelist-' ) !== FALSE ) {
 	die();
 }
 
-if ( strpos( $q, 'install-cron-script' ) !== FALSE ) {
+if ( strpos( $q, 'install-cron-script' ) !== false ) {
 	$dir = escapeshellcmd( exec( 'pwd' ) );
 	exec( "'$dir/install-alfred-cron-script.sh'" );
 	exec( "$tn -title 'Packal Updater' -message 'Alfred Cron will now check for workflow updates.'" );

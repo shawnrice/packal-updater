@@ -52,7 +52,7 @@
         setTimeout(function() {
           $( '.pane' ).load( 'packal.php', { page: dest } ).hide().fadeIn('fast');
         }, 300);
-        
+
         // This just makes the menu go away when you select an option, basically duplicated from the borderMenu.js script.
         // Also, add a timeout so it's not too sudden.
         var menu = document.getElementById( 'bt-menu' );
@@ -76,7 +76,7 @@
         },
         close: function( event, ui ) {
           ui.tooltip.hover( function() {
-              $( this ).stop( true ).fadeTo( 400, 1 ); 
+              $( this ).stop( true ).fadeTo( 400, 1 );
           },
           function() {
             $( this ).fadeOut( '200', function() {
@@ -102,7 +102,7 @@
             }
           }
     });
-      
+
 
 
       // $( '.bt-menu-trigger' ).hover( function() {

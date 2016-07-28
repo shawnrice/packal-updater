@@ -10,7 +10,7 @@
 ***/
 
 // Define the global bundler version.
-$bundler_version       = "aries";
+$bundler_version       = 'aries';
 $bundler_minor_version = '1';
 
 // Let's just make sure that the utility exists before we try to use it.
@@ -52,7 +52,7 @@ function __load( $name , $version = 'default' , $type = 'php' , $json = '' ) {
     foreach ($assets as $asset ) {
       require_once( $asset );
     }
-    return TRUE;
+    return true;
   } else if ( $type == 'utility' ) {
     $asset = __loadAsset( $name , $version , $bundle , strtolower($type) , $json );
     return str_replace(' ' , '\ ' , $asset[0]);
@@ -61,7 +61,7 @@ function __load( $name , $version = 'default' , $type = 'php' , $json = '' ) {
   }
 
   // We shouldn't get here.
-  return FALSE;
+  return false;
 
 } // End __load()
 

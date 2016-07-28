@@ -21,8 +21,9 @@ if ( ! ini_get('date.timezone') ) {
 $osx = exec( "sw_vers | grep 'ProductVersion:' | grep -o '10\.[0-9]*'" );
 
 // So, they can use the GUI if they're using Mavericks or Yosemite.
-if ( ( $osx == '10.9') || ( $osx == '10.10' ) || ( $osx == '10.11' ) )
-  $gui = TRUE;
+if ( ( $osx == '10.9') || ( $osx == '10.10' ) || ( $osx == '10.11' ) ) {
+  $gui = true;
+}
 
 firstRun();
 
@@ -35,7 +36,7 @@ $cache  = CACHE_DIR;
 
 $connection = checkConnection();
 
-if ( $connection === FALSE ) {
+if ( $connection === false ) {
       $w->result( '', '', 'Warning: no viable Internet connection',
       'Some features of this workflow will be unavailable without a solid Internet connection', 'assets/icons/task-attention.png', 'no', '');
 }
@@ -78,7 +79,7 @@ if ( ! file_exists( "$data/config/config.xml" ) ) {
 if ( ! file_exists( "$data/manifest.xml" ) ) {
   // This should be taken care of in the firstRun() call,
   // but the redundancy is fine.
-    if ( getManifest() == FALSE ) {
+    if ( getManifest() == false ) {
       $w->result( '', '', 'Error: Packal Updater',
         'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', 'assets/icons/task-reject.png', 'no', '');
       echo $w->toxml();
@@ -88,7 +89,7 @@ if ( ! file_exists( "$data/manifest.xml" ) ) {
 
 // Update the manifest if past cache.
 // This is a potential failure spot.
-if ( $connection !== FALSE )
+if ( $connection !== false )
   exec( "'" . __DIR__ . "/cli/packal.sh' update" );
 
 // Do the workflow reporting script as long as the config option is set.
@@ -100,7 +101,7 @@ $manifest  = @simplexml_load_file( "$data/manifest.xml" );
 
 // The manifest is not valid. Let's try to get it before we fail.
 if ( empty( $manifest ) ) {
-  if ( getManifest() === FALSE ) {
+  if ( getManifest() === false ) {
     $w->result( '', '', 'Error: Packal Updater',
       'The workflow manifest is not valid, and there is no valid Internet connection to retrieve a new one.', 'assets/icons/task-reject.png', 'no', '');
     echo $w->toxml();
@@ -215,27 +216,17 @@ if ( empty( $q[1] ) ) {
 
     $w->result( '', 'setup', 'Configure', 'Make this workflow work best for you.', 'assets/icons/applications-system.png', 'no', 'setup');
 
-  // Option to install a cron script
-  //
-  if ( file_exists( '../' . $json[ 'alfred.cron.spr' ] ) &&
-        ( ! file_exists( DATA_DIR . '/../alfred.cron.spr/scripts/packal_updater') ) ) {
-    $plist = '../' . $json[ 'alfred.cron.spr' ] . '/info.plist';
-    $icon = '../' . $json[ 'alfred.cron.spr' ] . '/icons/timer.png';
-    if ( exec( "/usr/libexec/PlistBuddy -c \"Print :disabled\" '$plist' 2> /dev/null" ) != 'true' )
-      $w->result( '', 'install-cron-script', 'Install Alfred Cron Script', 'Make Alfred Cron check for updates for you.', "$icon", 'yes', '');
-  }
-
   echo $w->toxml();
   die();
 }
 
-if ( strpos( $q[1], 'update' ) !== FALSE ) {
+if ( strpos( $q[1], 'update' ) !== false ) {
   if ( ! isset( $updates ) )
     $updates = array();
   if ( count( $updates ) > 0 ) {
     if ( count( $updates ) > 1 ) {
       // Don't allow the updates if there is no internet connection.
-      if ( $connection !== FALSE )
+      if ( $connection !== false )
         $w->result( 'update-all', 'update-all', "Update all workflows", '', '', 'yes', '');
     }
     foreach( $updates as $k => $v ) :
@@ -245,7 +236,7 @@ if ( strpos( $q[1], 'update' ) !== FALSE ) {
         $icon = $v[ 'path' ] . "/icon.png";
       else
         $icon = 'assets/icons/package.png';
-      if ( $connection !== FALSE )
+      if ( $connection !== false )
         $w->result( "update-$k", "update-$k", "Update " . $v[ 'name' ], "Update version " . $v[ 'version' ] . " => " . $wf[ $k ][ 'version' ], $v[ 'path' ] . "/icon.png", '', '');
       else
         $w->result( "update-$k", '', "An update for " . $v[ 'name' ] . ' is available.', "Update version " . $v[ 'version' ] . " => " . $wf[ $k ][ 'version' ] . '. << Exception: no viable Internet connection. Update impossible. >>' , $v[ 'path' ] . "/icon.png", 'no', '');
@@ -259,7 +250,7 @@ if ( strpos( $q[1], 'update' ) !== FALSE ) {
   die();
 }
 
-if ( strpos( $q[1], 'setup' ) !== FALSE ) {
+if ( strpos( $q[1], 'setup' ) !== false ) {
 
   // The next argument removes the forced-setup option.
   if ( ( ! file_exists( "$data/config/first-run-alfred" ) ) && ( ! file_exists( "$data/config/first-run" ) ) )
@@ -323,7 +314,7 @@ if ( strpos( $q[1], 'setup' ) !== FALSE ) {
   echo $w->toxml();
   die();
 
-} else if ( strpos( $q[1], 'blacklist' ) !== FALSE ) {
+} else if ( strpos( $q[1], 'blacklist' ) !== false ) {
   // Option to Blacklist a workflow
 
   // @TODO: Sort the workflows by name.

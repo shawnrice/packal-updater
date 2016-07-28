@@ -6,13 +6,13 @@ require_once( __DIR__ . '/init.php' );
 function getManifest() {
 	global $bundle;
 
-	if ( checkConnection() === FALSE )
-		return FALSE;
+	if ( checkConnection() === false )
+		return false;
 
 	$dir = DATA_DIR . '/manifest.xml';
 	file_put_contents( $dir, file_get_contents( 'https://raw.github.com/packal/repository/master/manifest.xml' ) );
 
-	return TRUE;
+	return true;
 }
 
 function firstRun() {
@@ -55,17 +55,17 @@ function firstRun() {
 
 	if ( ! file_exists( "$data/manifest.xml" ) ) {
 		// Get the manifest with error handling.
-		if ( getManifest() == FALSE ) {
+		if ( getManifest() == false ) {
 			// So, we're getting the manifest, but
 			// there was a problem, so we're going
 			// to communicate that.
-			return FALSE;
+			return false;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
-function generateEndpoints( $force = FALSE ) {
+function generateEndpoints( $force = false ) {
 	global $bundle;
 
 	$HOME = exec( 'echo $HOME' );
@@ -76,7 +76,7 @@ function generateEndpoints( $force = FALSE ) {
 	}
 
 	if ( ( ! ( file_exists( "$data/endpoints/endpoints.json" ) && file_exists( "$data/endpoints/endpoints.list" ) ) )
-		|| ( filemtime( "$data/endpoints/endpoints.json" ) < filemtime( dirname( __DIR__ ) ) ) || ( $force !== FALSE ) ) {
+		|| ( filemtime( "$data/endpoints/endpoints.json" ) < filemtime( dirname( __DIR__ ) ) ) || ( $force !== false ) ) {
 
 		// Okay, we need to update the files.
 		$dirs = array_diff( scandir( dirname( __DIR__ ) ), array( '.', '..', '.git', '.DS_Store' ) );
@@ -100,7 +100,7 @@ function generateEndpoints( $force = FALSE ) {
 		file_put_contents( "$data/endpoints/endpoints.json", utf8_encode( json_encode( $endpoints ) ) );
 		fclose( $fp );
 	} else
-		return FALSE;
+		return false;
 }
 
 function readPlistValue( $key, $plist ) {
@@ -113,16 +113,16 @@ function checkConnection() {
 	// First test
 	exec( "ping -c 1 -t 1 www.github.com", $pingResponse, $pingError);
 	if ( $pingError == 14 )
-		return FALSE;
+		return false;
 
 	// Second Test
     $connection = @fsockopen("www.github.com", 80, $errno, $errstr, 1);
 
     if ( $connection ) {
-        $status = TRUE;
+        $status = true;
         fclose( $connection );
     } else {
-        $status = FALSE;
+        $status = false;
     }
     return $status;
 }

@@ -45,7 +45,7 @@ if ( ! ( isset( $config->workflowReporting ) && ( (string) $config->workflowRepo
 	die();
 
 // Make sure that we have an Internet connection before continuing.
-if ( checkConnection() == FALSE )
+if ( checkConnection() == false )
 	die();
 
 // Check if the usage directory exists; make it if it doesn't.
@@ -80,8 +80,9 @@ $workflows = json_decode( file_get_contents( "$data/endpoints/endpoints.json" ) 
 
 foreach ( $workflows as $dir ) :
 	$w = getWorkflowData( $dir );
-	if ( is_array( $w ) )
+	if ( is_array( $w ) ) {
 		$report[] = $w;
+	}
 endforeach;
 
 
@@ -115,7 +116,7 @@ curl_close($ch);
 
 if ( $result == "It's all good." ) {
 	// It went through. Yay!
-	if ( file_put_contents( $file , $json ) !== FALSE ) {
+	if ( file_put_contents( $file , $json ) !== false ) {
 		// Recorded the file, so let's move on.
 		die();
 	} else {
@@ -133,12 +134,12 @@ die();
 function getWorkflowData( $dir ) {
 	$plist = "$dir/info.plist";
 	if ( ! file_exists( $plist ) )
-		return FALSE;
+		return false;
 
 	$bundle = utf8_encode( trim( readPlistValue( 'bundleid', $plist ) ) );
 
 	if ( ! $bundle )
-		return FALSE;
+		return false;
 
 	// Get the Workflow name
 	$name = utf8_encode( trim( readPlistValue( 'name', $plist ) ) );
@@ -169,16 +170,16 @@ function checkConnection() {
 	// First test
 	exec( "ping -c 1 -t 1 www.github.com", $pingResponse, $pingError);
 	if ( $pingError == 14 )
-		return FALSE;
+		return false;
 
 	// Second Test
     $connection = @fsockopen("www.github.com", 80, $errno, $errstr, 1);
 
     if ( $connection ) {
-        $status = TRUE;
+        $status = true;
         fclose( $connection );
     } else {
-        $status = FALSE;
+        $status = false;
     }
     return $status;
 }

@@ -26,10 +26,10 @@ $blacklist = json_decode( file_get_contents( "$data/config/blacklist.json" ), TR
 
 require_once( $endpoints[ 'com.packal'] . '/functions.php' );
 
-if ( checkConnection() === FALSE )
+if ( checkConnection() === false )
 	die();
 
-// Report usage data if config option is set to yes 
+// Report usage data if config option is set to yes
 if ( isset( $config->workflowReporting ) && ( $config->workflowReporting == 1 ) )
 	exec( "php '" . $endpoints[ 'com.packal' ] . "/report-usage-data.php'" );
 
@@ -42,7 +42,7 @@ foreach ( $manifest as $m ) :
   $wf[ "$m->bundle" ][ 'version' ] = $m->version;
 endforeach;
 
-$updates = FALSE;
+$updates = false;
 foreach ( $endpoints as $k => $v ) :
 if ( file_exists( "$v/packal/package.xml" ) ) {
   $w = simplexml_load_file( "$v/packal/package.xml" );
@@ -50,7 +50,7 @@ if ( file_exists( "$v/packal/package.xml" ) ) {
   if ( in_array( $k, $manifestBundles ) ) {
     if ( $wf[ "$k" ][ 'version' ] != (string) $w->version ) {
       if ( ! in_array( $k, $blacklist ) ) {
-        $updates = TRUE;
+        $updates = true;
         break;
       }
     }

@@ -12,15 +12,16 @@ if ( ! ini_get('date.timezone') ) {
 	$tz = exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' );
 	ini_set( 'date.timezone', $tz );
 }
-  
+
 // Make the time
 $time = time();
 
-// Get the user's home directory
-$home = exec('echo $HOME');
-
 // Create the file path name
-$file = "$home/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle/zombie";
+$file = "/tmp/{$bundle}/zombie";
+
+if ( ! file_exists( "/tmp/{$bundle}" ) {
+	mkdir( "/tmp/{$bundle}" );
+}
 
 // Place the file in the cache directory
 file_put_contents( $file, $time );

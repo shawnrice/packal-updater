@@ -2,7 +2,7 @@
 
 # Set the cache directory
 bundle='com.packal'
-file="$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle/zombie"
+file="/tmp/$bundle/zombie"
 # See if the time file exists; if so, check the time
 # Otherwise, kill the server (just in case)
 # And exit the script
@@ -16,9 +16,8 @@ echo "Waking up and starting the checks"
 while [ $alive -eq 1 ]
 do
 	echo "Doing a check..."
-	# file=$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow\ Data/$bundle/zombie
 	if [ -e "$file" ]
-	then 
+	then
 		# Find the UNIX Epoch time
 		now=`date +%s`
 		# Get the last update of the webserver in Unix Epoch time (read from file)

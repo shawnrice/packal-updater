@@ -1,7 +1,7 @@
 <?php
 
 require_once( '../functions.php' );
-require_once( __DIR__ . '/../init.php' );
+require_once( '../init.php' );
 firstRun();
 
 // Set date/time to avoid warnings/errors.
@@ -13,29 +13,31 @@ if ( ! ini_get('date.timezone') ) {
 $HOME = exec( 'echo $HOME' );
 $data = DATA_DIR;
 
-$workflowsDir = __DIR__ . '/../../';
+$workflowsDir = dirname( __DIR__ . '/../' ) . '/../';
 
 // Start script.
-if ( isset( $_GET[ 'action' ] ) )
+if ( isset( $_GET[ 'action' ] ) ) {
   $action = $_GET[ 'action' ];
-else if ( isset( $_POST[ 'page' ] ) )
+} else if ( isset( $_POST[ 'page' ] ) ) {
   $page   = $_POST[ 'page' ];
-else
+} else {
   $page   = 'status';
+}
 
-if ( ! file_exists( "$data/config/firstRun" ) )
+if ( ! file_exists( "$data/config/firstRun" ) ) {
   $page   = 'settings';
+}
 
 if ( ! file_exists( "$data/config/config.xml" ) ) {
   $d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
   $config = new SimpleXMLElement( $d );
   $config->packalAccount = 0;
-  $config->forcePackal = 0;
-  $config->backups = 3;
-  $config->username = '';
-  $config->authorName = '';
+  $config->forcePackal   = 0;
+  $config->backups       = 3;
+  $config->username      = '';
+  $config->authorName    = '';
   $config->notifications = '2';
-  $config->apiKey = '';
+  $config->apiKey        = '';
   $config->asXML( "$data/config/config.xml" );
   unset( $config );
 }
@@ -398,16 +400,19 @@ These are your workflows that are found on Packal. We won't try to update them.<
  */
 function settings() {
   global $config, $data, $workflowsDir;
+  require_once( '../init.php' );
   ?>
   <h1>Settings</h1>
   <?php
-    if ( ! file_exists( "$data/config/firstRun" ) ) {
+    if ( ! file_exists( DATA_DIR .'/config/firstRun' ) ) {
       ?>
       <div class='firstRun'>
         <p>Since this is your first time using the updater, please fill out a few of these settings.</p>
       </div>
       <?php
-      file_put_contents( "$data/config/firstRun", "done" );
+      echo "<p>". DATA_DIR .'/config/firstRun' . "</p>";
+      print_r( $_SERVER );
+      file_put_contents( DATA_DIR .'/config/firstRun', "done" );
     }
   ?>
   <p class='clearfix'>&nbsp;</p>
@@ -596,7 +601,7 @@ function status() {
   global $wf, $config, $workflows, $blacklist, $manifestBundles, $me, $data, $workflowsDir;
   $endpoints = json_decode( file_get_contents( "$data/endpoints/endpoints.json" ), TRUE );
 
-  $updates = FALSE;
+  $updates = false;
   foreach ( $endpoints as $k => $v ) :
     if ( file_exists( "$v/packal/package.xml" ) ) {
       $w = simplexml_load_file( "$v/packal/package.xml" );
@@ -604,7 +609,7 @@ function status() {
       if ( in_array( $k, $manifestBundles ) ) {
         if ( $wf[ "$k" ][ 'version' ] != (string) $w->version ) {
           if ( ! in_array( $k, $blacklist ) ) {
-            $updates = TRUE;
+            $updates = true;
             break;
           }
         }
@@ -661,13 +666,6 @@ function status() {
 
 <div class='status-body'>
     <?php
-      if ( $connection !== FALSE ) {
-        ?>
-        <div id="fusion_ad">
-          <a href="http://fusionads.net" class='hijack'>Powered by Fusion</a>
-        </div>
-<?php
-      }
   if ( $updates ) {
 ?>
 <div class='updates-available'>
@@ -681,7 +679,7 @@ function status() {
   <p id='manifest-status'>
     The manifest was last updated <strong><?php echo "$time" ; ?></strong>
     <?php
-      if ( $connection !== FALSE )
+      if ( $connection !== false )
         echo "<span class='update-manifest'>(Update)</span>";
     ?>
   </p>
@@ -775,31 +773,15 @@ if ( count( $meta[ 'myWorkflows'] ) > 0 ) {
 ?>
 </div>
 <?php
-  if ( $connection !== FALSE ) {
+  if ( $connection !== false ) {
     ?>
-  <script type="text/javascript">
-    (function(){
-      var fusion = document.createElement('script');
-      fusion.src = window.location.protocol + '//adn.fusionads.net/api/1.0/ad.js?zoneid=299&rand=' + Math.floor(Math.random()*9999999);
-      fusion.async = true;
-      (document.head || document.getElementsByTagName('head')[0]).appendChild(fusion);
-    })();
-    // function tag() {
-    //   //
-    //   console.log( 'hello' );
-    // }
-  </script>
   <script>
     myVar = setTimeout( function() {
-      $( '.fusionentire' ).find( 'a' ).each( function() {
-        $( this ).addClass( 'hijack' );
-      });
       $( '.hijack' ).click( function() {
         event.preventDefault();
         link = $( this ).attr( 'href' );
         $.get( "packal.php", { action: 'openDirectory', 'directory': link } );
       });
-        // console.log( document.getElementsByClassName( 'fusionentire' ).querySelectorAll( 'a' ) );
       }, 1500);
   </script>
   <script>
@@ -1185,7 +1167,7 @@ function writeConfig() {
 }
 
 function openDirectory() {
-  if ( strpos( $_GET[ 'directory' ] , 'http://') !== FALSE )
+  if ( strpos( $_GET[ 'directory' ] , 'http://') !== false )
     $dir = $_GET[ 'directory' ] ;
   else
     $dir = $_GET[ 'directory' ];
@@ -1194,7 +1176,7 @@ function openDirectory() {
 
 function updateManifest() {
   global $data;
-  if ( getManifest() == FALSE ) {
+  if ( getManifest() == false ) {
     $time = getManifestModTime();
     echo "The manifest was last updated <strong>$time</strong> However it couldn't be updated because of no viable Internet connection.";
     die();
