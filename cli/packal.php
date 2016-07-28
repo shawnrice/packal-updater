@@ -26,11 +26,11 @@ unset( $argv[1] );
 
 $argv = array_values( $argv );
 
-if ( function_exists( $function ) )
+if ( function_exists( $function ) ) {
   call_user_func( "$function", $argv );
-else
+} else {
   echo "Undefined method: $function";
-
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Option functions

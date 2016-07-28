@@ -15,8 +15,6 @@ if ( ! ini_get('date.timezone') ) {
   ini_set( 'date.timezone', $tz );
 }
 
-
-
 // Get the version of OSX; if we aren't using Mavericks, then they don't get access to the GUI.
 $osx = exec( "sw_vers | grep 'ProductVersion:' | grep -o '10\.[0-9]*'" );
 
@@ -257,11 +255,11 @@ if ( strpos( $q[1], 'setup' ) !== false ) {
     file_put_contents( "$data/config/first-run-alfred", 'done' );
 
   $options = array(
-    'authorName' => 'What name do you use when you write workflows?',
-    'packalAccount' => 'Do you have an account on Packal?',
-    'username' => 'What is your Packal username?',
+    'authorName'        => 'What name do you use when you write workflows?',
+    'packalAccount'     => 'Do you have an account on Packal?',
+    'username'          => 'What is your Packal username?',
     'workflowReporting' => 'Would you like to send anonymous data about your installed workflows to Packal.org?',
-    'backups' => 'How many backups of workflows would you like to keep?'
+    'backups'           => 'How many backups of workflows would you like to keep?'
   );
   foreach ( $options as $k => $v ) :
     if ( isset( $config->$k ) ) {
@@ -337,8 +335,5 @@ if ( strpos( $q[1], 'setup' ) !== false ) {
 // For all good measures....
 echo $w->toxml();
 die();
-
-
-
 
 ?>

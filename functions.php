@@ -79,7 +79,7 @@ function generateEndpoints( $force = false ) {
 		|| ( filemtime( "$data/endpoints/endpoints.json" ) < filemtime( dirname( __DIR__ ) ) ) || ( $force !== false ) ) {
 
 		// Okay, we need to update the files.
-		$dirs = array_diff( scandir( dirname( __DIR__ ) ), array( '.', '..', '.git', '.DS_Store' ) );
+		$dirs = array_diff( scandir( WORKFLOWS_DIR ), array( '.', '..', '.git', '.DS_Store' ) );
 
 		if ( file_exists( "$data/endpoints/endpoints.list" ) )
 			unlink( "$data/endpoints/endpoints.list" );

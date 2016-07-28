@@ -13,7 +13,8 @@ if ( ! ini_get('date.timezone') ) {
 $HOME = exec( 'echo $HOME' );
 $data = DATA_DIR;
 
-$workflowsDir = dirname( __DIR__ . '/../' ) . '/../';
+// $workflowsDir = dirname( __DIR__ . '/../' ) . '/../';
+$workflowsDir = WORKFLOWS_DIR;
 
 // Start script.
 if ( isset( $_GET[ 'action' ] ) ) {
