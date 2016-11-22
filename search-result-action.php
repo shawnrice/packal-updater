@@ -52,10 +52,10 @@ class Action {
 				break;
 
 			case 'install':
-				if ( 'workflow' == $args['type'] ) {
+				if ( 'workflow' === $args['type'] ) {
 					$result = $this->workflow->install( $args['resource'] );
 					return $this->check( $result, "Installed `{$args['resource']['name']}`." );
-				} elseif ( 'theme' == $args['type'] ) {
+				} elseif ( 'theme' === $args['type'] ) {
 					$result = $this->theme->install( Themes::find_slug( $args['resource']['url'] ) );
 					return $this->check( $result, "Installed `{$args['resource']['name']}`." );
 				}
@@ -86,9 +86,9 @@ class Action {
 				break;
 
 			case 'submit':
-				if ( 'workflow' == $args['type'] ) {
+				if ( 'workflow' === $args['type'] ) {
 					$result = $this->submit_workflow( $args['resource']['bundle'] );
-				} elseif ( 'theme' == $args['type'] ) {
+				} elseif ( 'theme' === $args['type'] ) {
 					$result = $this->submit_theme( $args['resource'] );
 				}
 				$this->clear_caches();
@@ -107,9 +107,7 @@ class Action {
 		return 'No action found.';
 	}
 
-
-
-	function check( $result, $message ) {
+	public function check( $result, $message ) {
 		if ( true === $result ) {
 			$this->success = true;
 			return $message;
@@ -136,19 +134,19 @@ class Action {
 		return $result;
 	}
 
-	function update_all_workflows( $updates, $verify_signature = true ) {
+	public function update_all_workflows( $updates, $verify_signature = true ) {
 		foreach ( $updates as $update ) :
 			$this->update_workflow( $update, $verify_signature );
 		endforeach;
 		return true;
 	}
 
-	function migrate_workflow( $workflow ) {
+	public function migrate_workflow( $workflow ) {
 		$new = Workflows::find_workflow_by_bundle_from_packal( $workflow['bundle'] );
 		return $this->update_workflow( [ 'old' => $workflow, 'new' => $new ], false );
 	}
 
-	function migrate_all_workflows( $workflows ) {
+	public function migrate_all_workflows( $workflows ) {
 		foreach ( $workflows as $workflow ) :
 			$this->migrate_workflow( $workflow );
 		endforeach;
@@ -162,7 +160,7 @@ class Action {
 	}
 
 	private function download( $url, $directory = false ) {
-		$directory = ( ! $directory ) ? "{$_SERVER['HOME']}/Downloads/" : $directory;
+		$directory = $directory ?: "{$_SERVER['HOME']}/Downloads/";
 		if ( false !== $result = FileSystem::download_file( $url, $directory ) ) {
 			return $result;
 		}
@@ -176,7 +174,7 @@ class Action {
 	}
 
 	private function configure( $key, $value = false ) {
-		if ( 'password' == $key ) {
+		if ( 'password' === $key ) {
 			$password = $this->alphred->get_password_dialog(
 				'Please enter your Packal.org password. If you do not have one, then please make an account on Packal.org and then set this.',
 				'Packal Workflow'
@@ -213,17 +211,17 @@ class Action {
 	private function report( $resource ) {
 		$values = [
 			'workflow_name' => $resource['name'],
-			'version' => $resource['version'],
-			'revision' => $resource['revision_id'],
-			'workflow' => $resource['id'],
+			'version'       => $resource['version'],
+			'revision'      => $resource['revision_id'],
+			'workflow'      => $resource['id'],
 		];
 		if ( ! $parsed = Pashua::go( 'pashau-report-config.ini', $values ) ) {
 			return false;
 		}
 		$params = [
 			'workflow_revision_id' => $parsed['revision'],
-			'report_type' => $parsed['type'],
-			'message' => $parsed['message'],
+			'report_type'          => $parsed['type'],
+			'message'              => $parsed['message'],
 		];
 		$output = submit_report( $params );
 		return $output;
@@ -232,12 +230,12 @@ class Action {
 	private function submit_theme( $theme ) {
 		$metadata = $this->submit_build_theme_info( $theme );
 		$uri = $theme['uri'];
-		// print_r( $metadata );
+
 		submit_theme([
-			'uri' => $theme['uri'],
+			'uri'         => $theme['uri'],
 			'description' => $metadata['theme_description'],
-			'tags' => $metadata['theme_tags'],
-			'name' => $theme['name'],
+			'tags'        => $metadata['theme_tags'],
+			'name'        => $theme['name'],
 		]);
 	}
 
@@ -248,10 +246,10 @@ class Action {
 		if ( ! $username = $this->alphred->config_read( 'username' ) ) {
 			$this->alphred->console( 'Could not read username in the config file.', 4 );
 			$dialog = new \Alphred\Dialog([
-				'title' => 'Packal Error: No Username Set',
-				'text' => 'Please set your username with the `config` option to submit a workflow',
+				'title'  => 'Packal Error: No Username Set',
+				'text'   => 'Please set your username with the `config` option to submit a workflow',
 				'button' => 'Okay',
-				'icon' => 'stop',
+				'icon'   => 'stop',
 			]);
 			$dialog->execute();
 			exit( 1 );
@@ -259,8 +257,8 @@ class Action {
 		if ( ! $password = $this->alphred->get_password( 'packal.org' ) ) {
 			$dialog = new \Alphred\Dialog([
 				'title' => 'Packal Error: No Password Set',
-				'text' => 'Please set your password with the `config` option to submit a workflow',
-				'icon' => 'stop',
+				'text'  => 'Please set your password with the `config` option to submit a workflow',
+				'icon'  => 'stop',
 			]);
 			$dialog->execute();
 			exit( 1 );
@@ -293,25 +291,28 @@ class Action {
 		$workflow = new BuildWorkflow( $workflow_path, $screenshots, $description_file );
 		// Let's actually do some submitting here
 		$json = json_encode( [
-			'file' => $workflow->archive_name(),
+			'file'     => $workflow->archive_name(),
 			'username' => $username,
 			'password' => $password,
-			'version' => $version,
+			'version'  => $version,
 		]);
 		$output = submit_workflow( [ 'file' => $workflow->archive_name(), 'version' => $version ] );
 		$this->alphred->console( print_r( $output, true ), 4 );
 	}
 
 	private function submit_build_theme_info( $theme ) {
-		$dir = "{$_SERVER['alfred_workflow_data']}/data/themes";
-		if ( ! file_exists( "{$_SERVER['alfred_workflow_data']}/data/themes" ) ) {
-			mkdir( "{$_SERVER['alfred_workflow_data']}/data/themes" );
+		$dir = __DATA__ . '/data/themes';
+		if ( ! file_exists( __DATA__ . '/data/themes' ) ) {
+			mkdir( __DATA__ . '/data/themes', 0775, true );
 		}
-		$file = "{$_SERVER['alfred_workflow_data']}/data/themes/submit-" . $this->slugify( $theme['name'] ) . '.json';
+		$file = __DATA__ . '/data/themes/submit-' . $this->slugify( $theme['name'] ) . '.json';
 		if ( file_exists( $file ) ) {
 			$data = json_decode( file_get_contents( $file ), true );
 		} else {
-			$data = [ 'theme_description' => '', 'theme_tags' => [] ];
+			$data = [
+				'theme_description' => '',
+				'theme_tags'        => [],
+			];
 		}
 		$data['theme_name'] = $theme['name'];
 		$metadata = $this->create_build_theme_info_dialog( $data );
@@ -322,7 +323,6 @@ class Action {
 		} else {
 			$this->alphred->console( 'User canceled saving theme information.', 1 );
 			// Since it was canceled, let's just exit.
-			// $alphred->notify('Should we put some notification here.')
 			exit( 1 );
 		}
 		return $metadata;
@@ -350,11 +350,11 @@ class Action {
 	private function slugify( $slug ) {
 		$slug = strtolower( $slug );
 		$slug = preg_replace( '/[^\w]{1,}/', '-', $slug );
-		$slug = preg_replace( '/[-]{2,}/', '-', $slug );
-		if ( '-' == substr( $slug, -1 ) ) {
+		$slug = preg_replace( '/[-]{2,}/',   '-', $slug );
+		if ( '-' === substr( $slug, -1 ) ) {
 			$slug = substr( $slug, 0, -1 );
 		}
-		if ( '-' == substr( $slug, 0, 1 ) ) {
+		if ( '-' === substr( $slug, 0, 1 ) ) {
 			$slug = substr( $slug, 1 );
 		}
 		return $slug;

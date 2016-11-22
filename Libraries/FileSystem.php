@@ -56,14 +56,14 @@ class FileSystem {
 		}
 
 		while ( false !== ( $file = readdir( $directory_handle ) ) ) :
-	    if ( $file == '.' || $file == '..' ) {
+			if ( $file == '.' || $file == '..' ) {
 				continue;
-	    }
-	    if ( is_dir( "{$directory}/{$file}" ) ) {
-	    	self::recurse_unlink( "{$directory}/{$file}" );
-	    } else {
-	    	unlink( "{$directory}/{$file}" );
-	    }
+			}
+			if ( is_dir( "{$directory}/{$file}" ) ) {
+				self::recurse_unlink( "{$directory}/{$file}" );
+			} else {
+				unlink( "{$directory}/{$file}" );
+			}
 
 	  endwhile;
 
@@ -130,7 +130,6 @@ class FileSystem {
 		return true;
 	}
 
-
 	public static function extract_to_temp( $file ) {
 		$directory = self::make_random_temp_dir();
 		if ( ! self::extract_archive( $file, $directory ) ) {
@@ -169,8 +168,6 @@ class FileSystem {
 		return $slug;
 	}
 
-
-
 	/**
 	 * Checks to the signature of a package
 	 * @param  string 	$appcast 	an xml file containing the signature (path)
@@ -200,8 +197,4 @@ class FileSystem {
 		return $result;
 	}
 
-
 }
-
-
-

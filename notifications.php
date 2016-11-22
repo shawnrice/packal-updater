@@ -20,14 +20,10 @@ if ( isset( $messages['subtitle'] ) ) {
 		$messages['action'] . ' Completed' : $messages['action'] . ' Failed';
 }
 
-if ( isset( $messages['text'] ) ) {
-	$text = $messages['text'];
-} else {
-	$text = implode( "\n", $messages['messages'] );
-}
+$text = isset( $messages['text'] ) ? $messages['text'] : implode( "\n", $messages['messages'] );
 
-$alphred->send_notification([
-	'title' 	 => 'Packal',
+$alphred->send_notification( [
+	'title'    => 'Packal',
 	'subtitle' => $subtitle,
-	'text' 		 => $text,
-]);
+	'text'     => $text,
+] );

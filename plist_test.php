@@ -15,7 +15,7 @@ class Plist {
 	var $pb = '/usr/libexec/PlistBuddy -c ';
 
 	function __construct() {
-		if ( ! self::pb_exists() ) {
+		if ( ! $this->pbExists() ) {
 			throw new Exception( 'Error: PlistBuddy not found.' );
 		}
 	}
@@ -96,23 +96,39 @@ class Plist {
 		// We need the key(order) so that we can set things properly
 		foreach ( $tmp['objects'] as $key => $o ) {
 			// Use only the things in the types above
-			if ( in_array( $o['type'] , $objects ) ) {
+			if ( in_array( $o['type'] , $objects, true ) ) {
 				// Check to see if the objects is one of the original objects with a uid.
-				if ( in_array( $o['uid'] , $uids ) ) {
-					echo $o['uid'] . '<br >';
+				if ( in_array( $o['uid'] , $uids, true ) ) {
+					echo $o['uid'] . '<br>';
 					echo $o['type'] . '<br> ';
 					if ( $o['type'] == 'alfred.workflow.trigger.hotkey' ) {
 						// We're not really going to bother to check to see if the values match;
 						// we'll just migrate them instead.
 						//setPlistValue( $location, $value, $plist)
-						$this->setPlistValue( ":objects:{$key}:config:hotmod", $original[ $o['uid'] ]['config']['hotmod'], $new );
-						$this->setPlistValue( ":objects:{$key}:config:hotkey", $original[ $o['uid'] ]['config']['hotkey'], $new );
-						$this->setPlistValue( ":objects:{$key}:config:hotstring", $original[ $o['uid'] ]['config']['hotstring'], $new );
+						$this->setPlistValue(
+							":objects:{$key}:config:hotmod",
+							$original[ $o['uid'] ]['config']['hotmod'],
+							$new
+						);
+						$this->setPlistValue(
+							":objects:{$key}:config:hotkey",
+							$original[ $o['uid'] ]['config']['hotkey'],
+							$new
+						);
+						$this->setPlistValue(
+							":objects:{$key}:config:hotstring",
+							$original[ $o['uid'] ]['config']['hotstring'],
+							$new
+						);
 					} else {
 						// At this point, the only other thing to migrate is the keyword
 						// Check to see if they match; if they don't, then set them to the new one
-						if ( $o['config']['keyword'] != $original[ $o['uid'] ]['config']['keyword'] ) {
-							$this->setPlistValue( ":objects:{$key}:config:keyword", $original[ $o['uid'] ]['config']['keyword'], $new );
+						if ( $o['config']['keyword'] !== $original[ $o['uid'] ]['config']['keyword'] ) {
+							$this->setPlistValue(
+								":objects:{$key}:config:keyword",
+								$original[ $o['uid'] ]['config']['keyword'],
+								$new
+							);
 						}
 					}
 				}
@@ -146,10 +162,10 @@ class Plist {
 		}
 
 		foreach ( $workflow['objects'] as $key => $object ) :
-			if ( $object['type'] == 'alfred.workflow.trigger.hotkey' ) {
+			if ( $object['type'] === 'alfred.workflow.trigger.hotkey' ) {
 				// We've found a hotkey, so let's strip it.
 				$location = ":objects:{$key}:config";
-				self::stripHotkey( $location, $plist );
+				$this->stripHotkey( $location, $plist );
 			}
 		endforeach;
 		return true;
@@ -163,29 +179,29 @@ class Plist {
 	 * @return bool
 	 */
 	private function stripHotkey( $location, $plist ) {
-		if ( 0 !== self::strip_hotmod( $location, $plist ) ) {
+		if ( 0 !== $this->stripHotmod( $location, $plist ) ) {
 			throw new Exception( 'Error when stripping hotkey modifier.' );
 		}
-		if ( 0 !== self::strip_hotstring( $location, $plist ) ) {
+		if ( 0 !== $this->stripHotstring( $location, $plist ) ) {
 			throw new Exception( 'Error when stripping hotkey string.' );
 		}
-		if ( 0 !== self::strip_hotkey( $location, $plist ) ) {
+		if ( 0 !== $this->stripHotkey( $location, $plist ) ) {
 			throw new Exception( 'Error when stripping hotkey.' );
 		}
 		return true;
 	}
 
-	private function strip_hotmod( $location, $plist ) {
+	private function stripHotmod( $location, $plist ) {
 		exec( $this->pb . "\"set {$location}:hotmod 0\" '{$plist}'", $output, $return );
 		return $return;
 	}
 
-	private function strip_hotstring( $location, $plist ) {
+	private function stripHotstring( $location, $plist ) {
 		exec( $this->pb . "\"set {$location}:hotstring \" '{$plist}'", $output, $return );
 		return $return;
 	}
 
-	private function strip_hotkey( $location, $plist ) {
+	private function stripHotkey( $location, $plist ) {
 		exec( $this->pb . "\"set {$location}:hotkey 0\" '{$plist}'", $output, $return );
 		return $return;
 	}
@@ -201,7 +217,7 @@ class Plist {
 		exec( $this->pb . "\"set {$location} {$value}\" '{$plist}'" );
 	}
 
-	private function pb_exists() {
+	private function pbExists() {
 		return file_exists( '/usr/libexec/PlistBuddy' );
 	}
 

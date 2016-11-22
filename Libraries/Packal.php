@@ -36,36 +36,35 @@ class Packal {
 	 * @return [type]             [description]
 	 */
 	public function post_download( $type, $properties ) {
-		// $id = ( 'theme' == $type ) ? $properties['theme'] : $properties['workflow'];
 		$json = [
-				'id' => self::uuid(),
-				'visit_id' => self::uuid(),
-				'user_id' => null,
-				'name' => "{$type}-{$properties['id']}",
-				'time' =>	date_format( date_create('now', new DateTimeZone( 'Etc/UTC' ) ), 'Y-m-d H:i:s' ),
-				'theme_id' => ($type == 'theme') ? $properties['id'] : null,
+				'id'                   => self::uuid(),
+				'visit_id'             => self::uuid(),
+				'user_id'              => null,
+				'name'                 => "{$type}-{$properties['id']}",
+				'time'                 => date_format( date_create( 'now', new DateTimeZone( 'Etc/UTC' ) ), 'Y-m-d H:i:s' ),
+				'theme_id'             => ($type == 'theme') ? $properties['id'] : null,
 				'workflow_revision_id' => ($type == 'workflow') ? (int) $properties['revision_id'] : null,
-				'workflow_id' => ($type == 'workflow') ? $properties['id'] : null,
+				'workflow_id'          => ($type == 'workflow') ? $properties['id'] : null,
 		];
-		if ( 'workflow' == $type ) {
+		if ( 'workflow' === $type ) {
 			$properties = [
-				'bundle' => $properties['bundle'],
+				'bundle'   => $properties['bundle'],
 				'revision' => $properties['revision_id'],
-				'workflow' => $properties['id']
+				'workflow' => $properties['id'],
 			];
-		} else if ( 'theme' == $type ) {
+		} elseif ( 'theme' === $type ) {
 			$properties = [
 				'theme' => $properties['id'],
-				'name' => $properties['name']
+				'name'  => $properties['name'],
 			];
 		}
 		$json['properties'] = $properties;
 
 		// I wanted to use $alphred->post, but it doesn't encode the query fields correctly.
-		$c = curl_init( BASE_URL . '/ahoy/events');
+		$c = curl_init( BASE_URL . '/ahoy/events' );
 		curl_setopt( $c, CURLOPT_POST, true );
 		curl_setopt( $c, CURLOPT_POSTFIELDS, json_encode( $json ) );
-		curl_setopt( $c, CURLOPT_HTTPHEADER, [ 'Content-Type: application/json' ]);
+		curl_setopt( $c, CURLOPT_HTTPHEADER, [ 'Content-Type: application/json' ] );
 		curl_setopt( $c, CURLOPT_RETURNTRANSFER, true );
 		curl_exec( $c );
 		curl_close( $c );
@@ -73,7 +72,7 @@ class Packal {
 
 	private static function uuid() {
 		$output = '';
-		foreach( [ 8, 4, 4, 4, 12 ] as $number ) :
+		foreach ( [ 8, 4, 4, 4, 12 ] as $number ) :
 			$output .= self::random( $number ) . '-';
 		endforeach;
 		return substr( $output, 0, strlen( $output ) - 1 );
@@ -100,7 +99,7 @@ class Packal {
 	 * @return string            the text of the output
 	 */
 	function search( $search, $key, $type, $identifer ) {
-		$items = call_user_func([ $this, "download_{$type}_data" ]);
+		$items = call_user_func( [ $this, "download_{$type}_data" ] );
 		$items = $this->alphred->filter(
 			$items[ "{$type}s" ],
 			$search,

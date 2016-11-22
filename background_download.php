@@ -20,7 +20,7 @@ if ( ! isset( $argv ) || 4 != count( $argv ) ) {
 
 $url         = $argv[1];
 $destination = $argv[2];
-$ttl = isset( $argv[3] ) ? $argv[3] : -1;
+$ttl         = isset( $argv[3] ) ? $argv[3] : -1;
 
 if ( ! file_exists( $destination ) ) {
 	print "Error: '{$destination}' does not exist.\n";
@@ -41,7 +41,7 @@ download_file( $url, $destination );
 // Functions
 
 function download_file( $url, $destination ) {
-	$dir = FileSystem::make_random_temp_dir();
+	$dir      = FileSystem::make_random_temp_dir();
 	$filename = get_icon_name( $url );
 	file_put_contents( "{$dir}/{$filename}" , file_get_contents( $url ) );
 	if ( file_exists( "{$destination}/{$filename}" ) ) {

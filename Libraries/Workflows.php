@@ -52,6 +52,7 @@ class Workflows {
 		self::create_unique_workflow_directory();
 	}
 
+	// this is a lame pseudo uuid
 	public static function generate_workflow_directory_name() {
 		$chars = str_split( '0123456789ABCDEF' );
 		$output = 'user.workflow.';
@@ -86,7 +87,7 @@ class Workflows {
 
 	public function find_workflow_by_bundle_from_packal( $bundle ) {
 		$workflows = $this->packal->download_workflow_data();
-		foreach( $workflows['workflows'] as $workflow ) :
+		foreach ( $workflows['workflows'] as $workflow ) :
 			if ( $bundle === $workflow['bundle'] ) {
 				return $workflow;
 			}

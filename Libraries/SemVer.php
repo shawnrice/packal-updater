@@ -143,7 +143,7 @@ class SemVer {
 		foreach ( [ 'major', 'minor', 'patch', 'extra', 'build' ] as $key => $val ) :
 			if ( isset( $matches[ $key ] ) ) {
 				$return[ $val ] = $matches[ $key ];
-			} else if ( $force ) {
+			} elseif ( $force ) {
 				$return[ $val ] = 0;
 			}
 			if ( in_array( $val, [ 'major', 'minor', 'patch' ] ) ) {
@@ -154,11 +154,11 @@ class SemVer {
 		endforeach;
 
 		// Strip out the "extra" and "build" if they are empty
-		if ( 0 === $return[ 'extra' ] || empty( $return[ 'extra' ] ) ) {
-			unset( $return[ 'extra' ] );
+		if ( 0 === $return['extra'] || empty( $return['extra'] ) ) {
+			unset( $return['extra'] );
 		}
-		if ( 0 === $return[ 'build' ] || empty( $return[ 'build' ] ) ) {
-			unset( $return[ 'build' ] );
+		if ( 0 === $return['build'] || empty( $return['build'] ) ) {
+			unset( $return['build'] );
 		}
 		return $return;
 	}

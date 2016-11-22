@@ -14,7 +14,6 @@
 
 require_once( __DIR__ . '/autoloader.php' );
 
-
 // Checks to make sure that Packal is reachable via grabbing a very low-payload URL off Packal
 function check_connection() {
 	global $alphred;
@@ -54,7 +53,9 @@ function main( $argv ) {
 	$parts = explode( $separator, $query );
 
 	// Trim the spaces
-	array_walk( $parts, create_function( '&$val', '$val = strtolower(trim($val));' ) );
+	$parts = array_map( 'trim', $parts );
+	$parts = array_map( 'strtolower', $parts );
+
 	$original_query = $query;
 	foreach ( $parts as $key => $part ) :
 		if ( empty( $part ) ) {
@@ -63,87 +64,112 @@ function main( $argv ) {
 	endforeach;
 	$parts = array_values( $parts );
 
-	if ( 0 === count( $parts ) ) {
-		return create_root_menu( $alphred->filter( $commands, $query ) );
-	}
+	switch ( count( $parts ) ) :
+		case 0:
+			return create_root_menu( $alphred->filter( $commands, $query ) );
 
-	if ( 1 === count( $parts ) ) {
-		if ( 'search' === $parts[0] ) {
-			return create_search_menu( false );
-		} elseif ( 'submit' === $parts[0] ) {
-			return create_submit_menu( false );
-		} elseif ( 'configure' === $parts[0] ) {
-			return create_configure_menu( false );
-		} elseif ( 'update' === $parts[0] ) {
-			return create_update_menu( false, false );
-		}
-		return;
-	}
+		case 1:
+			switch ( $parts[0] ) :
+				case 'search':
+					return create_search_menu( false );
+				case 'submit':
+					return create_submit_menu( false );
+				case 'configure':
+					return create_configure_menu( false );
+				case 'update':
+					return create_update_menu( false, false );
+				default:
+					return;
+			endswitch;
 
-	if ( 2 === count( $parts ) ) {
-		if ( 'search' === $parts[0] ) {
-			if ( 'theme' === $parts[1] ) {
-				$themes = $alphred->get( $endpoints['theme'], 3600, true );
-				render_themes( $themes, '' );
-			} elseif ( 'workflow' === $parts[1] ) {
-				$workflows = $alphred->get( $endpoints['workflow'], 3600, true );
-				render_workflows( $workflows, '' );
-			}
-		} elseif ( 'submit' === $parts[0] ) {
-			if ( 'theme' === $parts[1] ) {
-				submit_theme_menu( false );
-			} elseif ( 'workflow' === $parts[1] ) {
-				submit_workflow_menu( false );
-			}
-		} elseif ( 'configure' === $parts[0] ) {
-			if ( 'username' === $parts[1] ) {
-				config_set_username_menu( false );
-			} elseif ( 'authorname' === $parts[1] ) {
-				config_set_authorname_menu( false );
-			} elseif ( 'blacklist' === $parts[1] ) {
-				create_blacklist_menu( false );
-			}
-		} elseif ( 'update' === $parts[0] ) {
-			if ( 'migrate' === $parts[1] ) {
-				create_migrate_menu( false, true );
-			}
-		}
-		return;
-	}
-	if ( 3 === count( $parts ) ) {
-		if ( 'search' === $parts[0] ) {
-			if ( 'theme' === $parts[1] ) {
-				$themes = $alphred->get( $endpoints['theme'], 3600, true );
-				render_themes( $themes, $parts[2] );
-			} elseif ( 'workflow' === $parts[1] ) {
-				$alphred->console( 'Test' );
-				$workflows = $alphred->get( $endpoints['workflow'], 3600, true );
-				render_workflows( $workflows, $parts[2] );
-			}
-		} elseif ( 'submit' === $parts[0] ) {
-			if ( 'theme' === $parts[1] ) {
-				submit_theme_menu( $parts[2] );
-			} elseif ( 'workflow' === $parts[1] ) {
-				submit_workflow_menu( $parts[2] );
-			}
-		} elseif ( 'configure' === $parts[0] ) {
-			if ( 'username' === $parts[1] ) {
-				config_set_username_menu( $parts[2] );
-			} elseif ( 'authorname' === $parts[1] ) {
-				config_set_authorname_menu( $parts[2] );
-			} elseif ( 'blacklist' === $parts[1] ) {
-				create_blacklist_menu( $parts[2] );
-			}
-		}
-		return;
-	}
+		case 2:
+			switch ( $parts[0] ) :
+				case 'search':
+					switch ( $parts[1] ) :
+						case 'theme':
+							$themes = $alphred->get( $endpoints['theme'], 3600, true );
+							return render_themes( $themes, '' );
+						case 'workflow':
+							$workflows = $alphred->get( $endpoints['workflow'], 3600, true );
+							return render_workflows( $workflows, '' );
+						default:
+							return;
+					endswitch;
+				case 'submit':
+					switch ( $parts[1] ) :
+						case 'theme':
+							return submit_theme_menu( false );
+						case 'workflow':
+							return submit_workflow_menu( false );
+						default:
+							return;
+					endswitch;
+				case 'configure':
+					switch ( $parts[1] ) :
+						case 'username':
+							return config_set_username_menu( false );
+						case 'authorname':
+							return config_set_authorname_menu( false );
+						case 'blacklist':
+							return create_blacklist_menu( false );
+						default:
+							return;
+					endswitch;
+				case 'update':
+					if ( 'migrate' === $parts[1] ) {
+						return create_migrate_menu( false, true );
+					}
+					return;
+				default:
+					return;
+			endswitch;
+
+		case 3:
+			switch ( $parts[0] ) :
+				case 'search' :
+					switch ( $parts[1] ) :
+						case 'theme':
+							$themes = $alphred->get( $endpoints['theme'], 3600, true );
+							return render_themes( $themes, $parts[2] );
+						case 'workflow':
+							$alphred->console( 'Test' );
+							$workflows = $alphred->get( $endpoints['workflow'], 3600, true );
+							return render_workflows( $workflows, $parts[2] );
+						default :
+							return;
+					endswitch;
+				case 'submit' :
+					switch ( $parts[1] ) :
+						case 'theme':
+							return submit_theme_menu( $parts[2] );
+						case 'workflow':
+							return submit_workflow_menu( $parts[2] );
+						default:
+							return;
+					endswitch;
+				case 'configure' :
+					switch ( $parts[1] ) :
+						case 'username':
+							return config_set_username_menu( $parts[2] );
+						case 'authorname':
+							return config_set_authorname_menu( $parts[2] );
+						case 'blacklist':
+							return create_blacklist_menu( $parts[2] );
+						default:
+							return;
+					endswitch;
+			endswitch;
+
+		default :
+			return;
+	endswitch;
 }
 
 function check_for_updates( $api_endpoint ) {
 	global $alphred, $separator, $icon_suffix, $api_available;
 
 	// Retrieve the manifest of workflows, and cache it for a day.
-	// $workflows = $alphred->get( $api_endpoint, 86400, true );
+	// i.e.: $workflows = $alphred->get( $api_endpoint, 86400, true );
 	// So, next we load the workflow map, and do a quick comparison to see what has already been installed
 	// by Packal, and then we check to see what needs to be updated by comparing the manifest with
 	// the workflow.ini files.
@@ -174,19 +200,50 @@ function check_for_old_packal_workflows() {
 	return $workflows;
 }
 
+function check_old_connection() {
+	if ( file_exists( __CACHE__ . '/connection.txt' ) ) {
+		if ( 5 * 60 < time() - filemtime( __CACHE__ . '/connection.txt' ) ) {
+			return true;
+		}
+	}
+
+	$ch = curl_init( 'https://raw.githubusercontent.com/packal/repository/master/manifest.xml' );
+	curl_setopt( $ch , CURLOPT_FILETIME, true );
+	curl_setopt( $ch , CURLOPT_NOBODY, true );
+	curl_setopt( $ch , CURLOPT_RETURNTRANSFER, true );
+	curl_setopt( $ch , CURLOPT_HEADER, true );
+	$header = curl_exec( $ch );
+	$info   = curl_getinfo( $ch );
+	curl_close( $ch );
+	file_put_contents( __CACHE__ . '/connection.txt', 'conn' );
+	return 200 === $info['http_code'];
+}
+
+function old( $argv ) {
+	global $alphred, $separator, $icon_suffix, $original_query;
+	if ( check_old_connection() );
+}
+
 $alphred = new Alphred;
 
 if ( DEVELOPMENT_TESTING ) {
-	$alphred->add_result([
+	$alphred->add_result( [
 		'icon'     => '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/BurningIcon.icns',
 		'subtitle' => 'URL: ' . BASE_API_URL,
 		'title'    => 'Environment: ' . strtoupper( ENVIRONMENT ),
 		'valid'    => false,
-	]);
+	] );
 }
 
 $icon_suffix = ( 'light' === $alphred->theme_background() ) ? '-dark.png' : '-light.png';
 // $separator = '›';
 $separator = '»';
+
+if ( __LEGACY__ ) {
+	old( $argv );
+	$alphred->to_xml();
+	exit( 0 );
+}
+
 main( $argv );
 $alphred->to_xml();

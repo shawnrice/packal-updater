@@ -16,14 +16,14 @@ function generate_ini( $path ) {
 	} else {
 		$workflow = [];
 	}
-	if ( count( $workflow ) > 0 ) {
-		if ( count( $workflow['packal']['tags'] ) > 0 ) {
+	if ( 0 < count( $workflow ) ) {
+		if ( 0 < count( $workflow['packal']['tags'] ) ) {
 			$workflow['packal']['tags'] = explode( ',', $workflow['packal']['tags'] );
-			array_walk( $workflow['packal']['tags'], create_function( '&$val', '$val = trim($val);' ) );
+			$workflow['packal']['tags'] = array_map( 'trim', $workflow['packal']['tags'] );
 		}
-		if ( count( $workflow['packal']['categories'] ) > 0 ) {
+		if ( 0 < count( $workflow['packal']['categories'] ) ) {
 			$workflow['packal']['categories'] = explode( ',', $workflow['packal']['categories'] );
-			array_walk( $workflow['packal']['categories'], create_function( '&$val', '$val = trim($val);' ) );
+			$workflow['packal']['categories'] = array_map( 'trim', $workflow['packal']['categories'] );
 		}
 		ksort( $workflow['packal'] );
 	}
@@ -47,7 +47,7 @@ function generate_ini( $path ) {
  */
 function pashua_dialog( $directory, $workflow ) {
 	$alphred = new Alphred;
-	$plist = new CFPropertyList( "{$directory}/info.plist", CFPropertyList::FORMAT_XML);
+	$plist = new CFPropertyList( "{$directory}/info.plist", CFPropertyList::FORMAT_XML );
 	$plist = $plist->toArray();
 
 	foreach ( [ 'bundleid', 'name', 'description' ] as $key ) :
@@ -74,7 +74,7 @@ function pashua_dialog( $directory, $workflow ) {
 		}
 	}
 
-	foreach( [ 'tags', 'github', 'forum' ] as $var ) :
+	foreach ( [ 'tags', 'github', 'forum' ] as $var ) :
 		$$var = ( isset( $$var ) ) ? $$var : '';
 	endforeach;
 
@@ -96,7 +96,7 @@ function pashua_dialog( $directory, $workflow ) {
 		$temp_categories .= "cat_{$suffix}.label = {$categories[ $key ]}\r\n";
 
 		$temp_categories .= "cat_{$suffix}.default = ";
-		$temp_categories .= ( in_array( $categories[ $key ], $cats ) ) ? "1" : "0";
+		$temp_categories .= ( in_array( $categories[ $key ], $cats ) ) ? '1' : '0';
 		$temp_categories .= "\r\n";
 
 		$pashua_categories[ "cat_{$suffix}" ] = $categories[ $key ];
@@ -130,13 +130,15 @@ function pashua_dialog( $directory, $workflow ) {
 	  'mavericks' => '10.9',
 	  'mountain' => '10.8',
 	  'lion' => '10.7',
-	  'snow' => '10.6'
+	  'snow' => '10.6',
 	];
 	foreach ( $osx as $name => $version ) :
-		if ( 1 == $parsed[ $name ] ) $workflow['packal']['osx'][] = $version;
+		if ( 1 === $parsed[ $name ] ) {
+			$workflow['packal']['osx'][] = $version;
+		}
 	endforeach;
 
-	$workflow['packal']['osx'] = implode( ',', array_unique( $workflow['packal']['osx'] ) );
+	$workflow['packal']['osx']  = implode( ',', array_unique( $workflow['packal']['osx'] ) );
 	$workflow['packal']['tags'] = implode( ',', array_unique( explode( '[return]', $parsed['tags'] ) ) );
 
 	$categories = [];
@@ -202,20 +204,3 @@ function verify_forum( $url ) {
 	}
 	return $url;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

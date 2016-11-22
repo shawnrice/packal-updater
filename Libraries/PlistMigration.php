@@ -18,14 +18,13 @@ class Plist {
 		// I might consider adding error handling in this.
 
 		// Just the first part of the command that finds PlistBuddy
-		$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
+		$PlistBuddy = '/usr/libexec/PlistBuddy -c ';
 
 		if ( $hotstring ) {
 			// Reset the Hotstring (key)
 			$cmd = $PlistBuddy . "\"set {$location}:hotstring \" '{$plist}'";
 			exec( $cmd );
 		}
-
 
 		// Reset the hotkey
 		$cmd = $PlistBuddy . "\"set {$location}:hotkey 0\" '{$plist}'";
@@ -48,7 +47,7 @@ class Plist {
 		// I might consider adding error handling in this.
 
 		// Just the first part of the command that finds PlistBuddy
-		$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
+		$PlistBuddy = '/usr/libexec/PlistBuddy -c ';
 
 		// Set the value
 		$cmd = $PlistBuddy . "\"set {$location} {$value}\" '{$plist}'";
@@ -92,7 +91,7 @@ class Plist {
 	 * @return string      the name of the workflow
 	 */
 	public static function get_name( $dir ) {
-		$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
+		$PlistBuddy = '/usr/libexec/PlistBuddy -c ';
 		$cmd = $PlistBuddy . "'print :name' $dir/info.plist";
 		return exec( "$cmd" );
 	}
@@ -104,7 +103,7 @@ class Plist {
 	 * @return string      the bundleid of the workflow
 	 */
 	public static function get_bundle( $dir ) {
-		$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
+		$PlistBuddy = '/usr/libexec/PlistBuddy -c ';
 		$cmd = $PlistBuddy . "'print :bundleid' $dir/info.plist";
 		return exec( "$cmd" );
 	}
@@ -148,23 +147,21 @@ class Plist {
 
 				switch ( $o['type'] ) :
 					case 'alfred.workflow.trigger.hotkey' :
-						$value = array();
-	          if ( isset( $o['config']['hotkey'] ) )
-							$value['hotkey'] = $o['config']['hotkey'];
-	          if ( isset( $o['config']['hotmod'] ) )
-							$value['hotmod'] = $o['config']['hotmod'];
-	          if ( isset( $o['config']['hotstring'] ) )
-							$value['hotstring'] = $o['config']['hotstring'];
+						$value = [];
+
+						foreach( [ 'hotkey', 'hotmod', 'hotstring'] as $mod ) :
+							if ( isset( $o['config'][ $mod ] ) ) {
+								$value[ $mod ] = $o['config'][ $mod ];
+							}
+						endforeach;
 
 						$original[ $o['uid'] ]['config'] = $value;
 						break;
-			    case 'alfred.workflow.input.filefilter' :
-			    case 'alfred.workflow.input.scriptfilter' :
-			    case 'alfred.workflow.input.keyword' :
-			    	$value = array(
-			        	'keyword' => $o['config']['keyword']
-			    	);
-	    			$original[ $o['uid'] ]['config'] = $value;
+					case 'alfred.workflow.input.filefilter' :
+					case 'alfred.workflow.input.scriptfilter' :
+					case 'alfred.workflow.input.keyword' :
+						$value = [ 'keyword' => $o['config']['keyword'] ];
+						$original[ $o['uid'] ]['config'] = $value;
 			    break;
 				endswitch;
 
@@ -175,7 +172,7 @@ class Plist {
 
 		// The uids are stored as the keys of the $original array,
 		// so let's grab them to check if we need to migrate anything.
-		$uids = array_keys( $original);
+		$uids = array_keys( $original );
 
 		// These are the only types of objects that we need to migrate
 		$objects = [
@@ -186,29 +183,41 @@ class Plist {
 		];
 
 		// We need the key(order) so that we can set things properly
-		foreach ( $tmp['objects'] as $key => $o ) {
-			// Use only the things in the types above
-			if ( in_array( $o['type'] , $objects ) ) {
-				// Check to see if the objects is one of the original objects with a uid.
-				if ( in_array( $o['uid'] , $uids ) ) {
-					if ( $o['type'] == 'alfred.workflow.trigger.hotkey') {
-						// We're not really going to bother to check to see if the values match;
-						// we'll just migrate them instead.
-						//set_plist_value( $location, $value, $plist)
-						self::set_plist_value( ":objects:$key:config:hotmod", $original[ $o['uid'] ]['config']['hotmod'], $new);
-						self::set_plist_value( ":objects:$key:config:hotkey", $original[ $o['uid'] ]['config']['hotkey'], $new);
-						self::set_plist_value( ":objects:$key:config:hotstring", $original[ $o['uid'] ]['config']['hotstring'], $new);
-					} else {
-						// At this point, the only other thing to migrate is the keyword
-						// Check to see if they match; if they don't, then set them to the new one
-						if ( $o['config']['keyword'] != $original[ $o['uid'] ]['config']['keyword'] ) {
-							self::set_plist_value( ":objects:$key:config:keyword", $original[ $o['uid'] ]['config']['keyword'], $new);
-						}
+		foreach ( $tmp['objects'] as $key => $o ) :
+			// Use only the things in the types above and check if the objects is one of the original objects with a uid.
+			if ( in_array( $o['type'], $objects, true ) && in_array( $o['uid'], $uids, true ) ) {
+				if ( 'alfred.workflow.trigger.hotkey' === $o['type'] ) {
+					// We're not really going to bother to check to see if the values match;
+					// we'll just migrate them instead.
+					// Syntax: set_plist_value( $location, $value, $plist )
+					self::set_plist_value(
+						":objects:$key:config:hotmod",
+						$original[ $o['uid'] ]['config']['hotmod'],
+						$new
+					);
+					self::set_plist_value(
+						":objects:$key:config:hotkey",
+						$original[ $o['uid'] ]['config']['hotkey'],
+						$new
+					);
+					self::set_plist_value(
+						":objects:$key:config:hotstring",
+						$original[ $o['uid'] ]['config']['hotstring'],
+						$new
+					);
+				} else {
+					// At this point, the only other thing to migrate is the keyword
+					// Check to see if they match; if they don't, then set them to the new one
+					if ( $o['config']['keyword'] !== $original[ $o['uid'] ]['config']['keyword'] ) {
+						self::set_plist_value(
+							":objects:$key:config:keyword",
+							$original[ $o['uid'] ]['config']['keyword'],
+							$new
+						);
 					}
 				}
-
 			}
-		}
+		endforeach;
 		return true;
 	}
 		/**

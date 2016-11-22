@@ -1,38 +1,78 @@
 <?php
 
-$bundle = 'com.packal';
+$bundle = $_SERVER['alfred_workflow_bundleid'] ?: 'com.packal';
+$home   = $_SERVER['HOME'];
+
+function guess_alfred_version() {
+	if ( $_SERVER['alfred_version'] ) {
+		return floor( $_SERVER['alfred_version'] );
+	}
+	if ( file_exists( '/Applications/Alfred 3.app' ) ) {
+			return 3;
+	}
+	if ( file_exists( "{$_SERVER['HOME']}/Applications/Alfred 3.app" ) ) {
+			return 3;
+	}
+	if ( file_exists( '/Applications/Alfred 2.app' ) ) {
+		return 2;
+	}
+	if ( file_exists( "{$_SERVER['HOME']}/Applications/Alfred 2.app" ) ) {
+			return 2;
+	}
+	throw new Exception( 'Cannot guess what version of Alfred to use' );
+}
+
+function data() {
+	global $bundle;
+
+	if ( $_SERVER['alfred_workflow_data'] ) {
+		return $_SERVER['alfred_workflow_data'];
+	}
+
+	$v = guess_alfred_version();
+	return "{$HOME}/Library/Application Support/Alfred {$v}/Workflow Data/{$bundle}";
+}
+
+function cache() {
+	global $bundle;
+
+	if ( $_SERVER['alfred_workflow_cache'] ) {
+		return $_SERVER['alfred_workflow_cache'];
+	}
+
+	$v = guess_alfred_version();
+	return "{$HOME}/Library/Caches/com.runningwithcrayons.Alfred-{$v}/Workflow Data/{$bundle}"
+}
+
+$data  = data();
+$cache = cache();
 
 function getManifest() {
 	global $bundle;
 
-	if ( checkConnection() === false ) {
+	if ( false === checkConnection() ) {
 		return false;
 	}
 
-	$dir = exec( 'echo $HOME' ) .
-		"/Library/Application Support/Alfred 2/Workflow Data/$bundle" .
-		'/manifest.xml';
-
-	file_put_contents( "$dir",
-	file_get_contents( 'https://raw.github.com/packal/repository/master/manifest.xml' ) );
+	file_put_contents(
+		"{$data}/manifest.xml",
+		file_get_contents( 'https://raw.github.com/packal/repository/master/manifest.xml' )
+	);
 
 	return true;
 }
 
 function firstRun() {
-	global $bundle;
+	global $data, $cache;
 
-	$HOME        = exec( 'echo $HOME' );
-	$data        = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
-	$cache       = "$HOME/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/$bundle";
-	$config      = "$data/config";
-	$endpoints   = "$data/endpoints";
-	$backups     = "$data/backups";
-	$directories = array( $data, $cache, $config, $endpoints, $backups );
+	$config      = "{$data}/config";
+	$endpoints   = "{$data}/endpoints";
+	$backups     = "{$data}/backups";
+	$directories = [ $data, $cache, $config, $endpoints, $backups ];
 
 	foreach ( $directories as $d ) :
 		if ( ! file_exists( $d ) && is_dir( $d ) ) {
-			mkdir( $d );
+			mkdir( $d, 0775, true );
 		}
 	endforeach;
 	unset( $config );
@@ -41,26 +81,26 @@ function firstRun() {
 	if ( ! file_exists( "$data/config/config.xml" ) ) {
 		$d = '<?xml version="1.0" encoding="UTF-8"?><config></config>';
 		$config = new SimpleXMLElement( $d );
-		$config->packalAccount = 0;
-		$config->forcePackal = 0;
-		$config->backups = 3;
-		$config->username = '';
-		$config->authorName = '';
-		$config->notifications = '2';
+		$config->packalAccount     = 0;
+		$config->forcePackal       = 0;
+		$config->backups           = 3;
+		$config->username          = '';
+		$config->authorName        = '';
+		$config->notifications     = '2';
 		$config->workflowReporting = '1';
-		$config->apiKey = '';
-		$config->asXML( "$data/config/config.xml" );
+		$config->apiKey            = '';
+		$config->asXML( "{$data}/config/config.xml" );
 		unset( $config );
 	}
 
 	// Generate Empty Blacklist File
-	if ( ! file_exists( "$data/config/blacklist.json" ) ) {
-		file_put_contents( "$data/config/blacklist.json", utf8_encode( json_encode( array() ) ) );
+	if ( ! file_exists( "{$data}/config/blacklist.json" ) ) {
+		file_put_contents( "{$data}/config/blacklist.json", utf8_encode( json_encode( [] ) ) );
 	}
 
-	if ( ! file_exists( "$data/manifest.xml" ) ) {
+	if ( ! file_exists( "{$data}/manifest.xml" ) ) {
 		// Get the manifest with error handling.
-		if ( getManifest() == false ) {
+		if ( false === getManifest() ) {
 			// So, we're getting the manifest, but
 			// there was a problem, so we're going
 			// to communicate that.
@@ -73,7 +113,7 @@ function firstRun() {
 function generateEndpoints( $force = false ) {
 	global $bundle;
 
-	$HOME = exec( 'echo $HOME' );
+	$HOME = $_SERVER['HOME'];
 	$data = "$HOME/Library/Application Support/Alfred 2/Workflow Data/$bundle";
 
 	if ( ! file_exists( "$data/endpoints" ) && is_dir( "$data/endpoints" ) ) {

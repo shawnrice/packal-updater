@@ -6,7 +6,6 @@
  *
  */
 
-
 // This is needed because, Macs don't read EOLs well.
 if ( ! ini_get( 'auto_detect_line_endings' ) ) {
 	ini_set( 'auto_detect_line_endings', true );
@@ -15,6 +14,9 @@ if ( ! ini_get( 'auto_detect_line_endings' ) ) {
 if ( ! ini_get( 'date.timezone' ) ) {
 	ini_set( 'date.timezone', exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' ) );
 }
+
+require_once( __DIR__ . '/../config.php' );
+require_once( __DIR__ . '/../autoloader.php' );
 
 /**
  * ANSI Colors
@@ -35,9 +37,9 @@ if ( ! ini_get( 'date.timezone' ) ) {
  * What is the functionality that we need this thing to do?
  *
  * -- Search for a workflow by
- * 	-- name
- * 	-- bundle
- * 	-- short description
+ * -- name
+ * -- bundle
+ * -- short description
  * -- Search for themes by name
  * -- Install a workflow
  * -- Upgrade a Workflow
@@ -47,7 +49,7 @@ if ( ! ini_get( 'date.timezone' ) ) {
  */
 
 class CLI {
-	const VERSION  = '0.9.1';
+	const VERSION  = '0.9.2';
 	const CLI_NAME = 'packal-cli';
 
 	const GREEN    = "\033[32m";
@@ -447,7 +449,7 @@ class CLI {
 	 * @return boolean whether or not the cli is a phar
 	 */
 	private function is_phar() {
-		return ( 'Packal.phar' === @end( explode( '/', __DIR__ ) ) ) ? true : false;
+		return 'Packal.phar' === @end( explode( '/', __DIR__ ) );
 	}
 
 	/**
@@ -520,7 +522,7 @@ class CLI {
 	function aliases( $main, $aliases, &$options ) {
 		// Go through all the aliases and set the appropriate ones
 		foreach ( $aliases as $alias ) :
-			if ( in_array( $alias, array_keys( $options ) ) ) {
+			if ( in_array( $alias, array_keys( $options ), true ) ) {
 				$options[ $main ] = $options[ $alias ];
 				unset( $options[ $alias ] );
 			}
@@ -747,12 +749,12 @@ class CLI {
 	 * @return [type] [description]
 	 */
 	private function confirm( $prompt = false, $canceled = false ) {
-		$prompt   = ( $prompt ) ? $prompt : 'Continue (Y/n): ';
-		$canceled = ( ( $canceled ) ? $canceled : 'Canceled action.' ) . "\n";
+		$prompt   = $prompt ?: 'Continue (Y/n): ';
+		$canceled = ( $canceled ?: 'Canceled action.' ) . "\n";
 		$answer   = strtolower( self::get_input( $prompt ) );
 		if ( empty( $answer ) ) {
 			return true;
-		} elseif ( in_array( $answer, [ 'y', 'ye', 'yes' ] ) ) {
+		} elseif ( in_array( $answer, [ 'y', 'ye', 'yes' ], true ) ) {
 			return true;
 		}
 		print $canceled;
@@ -888,7 +890,7 @@ class CLI {
 		if ( ! array_key_exists( $color, $colors ) ) {
 			return $message;
 		}
-		return "{$colors[$color]}{$message}{$colors['normal']}";
+		return "{$colors[ $color ]}{$message}{$colors['normal']}";
 	}
 }
 

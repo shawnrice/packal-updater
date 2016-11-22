@@ -5,7 +5,6 @@
  *
  */
 
-
 require_once( __DIR__ . '/../autoloader.php' );
 
 use CFPropertyList\CFPropertyList as CFPropertyList;
@@ -19,14 +18,14 @@ class MapWorkflows {
 		if ( self::use_cache( $no_cache, $ttl ) ) {
 			return self::map_path();
 		}
-		$alphred = new Alphred;
-		$me = $alphred->config_read( 'authorname' );
-		$directory = self::find_workflows_directory();
-		$workflows = array_diff( scandir( $directory ), [ '.', '..' ] );
-		$files = [];
+		$alphred    = new Alphred;
+		$me         = $alphred->config_read( 'authorname' );
+		$directory  = self::find_workflows_directory();
+		$workflows  = array_diff( scandir( $directory ), [ '.', '..' ] );
+		$files      = [];
 		$old_packal = [];
-		$mine = [];
-		foreach( $workflows as $workflow ) :
+		$mine       = [];
+		foreach ( $workflows as $workflow ) :
 			if ( ! self::check_for_plist( "{$directory}/{$workflow}" ) ) {
 				continue;
 			}
@@ -65,15 +64,12 @@ class MapWorkflows {
 		return "{$_SERVER['alfred_workflow_data']}/data/workflows/old_packal.json";
 	}
 
-
 	public static function clear_cache() {
 		@unlink( self::migrate_path() );
 		@unlink( self::map_path() );
 		@unlink( self::my_workflows_path() );
 		return true;
 	}
-
-
 
 	private static function write_old_packal_migration( $old_packal ) {
 		// This is the old Packal workflow list.
@@ -83,7 +79,7 @@ class MapWorkflows {
 	}
 
 	private static function use_cache( $no_cache, $ttl ) {
-		if ( false == $no_cache ) {
+		if ( false === $no_cache ) {
 			return false;
 		}
 		// So, first we're going try to deal with some caching in order to
@@ -95,6 +91,7 @@ class MapWorkflows {
 			// it doesn't take long.
 			return false;
 		}
+
 		if ( self::check_for_expire_cache() ) {
 			return false;
 		}
@@ -108,8 +105,6 @@ class MapWorkflows {
 		}
 		return false;
 	}
-
-
 
 	private static function check_for_expire_cache() {
 		if ( file_exists( "{$_SERVER['alfred_workflow_data']}/expire_local_workflow_cache" ) ) {
@@ -125,7 +120,7 @@ class MapWorkflows {
 			return false;
 		}
 		// A value of -1 means an infinite cache
-		if ( -1 == $ttl ) {
+		if ( -1 === $ttl ) {
 			return true;
 		}
 		// Is there still time left in the time to live? Check the file modified time v current time
@@ -155,11 +150,11 @@ class MapWorkflows {
 
 	private static function find_workflows_directory() {
 		$preferences = "{$_SERVER['HOME']}/Library/Preferences/com.runningwithcrayons.Alfred-Preferences.plist";
-		$preferences = new CFPropertyList( $preferences, CFPropertyList::FORMAT_BINARY);
+		$preferences = new CFPropertyList( $preferences, CFPropertyList::FORMAT_BINARY );
 		$preferences = $preferences->toArray();
 
 		if ( isset( $preferences['syncfolder'] ) ) {
-			$workflows  = str_replace( '~', $_SERVER['HOME'], $preferences['syncfolder']);
+			$workflows  = str_replace( '~', $_SERVER['HOME'], $preferences['syncfolder'] );
 			$workflows .= '/Alfred.alfredpreferences/workflows';
 		} else {
 			$workflows = "{$_SERVER['HOME']}/Library/Application Support/Alfred 2/Alfred.alfredpreferences/workflows";
@@ -199,7 +194,7 @@ class MapWorkflows {
 			'name'   => $plist['name'],
 		];
 		if ( $version = self::read_workflow_ini( $directory ) ) {
-			$return[ 'version' ] = $version;
+			$return['version'] = $version;
 		}
 
 		$return['packal'] = self::check_for_packal( $directory );
@@ -218,9 +213,9 @@ class MapWorkflows {
 	 */
 	private static function check_for_mine( $plist, $me ) {
 		// This is a hack
-		$me = mb_ereg_replace( '[A-Za-z][^A-Za-z0-9\.\- ]', '', $me );
+		$me              = mb_ereg_replace( '[A-Za-z][^A-Za-z0-9\.\- ]', '', $me );
 		$plist['author'] = mb_ereg_replace( '[^A-Za-z0-9\.\- ]', '', $plist['author'] );
-		if ( $me == $plist['author'] ) {
+		if ( $me === $plist['author'] ) {
 			return true;
 		}
 		return false;

@@ -20,14 +20,14 @@ function submit_report( $params ) {
 function get_icon( $url, $ttl = -1 ) {
 	$cache_bin = CACHE . PRIMARY_CACHE_BIN . '-icons/';
 
-	if ( ! file_exists ( $cache_bin ) ) {
+	if ( ! file_exists( $cache_bin ) ) {
 		$dir_exists = mkdir( $cache_bin, 0775, true );
 	}
 
 	$parts = explode( '/', $url );
 	$filename = $cache_bin . $parts[ count( $parts ) - 2 ] . '.png';
 
-	if ( 'package.png' == end( explode( '/', $url ) ) ) {
+	if ( 'package.png' === end( explode( '/', $url ) ) ) {
 		return __DIR__ . '/../Resources/images/package.png';
 	}
 
@@ -35,7 +35,7 @@ function get_icon( $url, $ttl = -1 ) {
 		return $filename;
 	}
 	// Add something to the queue
-	file_put_contents(  CACHE . 'queue-' . ENVIRONMENT . '.txt', $url . "\n", FILE_APPEND | LOCK_EX );
+	file_put_contents( CACHE . 'queue-' . ENVIRONMENT . '.txt', $url . "\n", FILE_APPEND | LOCK_EX );
 	return __DIR__ . '/../Resources/images/package.png';
 }
 

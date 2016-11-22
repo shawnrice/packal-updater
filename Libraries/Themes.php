@@ -20,7 +20,7 @@ class Themes {
 		}
 		$theme = $this->find_theme_by_slug( $slug );
 		$this->packal->post_download( 'theme', $theme );
-		exec("open '{$uri}'");
+		exec( "open '{$uri}'" );
 		return [ true, $theme['name'] ];
 	}
 
@@ -41,7 +41,7 @@ class Themes {
 		if ( 1 === count( $themes ) ) {
 			return $themes[0];
 		}
-		foreach( $themes as $theme ) {
+		foreach ( $themes as $theme ) {
 			$tmp_slug = self::find_slug( $theme['url'] );
 			if ( $tmp_slug == $slug ) {
 				return $theme;
@@ -57,7 +57,7 @@ class Themes {
 	 * @return string      the slug
 	 */
 	public static function find_slug( $url ) {
-		return substr( $url, strrpos( $url, '/') + 1 );
+		return substr( $url, strrpos( $url, '/' ) + 1 );
 	}
 
 }

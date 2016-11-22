@@ -12,6 +12,8 @@
 /// Config
 ////////////////////////
 
+ini_set( 'phar.readonly', 'Off' );
+
 // Name of the final file
 $phar_name    = 'Packal.phar';
 // Directories to add wholesale
@@ -66,7 +68,7 @@ $phar[ $main_stub ] = file_get_contents( __DIR__ . "/{$main_stub}" );
 
 // Add an unpacked version of Alphred; we're doing this so we don't have the awkwardness of
 // using a phar within a phar. Too many levels and layers that way.
-$alphred_dir = "{$_SERVER['HOME']}/projects/Alfred/alphred/";
+$alphred_dir = "{$_SERVER['HOME']}/projects/Personal/Alfred/alphred/";
 
 $phar['Alphred/Main.php'] = file_get_contents( $alphred_dir . '/Main.php' );
 foreach ( [ 'classes', 'commands' ] as $directory ) :

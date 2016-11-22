@@ -170,19 +170,19 @@ class Submit {
 	private function curl_custom_postfields( $ch, array $assoc = array(), array $files = [] ) {
 
 	    // invalid characters for "name" and "filename"
-	    static $disallow = [ "\0", "\"", "\r", "\n" ];
+	    static $disallow = [ "\0", '"', "\r", "\n" ];
 
 	    // initialize body
 	    $body = [];
 
 	    // build normal parameters
 	    foreach ( $assoc as $k => $v ) {
-					$k      = str_replace( $disallow, "_", $k );
+					$k      = str_replace( $disallow, '_', $k );
 					$body[] = implode( "\r\n", [
-            "Content-Disposition: form-data; name=\"{$k}\"",
-            '',
-            filter_var( $v ),
-	        ]);
+						"Content-Disposition: form-data; name=\"{$k}\"",
+						'',
+						filter_var( $v ),
+					]);
 	    }
 
 	    // build file parameters
@@ -193,12 +193,12 @@ class Submit {
 	            case ! is_readable( $v ):
 	                continue; // or return false, throw new InvalidArgumentException
 	        }
-					$data = file_get_contents($v);
-					$v    = call_user_func( 'end', explode(DIRECTORY_SEPARATOR, $v));
+					$data = file_get_contents( $v );
+					$v    = call_user_func( 'end', explode( DIRECTORY_SEPARATOR, $v ) );
 
 	        // THIS IS A TERRIBLE HACK
 	        $k = 'workflow_revision[file]';
-	        list( $k, $v ) = str_replace( $disallow, "_", [ $k, $v ] );
+	        list( $k, $v ) = str_replace( $disallow, '_', [ $k, $v ] );
 	        $body[] = implode("\r\n", array(
 	            "Content-Disposition: form-data; name=\"{$k}\"; filename=\"{$v}\"",
 	            'Content-Type: application/octet-stream',
