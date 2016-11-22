@@ -1,7 +1,7 @@
 <?php
 
-require_once( '../functions.php' );
-require_once( '../init.php' );
+require_once( __DIR__ . '/../functions.php' );
+require_once( __DIR__ . '/../init.php' );
 firstRun();
 
 // Set date/time to avoid warnings/errors.
@@ -400,8 +400,8 @@ These are your workflows that are found on Packal. We won't try to update them.<
  * @return  [type]  [description]
  */
 function settings() {
-  global $config, $data, $workflowsDir;
-  require_once( '../init.php' );
+  global $config, $data, $workflowsDir, $home;
+
   ?>
   <h1>Settings</h1>
   <?php
@@ -411,8 +411,6 @@ function settings() {
         <p>Since this is your first time using the updater, please fill out a few of these settings.</p>
       </div>
       <?php
-      echo "<p>". DATA_DIR .'/config/firstRun' . "</p>";
-      print_r( $_SERVER );
       file_put_contents( DATA_DIR .'/config/firstRun', "done" );
     }
   ?>

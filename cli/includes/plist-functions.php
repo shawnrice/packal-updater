@@ -98,6 +98,3 @@ function getBundle( $dir ) {
 	$cmd = $PlistBuddy . "'print :bundleid' $dir/info.plist";
 	return exec( "$cmd" );
 }
-
-
-

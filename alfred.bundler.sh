@@ -64,7 +64,7 @@ function __installBundler {
 # Just a helper function to make a directory if it doesn't exist.
 function dir {
  if [ ! -d "$1" ]; then
-  mkdir "$1"
+  mkdir -p "$1"
  fi
 }
 

@@ -7,7 +7,7 @@ $cache_dir      = $_SERVER['alfred_workflow_cache'];
 
 if ( ! isset( $_SERVER['alfred_preferences'] ) ) {
 	$v = 3 === guess_alfred_version() ? '-3' : '';
-	$cmd = "defaults read ~/Library/Preferences/com.runningwithcrayons.Alfred-Preferences{$v}.plist|grep -hn syncfolder";
+	$cmd = "defaults read $HOME/Library/Preferences/com.runningwithcrayons.Alfred-Preferences{$v}.plist|grep -hn syncfolder";
 	exec( $cmd, $out );
 	$dir = preg_match( "/\"(.*)\";/", array_shift( $out ), $matches );
 	if ( isset( $matches[1] ) ) {
@@ -26,10 +26,12 @@ $workflows_dir = $workflows_dir .'/workflows';
 if ( ! empty( $data_dir ) ) {
 	// save this data elsewhere so that it can be used for the gui
 	$operation_data = [
-		'alfred_version' => $alfred_version,
-		'cache_dir'      => $cache_dir,
-		'data_dir'       => $data_dir,
-		'workflows_dir'  => $workflows_dir,
+		'alfred_version'     => $alfred_version,
+		'cache_dir'          => $cache_dir,
+		'data_dir'           => $data_dir,
+		'workflows_dir'      => $workflows_dir,
+		'alfred_preferences' => $_SERVER['alfred_preferences'],
+		'HOME'               => $_SERVER['HOME'],
 	];
 	if ( ! file_exists( '/tmp/com.packal' ) ) {
 		mkdir( '/tmp/com.packal' );

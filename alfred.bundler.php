@@ -78,10 +78,10 @@ function __installBundler() {
 
 	// Make the directories
 	if ( ! file_exists( $__cache ) ) {
-		mkdir( $__cache );
+		mkdir( $__cache, 0775, true );
 	}
 	if ( ! file_exists( "$__cache/installer" ) ) {
-		mkdir( "$__cache/installer" );
+		mkdir( "$__cache/installer", 0775, true );
 	}
 	// Download the installer
 	// I'm throwing in the second bash command to delay the execution of the next

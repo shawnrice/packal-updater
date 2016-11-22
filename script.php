@@ -9,7 +9,6 @@ require_once( __DIR__ . '/init.php' );
 require_once( 'libraries/workflows.php' );
 require_once( 'functions.php' );
 
-
 // Set date/time to avoid warnings/errors.
 if ( ! ini_get( 'date.timezone' ) ) {
 	$tz = exec( 'tz=`ls -l /etc/localtime` && echo ${tz#*/zoneinfo/}' );
@@ -186,10 +185,11 @@ if ( empty( $q[1] ) ) {
 		$w->result( 'updates', 'updates', 'Updates available', $message, '', 'no', 'update' );
 	}
 
-	if ( ( date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) < 86400 ) ) ) {
+	if ( ( time() - filemtime( "$data/manifest.xml" ) < 86400 ) ) {
 		$manifestTime = getManifestModTime();
 		$w->result( '', 'manifest-update', 'The manifest is up to date.', "Last updated $manifestTime", 'assets/icons/task-complete.png', 'yes', '' );
 	} else {
+		$manifestTime = getManifestModTime();
 		$w->result( '', 'manifest-update', 'The manifest is out of date.', "Last updated $manifestTime", 'assets/icons/task-attention.png', 'yes', '' );
 	}
 
@@ -346,5 +346,3 @@ if ( strpos( $q[1], 'setup' ) !== false ) {
 // For all good measures....
 echo $w->toxml();
 die();
-
-

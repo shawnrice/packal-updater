@@ -3,6 +3,7 @@
 require_once( __DIR__ . '/includes/plist-migration.php' );
 require_once( __DIR__ . '/../alfred.bundler.php' );
 require_once( __DIR__ . '/../init.php' );
+require_once( __DIR__ . '/../functions.php' );
 
 $cliDir = __DIR__;
 $bundle   = 'com.packal';
@@ -42,7 +43,6 @@ function getOption( $opt = array() ) {
 	if ( isset( $opt[1] ) && ( $opt[1] == true ) ) {
 		return $config->$opt[0];
 	}
-
 	echo $config->$opt[0];
 
 }
@@ -125,8 +125,6 @@ function checkUpdate( $wf ) {
  */
 function checkUpdates( $opt = array() ) {
 	global $manifest, $cache, $cliDir;
-
-	print_r( $opt );
 
 	if ( isset( $opt[0] ) ) {
 		if ( $opt[0] == 1 ) {

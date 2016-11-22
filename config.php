@@ -1,5 +1,17 @@
 <?php
 
+if ( 'cli-server' === php_sapi_name() ) {
+	$vars = json_decode( file_get_contents( '/tmp/com.packal/config.json' ), true );
+	foreach( $vars as $var => $val ) {
+		$$var = $val;
+	}
+	$_SERVER['alfred_workflow_data'] = $data_dir;
+	$_SERVER['alfred_workflow_cache'] = $cache_dir;
+	$_SERVER['HOME'] = $HOME;
+	$_SERVER['alfred_version'] = $alfred_version;
+	$_SERVER['alfred_preferences'] = $alfred_preferences;
+}
+
 // These are just here for now...
 $bundle = isset( $_SERVER['alfred_workflow_bundleid'] ) ? $_SERVER['alfred_workflow_bundleid'] : 'com.packal';
 $home   = $_SERVER['HOME'];

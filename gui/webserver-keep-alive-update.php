@@ -19,7 +19,7 @@ $time = time();
 // Create the file path name
 $file = "/tmp/{$bundle}/zombie";
 
-if ( ! file_exists( "/tmp/{$bundle}" ) {
+if ( ! file_exists( "/tmp/{$bundle}" ) ) {
 	mkdir( "/tmp/{$bundle}" );
 }
 

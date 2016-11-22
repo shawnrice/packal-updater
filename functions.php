@@ -163,56 +163,55 @@ function getManifestModTime() {
 	global $data;
 
 	// Set date/time things here.
-	$m     = date( 'U', mktime() ) - date( 'U', filemtime( "$data/manifest.xml" ) );
+	$m     = time() - filemtime( "$data/manifest.xml" );
 	$days  = floor( $m / 86400 );
 	$hours = floor( ( $m - ( $days * 86400 ) ) / 3600 );
 	$mins  = floor( ( $m - ( $hours * 3600 ) ) / 60 );
 	$secs  = floor( $m % 60 );
 
-	if ( $m > ( 60 * 60 * 24 ) ) {
-		if ( $m > ( 60 * 60 * 24 * 7) ) {
-			if ( $m > ( 60 * 60 * 24 * 7 * 30) ) {
-				if ( $m > ( 60 * 60 * 24 * 7 * 120) ) {
-					$time = 'a really long time ago.';
-				}
-				$time = 'over a month ago.';
-			}
-			$time = 'over a week ago.';
-		} else {
-			$time = 'over a day ago.';
-		}
-	} else {
-		$time = '';
-		if ( $hours > 0 ) {
-			$time .= $hours . ' hour';
-			if ( $hours > 1 ) {
-				$time .= 's, ';
-			} else { $time .= ', ';
-			}
-		}
-		if ( $mins > 0 ) {
-			$time .= $mins . ' minute';
-			if ( $mins > 1 ) {
-				$time .= 's';
-			} else { $time .= '';
-			}
-		}
-		if ( $hours > 0 && $mins > 0 ) {
-			$time .= ', and ';
-		} elseif ( $hours > 0 || $mins > 0 ) {
-			$time .= ' and ';
-		}
-		if ( $secs > 0 ) {
-			$time .= $secs . ' second';
-			if ( $time > 1 ) {
-				$time .= 's';
-			}
-		}
-		$time .= ' ago.';
+	if ( $m > 60 * 60 * 24 * 7 * 120 ) {
+		return 'a really long time ago.';
+	}
+	if ( $m > 60 * 60 * 24 * 7 * 30 ) {
+		return 'over a month ago.';
+	}
+	if ( $m > 60 * 60 * 24 * 7 * 30 ) {
+		return 'over a week ago.';
+	}
+	if ( $m > 60 * 60 * 24 ) {
+		return 'over a day ago.';
 	}
 	if ( $m === 0 ) {
 		$time = 'just now.';
 	}
+	$time = '';
+	if ( $hours > 0 ) {
+		$time .= $hours . ' hour';
+		if ( $hours > 1 ) {
+			$time .= 's, ';
+		} else { $time .= ', ';
+		}
+	}
+	if ( $mins > 0 ) {
+		$time .= $mins . ' minute';
+		if ( $mins > 1 ) {
+			$time .= 's';
+		} else { $time .= '';
+		}
+	}
+	if ( $hours > 0 && $mins > 0 ) {
+		$time .= ', and ';
+	} elseif ( $hours > 0 || $mins > 0 ) {
+		$time .= ' and ';
+	}
+	if ( $secs > 0 ) {
+		$time .= $secs . ' second';
+		if ( $time > 1 ) {
+			$time .= 's';
+		}
+	}
+	$time .= ' ago.';
+
 	return $time;
 }
 

@@ -35,11 +35,11 @@ if ( $q == 'open-gui' ) {
 	if ( ( strpos( $osx, '10.9' ) !== false ) || ( strpos( $osx, '10.10' ) !== false ) || ( strpos( $osx, '10.11' ) !== false ) ) {
 		// since the gui doesn't run inside the alfred process, it doesn't get the correct variables, so we'll save these to a tmp
 		// file and then reconstitute the data on the other side.
-		$operation_data = [ 'data_dir' => DATA_DIR, 'cache_dir' => CACHE_DIR, 'alfred_version' => ALFRED_VERSION ];
-		if ( ! file_exists( '/tmp/com.packal' ) ) {
-			mkdir( '/tmp/com.packal' );
-		}
-		file_put_contents( '/tmp/com.packal/config.json', json_encode( $operation_data ) );
+		// $operation_data = [ 'data_dir' => DATA_DIR, 'cache_dir' => CACHE_DIR, 'alfred_version' => ALFRED_VERSION ];
+		// if ( ! file_exists( '/tmp/com.packal' ) ) {
+		// 	mkdir( '/tmp/com.packal' );
+		// }
+		// file_put_contents( '/tmp/com.packal/config.json', json_encode( $operation_data ) );
 
 		// Since we're using Mavericks or greater, we can just use the native php 5.4 binary.
 		exec( 'nohup php -S localhost:7893 -t gui/ > /dev/null 2>&1 &' );
