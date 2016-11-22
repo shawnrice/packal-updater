@@ -37,7 +37,7 @@ if ( ! empty( $data_dir ) ) {
 		mkdir( '/tmp/com.packal' );
 	}
 	file_put_contents( '/tmp/com.packal/config.json', json_encode( $operation_data ) );
-	define( 'ALFRED_VERSION', $alfred_version );
+	define( 'ALFRED_VERSION', 'Alfred ' . guess_alfred_version() );
 	define( 'CACHE_DIR', __CACHE__ );
 	define( 'DATA_DIR', __DATA__ );
 	define( 'WORKFLOWS_DIR', $workflows_dir );
