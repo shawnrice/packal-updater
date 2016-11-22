@@ -14,9 +14,9 @@ $bundler_version       = 'aries';
 $bundler_minor_version = '1';
 
 // Let's just make sure that the utility exists before we try to use it.
-$__data = exec('echo $HOME') . "/Library/Application Support/Alfred 2/Workflow Data/alfred.bundler-$bundler_version";
+$__data = exec( 'echo $HOME' ) . "/Library/Application Support/Alfred 2/Workflow Data/alfred.bundler-$bundler_version";
 if ( ! file_exists( "$__data" ) ) {
-  __installBundler();
+	__installBundler();
 }
 
 // This file will be there because it either was or we just installed it.
@@ -37,31 +37,31 @@ exec( $cmd );
  *  If you are passing your own json, then include it as a file path.
  *
  **/
-function __load( $name , $version = 'default' , $type = 'php' , $json = '' ) {
-  if ( file_exists( 'info.plist' ) ) {
-    // Grab the bundle ID from the plist file.
-    $bundle = exec( "/usr/libexec/PlistBuddy -c 'print :bundleid' 'info.plist'" );
-  } else if ( file_exists( '../info.plist' ) ) {
-    $bundle = exec( "/usr/libexec/PlistBuddy -c 'print :bundleid' '../info.plist'" );
-  } else {
-    $bundle = '';
-  }
+function __load( $name, $version = 'default', $type = 'php', $json = '' ) {
+	if ( file_exists( 'info.plist' ) ) {
+		// Grab the bundle ID from the plist file.
+		$bundle = exec( "/usr/libexec/PlistBuddy -c 'print :bundleid' 'info.plist'" );
+	} elseif ( file_exists( '../info.plist' ) ) {
+		$bundle = exec( "/usr/libexec/PlistBuddy -c 'print :bundleid' '../info.plist'" );
+	} else {
+		$bundle = '';
+	}
 
-  if ( $type == 'php' ) {
-    $assets = __loadAsset( $name , $version , $bundle , strtolower($type) , $json );
-    foreach ($assets as $asset ) {
-      require_once( $asset );
-    }
-    return true;
-  } else if ( $type == 'utility' ) {
-    $asset = __loadAsset( $name , $version , $bundle , strtolower($type) , $json );
-    return str_replace(' ' , '\ ' , $asset[0]);
-  } else {
-    return __loadAsset( $name , $version , $bundle , strtolower($type) , $json );
-  }
+	if ( $type == 'php' ) {
+		$assets = __loadAsset( $name , $version , $bundle , strtolower( $type ) , $json );
+		foreach ( $assets as $asset ) {
+			require_once( $asset );
+		}
+		return true;
+	} elseif ( $type == 'utility' ) {
+		$asset = __loadAsset( $name , $version , $bundle , strtolower( $type ) , $json );
+		return str_replace( ' ' , '\ ' , $asset[0] );
+	} else {
+		return __loadAsset( $name , $version , $bundle , strtolower( $type ) , $json );
+	}
 
-  // We shouldn't get here.
-  return false;
+	// We shouldn't get here.
+	return false;
 
 } // End __load()
 
@@ -69,25 +69,25 @@ function __load( $name , $version = 'default' , $type = 'php' , $json = '' ) {
  * Installs the Alfred Bundler utility.
  **/
 function __installBundler() {
-  // Install the Alfred Bundler
+	// Install the Alfred Bundler
 
-  global $bundler_version, $__data;
-echo "here";
-  $installer = "https://raw.githubusercontent.com/shawnrice/alfred-bundler/$bundler_version/meta/installer.sh";
-  $__cache   = exec('echo $HOME') . "/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/alfred.bundler-$bundler_version";
+	global $bundler_version, $__data;
+	echo 'here';
+	$installer = "https://raw.githubusercontent.com/shawnrice/alfred-bundler/$bundler_version/meta/installer.sh";
+	$__cache   = exec( 'echo $HOME' ) . "/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/alfred.bundler-$bundler_version";
 
-  // Make the directories
-  if ( ! file_exists( $__cache ) ) {
-    mkdir( $__cache );
-  }
-  if ( ! file_exists( "$__cache/installer" ) ) {
-    mkdir( "$__cache/installer" );
-  }
-  // Download the installer
-  // I'm throwing in the second bash command to delay the execution of the next
-  // exec() command. I'm not sure if that's necessary.
-  exec( "curl -sL '$installer' > '$__cache/installer/installer.sh'" );
-  // Run the installer
-  exec( "sh '$__cache/installer/installer.sh'" );
+	// Make the directories
+	if ( ! file_exists( $__cache ) ) {
+		mkdir( $__cache );
+	}
+	if ( ! file_exists( "$__cache/installer" ) ) {
+		mkdir( "$__cache/installer" );
+	}
+	// Download the installer
+	// I'm throwing in the second bash command to delay the execution of the next
+	// exec() command. I'm not sure if that's necessary.
+	exec( "curl -sL '$installer' > '$__cache/installer/installer.sh'" );
+	// Run the installer
+	exec( "sh '$__cache/installer/installer.sh'" );
 
 } // End __installBundler()
