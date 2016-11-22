@@ -11,7 +11,7 @@ function stripHotkey( $location, $plist ) {
 	// I might consider adding error handling in this.
 
 	// Just the first part of the command that finds PlistBuddy
-	$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
+	$PlistBuddy = '/usr/libexec/PlistBuddy -c ';
 
 	// Reset the Hotstring (key)
 	$cmd = $PlistBuddy . "\"set $location:hotstring \" '$plist'";
@@ -38,7 +38,7 @@ function setPlistValue( $location, $value, $plist ) {
 	// I might consider adding error handling in this.
 
 	// Just the first part of the command that finds PlistBuddy
-	$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
+	$PlistBuddy = '/usr/libexec/PlistBuddy -c ';
 
 	// Set the value
 	$cmd = $PlistBuddy . "\"set $location $value\" '$plist'";
@@ -82,7 +82,7 @@ function importSanitize( $plist ) {
  * @return string      the name of the workflow
  */
 function getName( $dir ) {
-	$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
+	$PlistBuddy = '/usr/libexec/PlistBuddy -c ';
 	$cmd = $PlistBuddy . "'print :name' $dir/info.plist";
 	return exec( "$cmd" );
 }
@@ -94,10 +94,10 @@ function getName( $dir ) {
  * @return string      the bundleid of the workflow
  */
 function getBundle( $dir ) {
-	$PlistBuddy = "/usr/libexec/PlistBuddy -c ";
+	$PlistBuddy = '/usr/libexec/PlistBuddy -c ';
 	$cmd = $PlistBuddy . "'print :bundleid' $dir/info.plist";
 	return exec( "$cmd" );
 }
 
 
-?>
+

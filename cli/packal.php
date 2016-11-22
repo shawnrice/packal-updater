@@ -13,12 +13,11 @@ $cache    = CACHE_DIR;
 $manifest = "$data/manifest.xml";
 $config   = "$data/config/config.xml";
 
-$repo = "https://github.com/packal/repository/raw/master";
+$repo = 'https://github.com/packal/repository/raw/master';
 
 if ( ! isset( $argv[1] ) ) {
-  echo "ERROR: You need to specify an action.
-";
-  die();
+	echo 'ERROR: You need to specify an action.';
+	die();
 }
 $function = $argv[1];
 unset( $argv[0] );
@@ -27,89 +26,95 @@ unset( $argv[1] );
 $argv = array_values( $argv );
 
 if ( function_exists( $function ) ) {
-  call_user_func( "$function", $argv );
+	call_user_func( "$function", $argv );
 } else {
-  echo "Undefined method: $function";
+	echo "Undefined method: $function";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Option functions
 
 function getOption( $opt = array() ) {
-  global $data, $config;
+	global $data, $config;
 
-  $config = simplexml_load_file( $config );
+	$config = simplexml_load_file( $config );
 
-  if ( isset( $opt[1] ) && ( $opt[1] == TRUE ) )
-    return $config->$opt[0];
+	if ( isset( $opt[1] ) && ( $opt[1] == true ) ) {
+		return $config->$opt[0];
+	}
 
-  echo $config->$opt[0];
+	echo $config->$opt[0];
 
 }
 
 function setOption( $opt = array() ) {
-  global $config;
+	global $config;
 
-  $value = $opt[1];
-  if ( $value == 'null' )
-    $value = '';
+	$value = $opt[1];
+	if ( $value == 'null' ) {
+		$value = '';
+	}
 
-  $options = array( 'backups',
-                    'auto_add',
-                    'workflowReporting',
-                    'notify',
-                    'username',
-                    'authorName',
-                    'api_key' );
+	$options = array(
+	'backups',
+					'auto_add',
+					'workflowReporting',
+					'notify',
+					'username',
+					'authorName',
+					'api_key',
+	);
 
-  $bool   = array(  'auto_add',
-                    'report',
-                    'notify',
-                    'packalAccount' );
+	$bool   = array(
+	'auto_add',
+					'report',
+					'notify',
+					'packalAccount',
+	);
 
-  if ( ( ! in_array( $opt[0], $options ) ) && ( ! in_array( $opt[0], $bool ) ) ) {
-    echo "Error: invalid option.";
-    return false;
-  } else if ( in_array( $opt[0], $bool ) && ( ! ( $value == 0 || $value == 1 ) ) ) {
-    echo "Error: $opt[0] value must be 0 or 1.";
-    return false;
-  } else if ( ( $opt[0] == "backup" ) && ( ! is_numeric( $value ) ) ) {
-    echo "Error: $opt[0] value must be numeric.";
-  }
+	if ( ( ! in_array( $opt[0], $options ) ) && ( ! in_array( $opt[0], $bool ) ) ) {
+		echo 'Error: invalid option.';
+		return false;
+	} elseif ( in_array( $opt[0], $bool ) && ( ! ( $value == 0 || $value == 1 ) ) ) {
+		echo "Error: $opt[0] value must be 0 or 1.";
+		return false;
+	} elseif ( ( $opt[0] == 'backup' ) && ( ! is_numeric( $value ) ) ) {
+		echo "Error: $opt[0] value must be numeric.";
+	}
 
-  // Load the config
-  $xml = simplexml_load_file( $config );
+	// Load the config
+	$xml = simplexml_load_file( $config );
 
-  $xml->$opt[0] = $value;
+	$xml->$opt[0] = $value;
 
-  // Save the config again.
-  $xml->asXml( $config );
+	// Save the config again.
+	$xml->asXml( $config );
 }
 
 function validateAPI( $key ) {
-  // To be written, but not needed for this version.
+	// To be written, but not needed for this version.
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Check single update
 
 function checkUpdate( $wf ) {
-  global $manifest, $cliDir;
+	global $manifest, $cliDir;
 
-  $wf = $wf[0];
-  $dir = trim( `"$cliDir/packal.sh" getDir "$wf" 2> /dev/null` );
-  $xml = simplexml_load_file( "$dir/packal/package.xml" );
-  $last = $xml->updated;
+	$wf = $wf[0];
+	$dir = trim( `"$cliDir/packal.sh" getDir "$wf" 2> /dev/null` );
+	$xml = simplexml_load_file( "$dir/packal/package.xml" );
+	$last = $xml->updated;
 
-  $xml = simplexml_load_file( "$manifest" );
+	$xml = simplexml_load_file( "$manifest" );
 
-  foreach ( $xml as $w ) :
-    if ( $w->bundle == $wf ) {
-      if ( "$w->updated" > "$last" ) {
-        echo "Needs update.";
-      }
-    }
-  endforeach;
+	foreach ( $xml as $w ) :
+		if ( $w->bundle == $wf ) {
+			if ( "$w->updated" > "$last" ) {
+				echo 'Needs update.';
+			}
+		}
+	endforeach;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,109 +124,111 @@ function checkUpdate( $wf ) {
  * Checks updates for all workflows (that are on Packal)
  */
 function checkUpdates( $opt = array() ) {
-  global $manifest, $cache, $cliDir;
+	global $manifest, $cache, $cliDir;
 
-  print_r( $opt );
+	print_r( $opt );
 
-  if ( isset( $opt[0] ) ) {
-    if ( $opt[0] == 1 )
-      $yes = true;
-    else
-      $yes = false;
-  } else {
-    $yes = false;
-  }
-  if ( isset( $opt[1] ) ) {
-    if ( $opt[1] == 1 )
-      $force = true;
-    else
-      $force = false;
-  } else {
-    $force = false;
-  }
+	if ( isset( $opt[0] ) ) {
+		if ( $opt[0] == 1 ) {
+			$yes = true;
+		} else { $yes = false;
+		}
+	} else {
+		$yes = false;
+	}
+	if ( isset( $opt[1] ) ) {
+		if ( $opt[1] == 1 ) {
+			$force = true;
+		} else { $force = false;
+		}
+	} else {
+		$force = false;
+	}
 
-  $xml = simplexml_load_file( "$manifest" );
-  $me  = getOption( array( 'username', TRUE ) );
+	$xml = simplexml_load_file( "$manifest" );
+	$me  = getOption( array( 'username', true ) );
 
-  if ( file_exists( "$cache/updates" ) )
-    unlink( "$cache/updates" );
+	if ( file_exists( "$cache/updates" ) ) {
+		unlink( "$cache/updates" );
+	}
 
-  $i = 1;
-  foreach( $xml as $w ) :
-    $dir = trim( `"$cliDir/packal.sh" getDir "$w->bundle" 2> /dev/null` );
+	$i = 1;
+	foreach ( $xml as $w ) :
+		$dir = trim( `"$cliDir/packal.sh" getDir "$w->bundle" 2> /dev/null` );
 
-    if ( $dir == "FALSE" )
-      continue;
+		if ( $dir == 'FALSE' ) {
+			continue;
+		}
 
-    if ( "$w->author" == "$me" ) {
-      echo "* Skipping $i... $w->name ($w->bundle)\n";
-      $i++;
-      continue;
-    }
+		if ( "$w->author" == "$me" ) {
+			echo "* Skipping $i... $w->name ($w->bundle)\n";
+			$i++;
+			continue;
+		}
 
-    if ( file_exists( "$dir/packal/package.xml" ) ) {
-      echo "Checking $i... $w->name ($w->bundle)";
+		if ( file_exists( "$dir/packal/package.xml" ) ) {
+			echo "Checking $i... $w->name ($w->bundle)";
 
-      $wf = simplexml_load_file( "$dir/packal/package.xml" );
-      $wf->updated += 120; // Compensation for time in the generated packages.
+			$wf = simplexml_load_file( "$dir/packal/package.xml" );
+			$wf->updated += 120; // Compensation for time in the generated packages.
 
-      if ( "$w->updated" > "$wf->updated" ) {
-        echo " — Update Available";
-        file_put_contents( "$cache/updates", $w->bundle . "\n", FILE_APPEND );
-        $updatable[] = array( (string) $w->name, (string) $wf->version, (string) $w->version, (string) $w->bundle );
-      }
-      echo "\n";
-      $i++;
-    } else {
-      if ( $force == false )
-        continue;
+			if ( "$w->updated" > "$wf->updated" ) {
+				echo ' — Update Available';
+				file_put_contents( "$cache/updates", $w->bundle . "\n", FILE_APPEND );
+				$updatable[] = array( (string) $w->name, (string) $wf->version, (string) $w->version, (string) $w->bundle );
+			}
+			echo "\n";
+			$i++;
+		} else {
+			if ( $force == false ) {
+				continue;
+			}
 
-      echo "Checking $i... Forcing Update for $w->name ($w->bundle)";
+			echo "Checking $i... Forcing Update for $w->name ($w->bundle)";
 
-      file_put_contents( "$cache/updates", $w->bundle . "\n", FILE_APPEND );
-      $updatable[] = array( (string) $w->name, "Forced Update", (string) $w->version, (string) $w->bundle );
-      echo "\n";
-      $i++;
+			file_put_contents( "$cache/updates", $w->bundle . "\n", FILE_APPEND );
+			$updatable[] = array( (string) $w->name, 'Forced Update', (string) $w->version, (string) $w->bundle );
+			echo "\n";
+			$i++;
 
-    }
+		}
 
-  endforeach;
+	endforeach;
 
-  if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) ) {
-    echo "Everything is up to date.\n";
-    return false;
-  }
+	if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) ) {
+		echo "Everything is up to date.\n";
+		return false;
+	}
 
-  echo "Updates available for: ";
-  $count = count( $updatable ) - 1;
-  foreach ( $updatable as $u ) :
-    echo "$u[0] ($u[1] -> $u[2])";
-    if ( $count > 0 )
-      echo ", ";
-    else
-      echo ".\n";
-    $count--;
-  endforeach;
-  echo "\n";
-  echo "* Note: Packal tracks updates on timestamps not version numbers, so if these seem off, then the workflow author did not update the version number.\n";
-  echo "\n";
-  $conf = getConfirmation( $yes );
+	echo 'Updates available for: ';
+	$count = count( $updatable ) - 1;
+	foreach ( $updatable as $u ) :
+		echo "$u[0] ($u[1] -> $u[2])";
+		if ( $count > 0 ) {
+			echo ', ';
+		} else { echo ".\n";
+		}
+		$count--;
+	endforeach;
+	echo "\n";
+	echo "* Note: Packal tracks updates on timestamps not version numbers, so if these seem off, then the workflow author did not update the version number.\n";
+	echo "\n";
+	$conf = getConfirmation( $yes );
 
-  if ( $conf ) {
-    foreach ( $updatable as $u ) :
-      echo "Trying to update $u[0] ($u[3])...";
-      if ( doUpdate( $u[3] ) ) {
-        echo " Success.\n";
-      } else {
-        echo " ERROR.";
-      }
-    endforeach;
-  } else {
-    echo "Aborting.\n";
-  }
+	if ( $conf ) {
+		foreach ( $updatable as $u ) :
+			echo "Trying to update $u[0] ($u[3])...";
+			if ( doUpdate( $u[3] ) ) {
+				echo " Success.\n";
+			} else {
+				echo ' ERROR.';
+			}
+		endforeach;
+	} else {
+		echo "Aborting.\n";
+	}
 
-  // While this method is incomplete, it doesn't quite matter for current functionality.
-
+	// While this method is incomplete, it doesn't quite matter for current functionality.
 
 }
 
@@ -231,23 +238,23 @@ function checkUpdates( $opt = array() ) {
  */
 function getConfirmation( $yes = false ) {
 
-  if ( $yes ) {
-    echo "Update? (Y/n): y\n";
-    return true;
-  }
+	if ( $yes ) {
+		echo "Update? (Y/n): y\n";
+		return true;
+	}
 
-  $conf = readline( "Update? (Y/n): " );
+	$conf = readline( 'Update? (Y/n): ' );
 
-  if ( empty( $conf ) || ( $conf == 'y' ) || ( $conf == 'Y' ) )
-    $response = true;
-  else if ( $conf == 'n' || $conf == 'N' )
-    $response = false;
-  else {
-    echo "Invalid entry. Please choose y or n.\n";
-    $response = getConfirmation();
-  }
+	if ( empty( $conf ) || ( $conf == 'y' ) || ( $conf == 'Y' ) ) {
+		$response = true;
+	} elseif ( $conf == 'n' || $conf == 'N' ) {
+		$response = false;
+	} else {
+		echo "Invalid entry. Please choose y or n.\n";
+		$response = getConfirmation();
+	}
 
-  return $response;
+	return $response;
 }
 
 /**
@@ -257,121 +264,126 @@ function getConfirmation( $yes = false ) {
  */
 function doUpdate( $bundle, $force = false ) {
 
-  global $data, $cache, $manifest, $repo, $cliDir;
+	global $data, $cache, $manifest, $repo, $cliDir;
 
-  if ( is_array( $bundle ) ) {
-    $bundle = $bundle[0];
-  }
+	if ( is_array( $bundle ) ) {
+		$bundle = $bundle[0];
+	}
 
+	$dir = trim( `"$cliDir/packal.sh" getDir "$bundle"` );
+	// echo $dir;
+	// The force variable means to download even if the original
+	// is not from Packal. Obviously, since we don't have the
+	// update data, this just means to download the update no
+	// matter what and to get everything.
+	if ( ! $force ) {
+		if ( ! file_exists( "$dir/packal/package.xml" ) ) {
+			echo 'Error: No package information exists.';
+			return false;
+		}
+	}
 
-  $dir = trim( `"$cliDir/packal.sh" getDir "$bundle"` );
-  // echo $dir;
-  // The force variable means to download even if the original
-  // is not from Packal. Obviously, since we don't have the
-  // update data, this just means to download the update no
-  // matter what and to get everything.
-  if ( ! $force ) {
-    if ( ! file_exists( "$dir/packal/package.xml" ) ) {
-      echo "Error: No package information exists.";
-      return false;
-    }
-  }
+	$xml = simplexml_load_file( "$manifest" );
 
-  $xml = simplexml_load_file( "$manifest" );
+	foreach ( $xml as $x ) :
+		if ( "$x->bundle" != "$bundle" ) {
+			continue;
+		}
+		$xml = $x;
+		break;
+	endforeach;
 
-  foreach ( $xml as $x ) :
-    if ( "$x->bundle" != "$bundle" )
-      continue;
-    $xml = $x;
-    break;
-  endforeach;
+	// Make the temporary directories.
+	if ( ! file_exists( "$cache/update" ) ) {
+		mkdir( "$cache/update" );
+	}
+	if ( ! file_exists( "$cache/update/$bundle" ) ) {
+		mkdir( "$cache/update/$bundle" );
+	}
+	if ( ! file_exists( "$cache/update/$bundle/tmp" ) ) {
+		mkdir( "$cache/update/$bundle/tmp" );
+	}
 
-  // Make the temporary directories.
-  if ( ! file_exists( "$cache/update" ) )
-    mkdir( "$cache/update" );
-  if ( ! file_exists( "$cache/update/$bundle" ) )
-    mkdir( "$cache/update/$bundle" );
-  if ( ! file_exists( "$cache/update/$bundle/tmp" ) )
-    mkdir( "$cache/update/$bundle/tmp" );
+	`curl -sL "$repo/$bundle/$xml->file" > "$cache/update/$bundle/$xml->file"`;
+	`curl -sL "$repo/$bundle/appcast.xml" > "$cache/update/$bundle/appcast.xml"`;
+	`unzip -qo "$cache/update/$bundle/$xml->file" -d "$cache/update/$bundle/tmp"`;
 
-  `curl -sL "$repo/$bundle/$xml->file" > "$cache/update/$bundle/$xml->file"`;
-  `curl -sL "$repo/$bundle/appcast.xml" > "$cache/update/$bundle/appcast.xml"`;
-  `unzip -qo "$cache/update/$bundle/$xml->file" -d "$cache/update/$bundle/tmp"`;
+	$valid = verifySignature( "$cache/update/$bundle/appcast.xml",
+		"$cache/update/$bundle/$xml->file",
+		"$dir/packal/$bundle.pub"
+	);
 
+	if ( ! $valid ) {
+		echo "Error: Cannot verify signature for $xml->file from $bundle.";
+		return false;
+	}
 
-  $valid = verifySignature( "$cache/update/$bundle/appcast.xml",
-                            "$cache/update/$bundle/$xml->file",
-                            "$dir/packal/$bundle.pub"
-          );
+	// Why can't I just include the function, call it, and be done with it?
+	// I think it might be a namespacing issue or something.
+	// migratePlist( "$dir/info.plist", "$cache/update/$bundle/tmp/info.plist" );
 
-  if ( ! $valid ) {
-    echo "Error: Cannot verify signature for $xml->file from $bundle.";
-    return false;
-  }
+	// It's too late to figure that out. Maybe tomorrow.
+	$cmd = 'php ' . __DIR__ . "/includes/plist-migration.php \"$dir/info.plist\" \"$cache/update/$bundle/tmp/info.plist\"";
+	exec( "$cmd" );
 
-  // Why can't I just include the function, call it, and be done with it?
-  // I think it might be a namespacing issue or something.
-  // migratePlist( "$dir/info.plist", "$cache/update/$bundle/tmp/info.plist" );
+	// Backup the bundle.
+	echo `"$cliDir/packal.sh" backup "$bundle"`;
+	$cmd = "'" . __DIR__ . "/packal.sh' replaceFiles " . escapeshellarg( $dir ) . ' ' . escapeshellarg( $cache . '/update/' . "$bundle/tmp/" );
 
-  // It's too late to figure that out. Maybe tomorrow.
-  $cmd = "php " . __DIR__ . "/includes/plist-migration.php \"$dir/info.plist\" \"$cache/update/$bundle/tmp/info.plist\"";
-  exec( "$cmd" );
+	exec( "$cmd" );
 
-  // Backup the bundle.
-  echo `"$cliDir/packal.sh" backup "$bundle"`;
-  $cmd = "'" . __DIR__ . "/packal.sh' replaceFiles " . escapeshellarg( $dir ) . ' ' . escapeshellarg( $cache . '/update/' . "$bundle/tmp/");
+	`rm -fR "$cache/update/$bundle"`;
 
-  exec( "$cmd" );
+	$tn = __load( 'terminal-notifier' , 'default' , 'utility' );
+	exec( "$tn -title 'Packal Updater' -message '$xml->name has been updated to version $xml->version'" );
 
-  `rm -fR "$cache/update/$bundle"`;
-
-  $tn = __load( 'terminal-notifier' , 'default' , 'utility' );
-  exec( "$tn -title 'Packal Updater' -message '$xml->name has been updated to version $xml->version'" );
-
-  echo "TRUE";
-  return true;
+	echo 'TRUE';
+	return true;
 
 }
 
 function doUpdateAll( $force = false ) {
-  global $manifest, $cache, $cliDir;
+	global $manifest, $cache, $cliDir;
 
-  $xml = simplexml_load_file( "$manifest" );
-  $me  = getOption( array( 'username', TRUE ) );
+	$xml = simplexml_load_file( "$manifest" );
+	$me  = getOption( array( 'username', true ) );
 
-  foreach( $xml as $w ) :
-    $dir = trim( `"$cliDir/packal.sh" getDir "$w->bundle" 2> /dev/null` );
+	foreach ( $xml as $w ) :
+		$dir = trim( `"$cliDir/packal.sh" getDir "$w->bundle" 2> /dev/null` );
 
-    if ( $dir === "FALSE" )
-      continue;
+		if ( $dir === 'FALSE' ) {
+			continue;
+		}
 
-    if ( "$w->author" == "$me" ) {
-      continue;
-    }
+		if ( "$w->author" == "$me" ) {
+			continue;
+		}
 
-    if ( file_exists( "$dir/packal/package.xml" ) ) {
-      $wf = simplexml_load_file( "$dir/packal/package.xml" );
-      $wf->updated += 120; // Compensation for time in the generated packages.
+		if ( file_exists( "$dir/packal/package.xml" ) ) {
+			$wf = simplexml_load_file( "$dir/packal/package.xml" );
+			$wf->updated += 120; // Compensation for time in the generated packages.
 
-      if ( "$w->version" != "$wf->version" ) {
-        $updatable[] = array( (string) $w->name, (string) $wf->version, (string) $w->version, (string) $w->bundle );
-      }
-    } else {
-      if ( $force == false )
-        continue;
+			if ( "$w->version" != "$wf->version" ) {
+				$updatable[] = array( (string) $w->name, (string) $wf->version, (string) $w->version, (string) $w->bundle );
+			}
+		} else {
+			if ( $force == false ) {
+				continue;
+			}
 
-      $updatable[] = array( (string) $w->name, "Forced Update", (string) $w->version, (string) $w->bundle );
+			$updatable[] = array( (string) $w->name, 'Forced Update', (string) $w->version, (string) $w->bundle );
 
-    }
+		}
 
-  endforeach;
+	endforeach;
 
-  if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) )
-    return false;
+	if ( ( ! isset( $updatable ) ) || ( ! count( $updatable > 0 ) ) ) {
+		return false;
+	}
 
-  foreach ( $updatable as $u ) :
-    doUpdate( $u[3] );
-  endforeach;
+	foreach ( $updatable as $u ) :
+		doUpdate( $u[3] );
+	endforeach;
 }
 
 /**
@@ -381,29 +393,29 @@ function doUpdateAll( $force = false ) {
  * @param  string 	$key     	the public key to use for checking (path)
  * @return [type]          [description]
  */
-function verifySignature( $appcast , $package , $key ) {
+function verifySignature( $appcast, $package, $key ) {
 
-  $appcast = simplexml_load_file( $appcast );
-  $signature = $appcast->signature;
+	$appcast = simplexml_load_file( $appcast );
+	$signature = $appcast->signature;
 
-  $data = sha1_file( $package , false );
+	$data = sha1_file( $package , false );
 
-  // fetch public key from certificate and ready it
-  $fp = fopen( $key , 'r' );
-  $cert = fread( $fp , filesize( $key ) );
-  fclose( $fp );
+	// fetch public key from certificate and ready it
+	$fp = fopen( $key , 'r' );
+	$cert = fread( $fp , filesize( $key ) );
+	fclose( $fp );
 
-  // Get the public key
-  $id = openssl_get_publickey( $cert );
+	// Get the public key
+	$id = openssl_get_publickey( $cert );
 
-  // Get the result of the signature
-  $result = openssl_verify( $data , base64_decode( $signature ) , $id , OPENSSL_ALGO_SHA1 );
+	// Get the result of the signature
+	$result = openssl_verify( $data , base64_decode( $signature ) , $id , OPENSSL_ALGO_SHA1 );
 
-  // Free key from memory
-  openssl_free_key( $id );
+	// Free key from memory
+	openssl_free_key( $id );
 
-  // Return the result
-  return $result;
+	// Return the result
+	return $result;
 
 }
 
@@ -411,9 +423,9 @@ function verifySignature( $appcast , $package , $key ) {
 /// Strongarm functions
 // This isn't implemented currently. For the future.
 function forcePackal() {
-global $manifest, $cache;
+	global $manifest, $cache;
 
-  $xml = simplexml_load_file( "$manifest" );
-  $me  = getOption( array( 'username', TRUE ) );
+	$xml = simplexml_load_file( "$manifest" );
+	$me  = getOption( array( 'username', true ) );
 
 }
