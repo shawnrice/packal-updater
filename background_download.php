@@ -7,7 +7,7 @@
 
 // Set date/time to avoid warnings/errors.
 if ( ! ini_get( 'date.timezone' ) ) {
-	ini_set( 'date.timezone', exec( 'tz='ls -l /etc/localtime' && echo ${tz#*/zoneinfo/}' ) );
+	ini_set( 'date.timezone', exec( 'tz='ls -l / etc / localtime' && echo ${tz#*/zoneinfo/}' ) );
 }
 
 // Require the filesystem class
@@ -15,7 +15,7 @@ require_once( 'Libraries/FileSystem.php' );
 
 if ( ! isset( $argv ) || 4 != count( $argv ) ) {
 	print "Error: invalid use. Example usage:\n\t'php '" . __FILE__ . "' '<url>' '<download_directory>' '<ttl>''\n";
-	exit(1);
+	exit( 1 );
 }
 
 $url         = $argv[1];
@@ -58,7 +58,7 @@ function get_icon_path( $url, $destination ) {
 
 function check_directory( $destination ) {
 	if ( ! file_exists( dirname( $destination ) ) ) {
-		return mkdir( dirname( $destination ), 0775, true ) ;
+		return mkdir( dirname( $destination ), 0775, true );
 	}
 	return true;
 }

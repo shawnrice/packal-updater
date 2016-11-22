@@ -70,11 +70,11 @@ function main( $argv ) {
 	if ( 1 === count( $parts ) ) {
 		if ( 'search' === $parts[0] ) {
 			return create_search_menu( false );
-		} else if ( 'submit' === $parts[0] ) {
+		} elseif ( 'submit' === $parts[0] ) {
 			return create_submit_menu( false );
-		} else if ( 'configure' === $parts[0] ) {
+		} elseif ( 'configure' === $parts[0] ) {
 			return create_configure_menu( false );
-		} else if ( 'update' === $parts[0] ) {
+		} elseif ( 'update' === $parts[0] ) {
 			return create_update_menu( false, false );
 		}
 		return;
@@ -85,25 +85,25 @@ function main( $argv ) {
 			if ( 'theme' === $parts[1] ) {
 				$themes = $alphred->get( $endpoints['theme'], 3600, true );
 				render_themes( $themes, '' );
-			} else if ( 'workflow' === $parts[1] ) {
+			} elseif ( 'workflow' === $parts[1] ) {
 				$workflows = $alphred->get( $endpoints['workflow'], 3600, true );
 				render_workflows( $workflows, '' );
 			}
-		} else if ( 'submit' === $parts[0] ) {
+		} elseif ( 'submit' === $parts[0] ) {
 			if ( 'theme' === $parts[1] ) {
 				submit_theme_menu( false );
-			} else if ( 'workflow' === $parts[1] ) {
+			} elseif ( 'workflow' === $parts[1] ) {
 				submit_workflow_menu( false );
 			}
-		} else if ( 'configure' === $parts[0] ) {
+		} elseif ( 'configure' === $parts[0] ) {
 			if ( 'username' === $parts[1] ) {
 				config_set_username_menu( false );
-			} else if ( 'authorname' === $parts[1] ) {
+			} elseif ( 'authorname' === $parts[1] ) {
 				config_set_authorname_menu( false );
-			} else if ( 'blacklist' === $parts[1] ) {
+			} elseif ( 'blacklist' === $parts[1] ) {
 				create_blacklist_menu( false );
 			}
-		} else if ( 'update' === $parts[0] ) {
+		} elseif ( 'update' === $parts[0] ) {
 			if ( 'migrate' === $parts[1] ) {
 				create_migrate_menu( false, true );
 			}
@@ -115,23 +115,23 @@ function main( $argv ) {
 			if ( 'theme' === $parts[1] ) {
 				$themes = $alphred->get( $endpoints['theme'], 3600, true );
 				render_themes( $themes, $parts[2] );
-			} else if ( 'workflow' === $parts[1] ) {
+			} elseif ( 'workflow' === $parts[1] ) {
 				$alphred->console( 'Test' );
 				$workflows = $alphred->get( $endpoints['workflow'], 3600, true );
 				render_workflows( $workflows, $parts[2] );
 			}
-		} else if ( 'submit' === $parts[0] ) {
+		} elseif ( 'submit' === $parts[0] ) {
 			if ( 'theme' === $parts[1] ) {
 				submit_theme_menu( $parts[2] );
-			} else if ( 'workflow' === $parts[1] ) {
+			} elseif ( 'workflow' === $parts[1] ) {
 				submit_workflow_menu( $parts[2] );
 			}
-		} else if ( 'configure' === $parts[0] ) {
+		} elseif ( 'configure' === $parts[0] ) {
 			if ( 'username' === $parts[1] ) {
 				config_set_username_menu( $parts[2] );
-			} else if ( 'authorname' === $parts[1] ) {
+			} elseif ( 'authorname' === $parts[1] ) {
 				config_set_authorname_menu( $parts[2] );
-			} else if ( 'blacklist' === $parts[1] ) {
+			} elseif ( 'blacklist' === $parts[1] ) {
 				create_blacklist_menu( $parts[2] );
 			}
 		}
@@ -157,7 +157,7 @@ function retrieve_remote_data( $api_endpoint ) {
 	// This is dumb:
 	if ( strpos( $api_endpoint, 'workflow' ) ) {
 		$type = 'workflow';
-	} else if ( strpos( $api_endpoint, 'theme' ) ) {
+	} elseif ( strpos( $api_endpoint, 'theme' ) ) {
 		$type = 'theme';
 	}
 	return $alphred->get( $api_endpoint, [], 86400, true );

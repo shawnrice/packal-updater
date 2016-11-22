@@ -543,7 +543,7 @@ class CLI {
 		$replacements = [
 			'VERSION'   => self::VERSION,
 			'CLI_NAME'  => self::CLI_NAME,
-			'COPYRIGHT' => '2015' . ( ( 2015 === date('Y', time() ) ) ? '.' : '-' . date('Y', time() ) . '.' ),
+			'COPYRIGHT' => '2015' . ( ( 2015 === date( 'Y', time() ) ) ? '.' : '-' . date( 'Y', time() ) . '.' ),
 		];
 		foreach ( $replacements as $key => $val ) {
 			$text = str_replace( "%%{$key}%%", $val, $text );
@@ -618,7 +618,7 @@ class CLI {
 	 * Prints version data for the CLI
 	 */
 	function version() {
-		print self::CLI_NAME . " version " . self::VERSION . "\n";
+		print self::CLI_NAME . ' version ' . self::VERSION . "\n";
 	}
 
 	/**
@@ -747,12 +747,12 @@ class CLI {
 	 * @return [type] [description]
 	 */
 	private function confirm( $prompt = false, $canceled = false ) {
-		$prompt   = ( $prompt ) ? $prompt : "Continue (Y/n): ";
+		$prompt   = ( $prompt ) ? $prompt : 'Continue (Y/n): ';
 		$canceled = ( ( $canceled ) ? $canceled : 'Canceled action.' ) . "\n";
 		$answer   = strtolower( self::get_input( $prompt ) );
 		if ( empty( $answer ) ) {
 			return true;
-		} else if ( in_array( $answer, [ 'y', 'ye', 'yes' ] ) ) {
+		} elseif ( in_array( $answer, [ 'y', 'ye', 'yes' ] ) ) {
 			return true;
 		}
 		print $canceled;
@@ -788,7 +788,7 @@ class CLI {
 	private function calculate_pads( $array ) {
 		// Go through each item in the array
 		for ( $i = 0; $i < count( $array ); $i++ ) :
-			foreach ( $array[$i] as $key => $value ) :
+			foreach ( $array[ $i ] as $key => $value ) :
 				if ( ! isset( $max[ $key ] ) ) {
 					$max[ $key ] = strlen( $value );
 					continue;
@@ -809,7 +809,7 @@ class CLI {
 	 */
 	private static function scrub( $string ) {
 		$replacements = [
-			"&#39;" => "'",
+			'&#39;' => "'",
 			"\n"    => ' ',
 			"\t"    => ' ',
 		];

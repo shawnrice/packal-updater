@@ -18,10 +18,10 @@ if ( ! file_exists( $dir ) ) {
 run_workflow_queue( $queue );
 
 function run_workflow_queue( $queue ) {
-	print "Starting queue for file `{$queue}` at " . date('Y-m-d H:i:s', time() ) . ".\n";
+	print "Starting queue for file `{$queue}` at " . date( 'Y-m-d H:i:s', time() ) . ".\n";
 	if ( ! file_exists( $queue ) ) {
 		print "Error: File `{$queue}` does not exist.\n";
-		exit(1);
+		exit( 1 );
 	}
 	$count = 0;
 	while ( true ) :
@@ -29,14 +29,14 @@ function run_workflow_queue( $queue ) {
 		if ( empty( $line ) || ! $line ) {
 			break;
 		}
-		if ( download_workflow_icon( $line ) ){
-			print "Downloaded " . get_workflow_icon_name( $line ) . ".\n";
+		if ( download_workflow_icon( $line ) ) {
+			print 'Downloaded ' . get_workflow_icon_name( $line ) . ".\n";
 			$count++;
 			// Sleep for a moment so that we don't spam the server, etc...
-			usleep(250000);
+			usleep( 250000 );
 		}
 	endwhile;
-	print "Finished running queue at " . date('Y-m-d H:i:s', time() ) . ". Downloaded {$count} file(s).\n";
+	print 'Finished running queue at ' . date( 'Y-m-d H:i:s', time() ) . ". Downloaded {$count} file(s).\n";
 }
 
 function download_workflow_icon( $line ) {

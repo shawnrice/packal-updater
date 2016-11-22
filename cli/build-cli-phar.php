@@ -68,7 +68,7 @@ $phar[ $main_stub ] = file_get_contents( __DIR__ . "/{$main_stub}" );
 // using a phar within a phar. Too many levels and layers that way.
 $alphred_dir = "{$_SERVER['HOME']}/projects/Alfred/alphred/";
 
-$phar[ 'Alphred/Main.php' ] = file_get_contents( $alphred_dir . '/Main.php' );
+$phar['Alphred/Main.php'] = file_get_contents( $alphred_dir . '/Main.php' );
 foreach ( [ 'classes', 'commands' ] as $directory ) :
 	foreach ( array_diff( scandir( $alphred_dir . $directory ), [ '.', '..', '.DS_Store' ] ) as $filename ) :
 		$phar[ "Alphred/{$directory}/{$filename}" ] = file_get_contents( $alphred_dir . "/{$directory}/{$filename}" );
@@ -77,8 +77,8 @@ endforeach;
 // Done adding Alphred
 
 // Cycle through these directories and include everything
-foreach( $directories as $directory ) :
-	foreach( array_diff( scandir( __DIR__ . '/../' . $directory ), ['.', '..', '.DS_Store' ] ) as $file ) :
+foreach ( $directories as $directory ) :
+	foreach ( array_diff( scandir( __DIR__ . '/../' . $directory ), [ '.', '..', '.DS_Store' ] ) as $file ) :
 		$phar[ "{$directory}/{$file}" ] = file_get_contents( __DIR__ . "/../{$directory}/{$file}" );
 	endforeach;
 endforeach;
@@ -90,7 +90,7 @@ foreach ( $other_files as $file ) :
 	$phar[ $name ] = file_get_contents( __DIR__ . '/../' . $file );
 endforeach;
 // Why is this line here again?
-$phar[ 'autoloader.php' ] = ''; // This is just something here for now
+$phar['autoloader.php'] = ''; // This is just something here for now
 
 // Add in the hashbang so we can execute easier from the command line
 $stub = "#!/usr/bin/env php\n" . $default_stub;
@@ -101,8 +101,8 @@ $phar->stopBuffering();
 
 ////////////////////////
 // Delete a file if one already exists with the same compression level
-if ( file_exists( $phar_name . '.' . strtolower($compression) ) ) {
-	unlink($phar_name . '.' . strtolower($compression) );
+if ( file_exists( $phar_name . '.' . strtolower( $compression ) ) ) {
+	unlink( $phar_name . '.' . strtolower( $compression ) );
 }
 
 // $phar->compress(constant('Phar::' . $compression ));

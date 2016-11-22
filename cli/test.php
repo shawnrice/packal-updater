@@ -53,9 +53,9 @@ class ProgressBars {
 			echo "\033[1A";
 			for ( $i = 0; $i < $steps; $i ++ ) :
 				if ( $i < $progress ) {
-					echo "|";
+					echo '|';
 				} else {
-					echo ".";
+					echo '.';
 				}
 			endfor;
 			echo "\n";
@@ -72,11 +72,11 @@ class ProgressBars {
 			$progress = call_user_func( $callback );
 			usleep( 50000 );
 		endwhile;
-		echo "Done!";
+		echo 'Done!';
 	}
 
 	static public function spinner( $callback ) {
-		$steps = [ "/", "—", "\\", "|", "/", "—", "\\", "|" ];
+		$steps = [ '/', '—', '\\', '|', '/', '—', '\\', '|' ];
 		$spin = true;
 		$counter = 0;
 		while ( $spin ) :

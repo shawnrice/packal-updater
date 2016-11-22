@@ -16,7 +16,7 @@ $alphred = new Alphred;
 if ( isset( $messages['subtitle'] ) ) {
 	$subtitle = $messages['subtitle'];
 } else {
-	$subtitle = ( 'pass' === $messages[ 'status' ] ) ?
+	$subtitle = ( 'pass' === $messages['status'] ) ?
 		$messages['action'] . ' Completed' : $messages['action'] . ' Failed';
 }
 

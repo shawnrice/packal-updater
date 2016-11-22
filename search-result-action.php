@@ -15,7 +15,7 @@ class Action {
 		$this->workflow = new Workflows( ENVIRONMENT );
 		$this->theme    = new Themes( ENVIRONMENT );
 
-		foreach( [ 'action', 'resource', 'target', 'type', 'value' ] as $var ) :
+		foreach ( [ 'action', 'resource', 'target', 'type', 'value' ] as $var ) :
 			$parsed_args[ $var ] = ( isset( $args[ $var ] ) ) ? $args[ $var ] : false;
 		endforeach;
 
@@ -36,9 +36,9 @@ class Action {
 				break;
 
 			case 'download':
-				if ( $result = FileSystem::download_file( $args['target'], "{$_SERVER['HOME']}/Downloads/" ) ){
+				if ( $result = FileSystem::download_file( $args['target'], "{$_SERVER['HOME']}/Downloads/" ) ) {
 					$this->success = true;
-					return "Download succesful.";
+					return 'Download succesful.';
 				} else {
 					$this->success = false;
 					return "Could not download `{$args['target']}`";
@@ -48,14 +48,14 @@ class Action {
 			case 'generate_ini':
 				$this->generate_ini( $args['target'] );
 				$this->success = true;
-				return "Generated `workflow.ini`";
+				return 'Generated `workflow.ini`';
 				break;
 
 			case 'install':
 				if ( 'workflow' == $args['type'] ) {
 					$result = $this->workflow->install( $args['resource'] );
 					return $this->check( $result, "Installed `{$args['resource']['name']}`." );
-				} else if ( 'theme' == $args['type'] ) {
+				} elseif ( 'theme' == $args['type'] ) {
 					$result = $this->theme->install( Themes::find_slug( $args['resource']['url'] ) );
 					return $this->check( $result, "Installed `{$args['resource']['name']}`." );
 				}
@@ -88,7 +88,7 @@ class Action {
 			case 'submit':
 				if ( 'workflow' == $args['type'] ) {
 					$result = $this->submit_workflow( $args['resource']['bundle'] );
-				} else if ( 'theme' == $args['type'] ) {
+				} elseif ( 'theme' == $args['type'] ) {
 					$result = $this->submit_theme( $args['resource'] );
 				}
 				$this->clear_caches();
@@ -104,7 +104,7 @@ class Action {
 				break;
 
 		endswitch;
-		return "No action found.";
+		return 'No action found.';
 	}
 
 
@@ -137,7 +137,7 @@ class Action {
 	}
 
 	function update_all_workflows( $updates, $verify_signature = true ) {
-		foreach( $updates as $update ) :
+		foreach ( $updates as $update ) :
 			$this->update_workflow( $update, $verify_signature );
 		endforeach;
 		return true;
@@ -149,7 +149,7 @@ class Action {
 	}
 
 	function migrate_all_workflows( $workflows ) {
-		foreach( $workflows as $workflow ) :
+		foreach ( $workflows as $workflow ) :
 			$this->migrate_workflow( $workflow );
 		endforeach;
 		return true;
@@ -158,7 +158,7 @@ class Action {
 	private function clear_caches( $bin = false ) {
 		$request = new \Alphred\Request( BASE_URL );
 		$request->clear_cache( PRIMARY_CACHE_BIN );
-		return "Cleared caches in " . PRIMARY_CACHE_BIN;
+		return 'Cleared caches in ' . PRIMARY_CACHE_BIN;
 	}
 
 	private function download( $url, $directory = false ) {
@@ -200,7 +200,7 @@ class Action {
 
 	private function generate_ini( $path ) {
 		$return = generate_ini( $path );
-		$this->alphred->console( print_r( $workflow, true), 4);
+		$this->alphred->console( print_r( $workflow, true ), 4 );
 		if ( $return[0] ) {
 			$this->messages['subtitle'] = [ 'Workflow Generation Success' ];
 			$this->messages['messages'] = [ 'Generated `workflow.ini` for ' . $return[1] ];
@@ -223,7 +223,7 @@ class Action {
 		$params = [
 			'workflow_revision_id' => $parsed['revision'],
 			'report_type' => $parsed['type'],
-			'message' => $parsed['message']
+			'message' => $parsed['message'],
 		];
 		$output = submit_report( $params );
 		return $output;
@@ -234,10 +234,10 @@ class Action {
 		$uri = $theme['uri'];
 		// print_r( $metadata );
 		submit_theme([
-		  'uri' => $theme['uri'],
-		  'description' => $metadata['theme_description'],
-		  'tags' => $metadata['theme_tags'],
-		  'name' => $theme['name'],
+			'uri' => $theme['uri'],
+			'description' => $metadata['theme_description'],
+			'tags' => $metadata['theme_tags'],
+			'name' => $theme['name'],
 		]);
 	}
 
@@ -254,7 +254,7 @@ class Action {
 				'icon' => 'stop',
 			]);
 			$dialog->execute();
-			exit(1);
+			exit( 1 );
 		}
 		if ( ! $password = $this->alphred->get_password( 'packal.org' ) ) {
 			$dialog = new \Alphred\Dialog([
@@ -263,7 +263,7 @@ class Action {
 				'icon' => 'stop',
 			]);
 			$dialog->execute();
-			exit(1);
+			exit( 1 );
 		}
 		$ini = Ini::read_ini( "{$workflow_path}/workflow.ini" );
 		$version = $ini['workflow']['version'];
@@ -293,12 +293,12 @@ class Action {
 		$workflow = new BuildWorkflow( $workflow_path, $screenshots, $description_file );
 		// Let's actually do some submitting here
 		$json = json_encode( [
-      'file' => $workflow->archive_name(),
-      'username' => $username,
-      'password' => $password,
-      'version' => $version,
+			'file' => $workflow->archive_name(),
+			'username' => $username,
+			'password' => $password,
+			'version' => $version,
 		]);
-		$output = submit_workflow([ 'file' => $workflow->archive_name(), 'version' => $version ]);
+		$output = submit_workflow( [ 'file' => $workflow->archive_name(), 'version' => $version ] );
 		$this->alphred->console( print_r( $output, true ), 4 );
 	}
 
@@ -307,7 +307,7 @@ class Action {
 		if ( ! file_exists( "{$_SERVER['alfred_workflow_data']}/data/themes" ) ) {
 			mkdir( "{$_SERVER['alfred_workflow_data']}/data/themes" );
 		}
-		$file = "{$_SERVER['alfred_workflow_data']}/data/themes/submit-" . $this->slugify( $theme['name'] ) . ".json";
+		$file = "{$_SERVER['alfred_workflow_data']}/data/themes/submit-" . $this->slugify( $theme['name'] ) . '.json';
 		if ( file_exists( $file ) ) {
 			$data = json_decode( file_get_contents( $file ), true );
 		} else {
@@ -323,7 +323,7 @@ class Action {
 			$this->alphred->console( 'User canceled saving theme information.', 1 );
 			// Since it was canceled, let's just exit.
 			// $alphred->notify('Should we put some notification here.')
-			exit(1);
+			exit( 1 );
 		}
 		return $metadata;
 	}
@@ -338,7 +338,7 @@ class Action {
 			$parsed['theme_tags'] = [];
 		}
 		$parsed['theme_description'] = str_replace( '[return]', "\n", $parsed['theme_description'] );
- 		return $parsed;
+			return $parsed;
 	}
 
 	/**

@@ -12,7 +12,7 @@ use CFPropertyList\CFPropertyList as CFPropertyList;
  */
 class Plist {
 
-	var $pb = "/usr/libexec/PlistBuddy -c ";
+	var $pb = '/usr/libexec/PlistBuddy -c ';
 
 	function __construct() {
 		if ( ! self::pb_exists() ) {
@@ -53,23 +53,26 @@ class Plist {
 			if ( isset( $o['config'] ) ) {
 				$original[ $o['uid'] ]['type'] = $o['type'];
 
-				switch ( $o['type']) :
+				switch ( $o['type'] ) :
 					case 'alfred.workflow.trigger.hotkey' :
 						$value = [];
-	          if ( isset( $o['config']['hotkey'] ) )
+						if ( isset( $o['config']['hotkey'] ) ) {
 							$value['hotkey'] = $o['config']['hotkey'];
-	          if ( isset( $o['config']['hotmod'] ) )
+						}
+						if ( isset( $o['config']['hotmod'] ) ) {
 							$value['hotmod'] = $o['config']['hotmod'];
-	          if ( isset( $o['config']['hotstring'] ) )
+						}
+						if ( isset( $o['config']['hotstring'] ) ) {
 							$value['hotstring'] = $o['config']['hotstring'];
+						}
 
 						$original[ $o['uid'] ]['config'] = $value;
 						break;
-			    case 'alfred.workflow.input.filefilter' :
-			    case 'alfred.workflow.input.scriptfilter' :
-			    case 'alfred.workflow.input.keyword' :
-			    	$value = ['keyword' => $o['config']['keyword'] ];
-	    			$original[ $o['uid'] ]['config'] = $value;
+					case 'alfred.workflow.input.filefilter' :
+					case 'alfred.workflow.input.scriptfilter' :
+					case 'alfred.workflow.input.keyword' :
+						$value = [ 'keyword' => $o['config']['keyword'] ];
+						$original[ $o['uid'] ]['config'] = $value;
 			    break;
 				endswitch;
 
@@ -87,7 +90,7 @@ class Plist {
 			'alfred.workflow.trigger.hotkey',
 			'alfred.workflow.input.filefilter',
 			'alfred.workflow.input.scriptfilter',
-			'alfred.workflow.input.keyword'
+			'alfred.workflow.input.keyword',
 		];
 
 		// We need the key(order) so that we can set things properly
@@ -96,8 +99,8 @@ class Plist {
 			if ( in_array( $o['type'] , $objects ) ) {
 				// Check to see if the objects is one of the original objects with a uid.
 				if ( in_array( $o['uid'] , $uids ) ) {
-					echo $o['uid']   . "<br >";
-					echo $o['type']  . "<br> ";
+					echo $o['uid'] . '<br >';
+					echo $o['type'] . '<br> ';
 					if ( $o['type'] == 'alfred.workflow.trigger.hotkey' ) {
 						// We're not really going to bother to check to see if the values match;
 						// we'll just migrate them instead.
@@ -109,14 +112,13 @@ class Plist {
 						// At this point, the only other thing to migrate is the keyword
 						// Check to see if they match; if they don't, then set them to the new one
 						if ( $o['config']['keyword'] != $original[ $o['uid'] ]['config']['keyword'] ) {
-							$this->setPlistValue( ":objects:{$key}:config:keyword", $original[ $o['uid'] ]['config']['keyword'], $new);
+							$this->setPlistValue( ":objects:{$key}:config:keyword", $original[ $o['uid'] ]['config']['keyword'], $new );
 						}
 					}
 				}
-
 			}
 		}
-		return TRUE;
+		return true;
 
 		/**
 		 *
@@ -196,7 +198,7 @@ class Plist {
 	 * @param [type]  $plist    The plist file
 	 */
 	private function setPlistValue( $location, $value, $plist ) {
-		exec(  $this->pb . "\"set {$location} {$value}\" '{$plist}'" );
+		exec( $this->pb . "\"set {$location} {$value}\" '{$plist}'" );
 	}
 
 	private function pb_exists() {
