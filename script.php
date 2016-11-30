@@ -16,10 +16,11 @@ if ( ! ini_get( 'date.timezone' ) ) {
 }
 
 // Get the version of OSX; if we aren't using Mavericks, then they don't get access to the GUI.
-$osx = exec( "sw_vers | grep 'ProductVersion:' | grep -o '10\.[0-9]*'" );
-
-// So, they can use the GUI if they're using Mavericks or Yosemite.
-if ( ( $osx == '10.9') || ( $osx == '10.10' ) || ( $osx == '10.11' ) ) {
+$gui = false;
+$version = explode( '.',  phpversion() );
+if ( 5 < $version[0] ) {
+	$gui = true;
+} else if ( 3 < $version[1] && 5 === (int) $version[0] ) {
 	$gui = true;
 }
 
