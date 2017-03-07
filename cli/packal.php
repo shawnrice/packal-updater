@@ -41,9 +41,11 @@ function getOption( $opt = array() ) {
 	$config = simplexml_load_file( $config );
 
 	if ( isset( $opt[1] ) && ( $opt[1] == true ) ) {
-		return $config->$opt[0];
+		$prop = $opt[0];
+		return $config->{$prop};
 	}
-	echo $config->$opt[0];
+	$prop = $opt[0];
+	echo $config->{$prop};
 
 }
 
